@@ -32,22 +32,15 @@ class StockSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class RatingSerializer(serializers.ModelSerializer):
-    user = BasicUserSerializer()
-
     class Meta:
         model = Rating
         fields = '__all__'
 
 class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = '__all__'
-
-class ProductDetailSerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
-    subcategory = SubcategorySerializer()
-    brand = BrandSerializer()
-
+    category = CategorySerializer(read_only=True)
+    subcategory = SubcategorySerializer(read_only=True)
+    brand = BrandSerializer(read_only=True)
+    
     class Meta:
         model = Product
         fields = '__all__'
