@@ -92,7 +92,7 @@ class Stock(models.Model):
     image = models.ImageField(upload_to='stock/', default='stock/no_picture.png')
     size = models.CharField(max_length=100, null=True, blank=True)
     color = models.CharField(max_length=100, null=True, blank=True)
-    shade = models.CharField(max_length=100, null=True, blank=True)
+    other = models.CharField(max_length=100, null=True, blank=True)
     quantity = models.IntegerField(default=0)
     purchase_price = models.IntegerField(default=0)
     purchase_date = models.DateTimeField(null=True, blank=True)
@@ -100,10 +100,10 @@ class Stock(models.Model):
 
     def __str__(self):
         if self.color is None:
-            return f"{self.product.slug} - {self.size} - {self.quantity}"
+            return f"{self.product.slug} - {self.size} - {self.other} -  {self.quantity}"
         elif self.size is None:
-            return f"{self.product.slug} - {self.color} - {self.quantity}"
-        elif self.shade is None:
+            return f"{self.product.slug} - {self.color} - {self.other} - {self.quantity}"
+        elif self.other is None:
             return f"{self.product.slug} - {self.size} - {self.color} - {self.quantity}"
         else:
-            return f"{self.product.slug} - {self.size} - {self.color} - {self.shade} - {self.quantity}"
+            return f"{self.product.slug} - {self.size} - {self.color} - {self.other} - {self.quantity}"
