@@ -18,7 +18,7 @@ class Category(models.Model):
         super(Category, self).save(*args,**kwargs)
 
     def __str__(self):
-        return self.name
+        return self.slug
     
 class Subcategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -34,12 +34,11 @@ class Subcategory(models.Model):
         super(Subcategory, self).save(*args,**kwargs)
 
     def __str__(self):
-        return self.name
+        return self.slug
     
 class Tag(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=250)
-    color = models.CharField(max_length=100, null=True, blank=True)
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True, editable=False)
     
     def save(self, *args, **kwargs):
@@ -47,7 +46,7 @@ class Tag(models.Model):
         super(Tag, self).save(*args,**kwargs)
 
     def __str__(self):
-        return self.name
+        return self.slug
     
 class Brand(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -62,7 +61,7 @@ class Brand(models.Model):
         super(Brand, self).save(*args,**kwargs)
 
     def __str__(self):
-        return self.name
+        return self.slug
 
 class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -86,7 +85,7 @@ class Product(models.Model):
         super(Product, self).save(*args,**kwargs)
 
     def __str__(self):
-        return self.name
+        return self.slug
 
 class Rating(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -114,11 +113,4 @@ class Stock(models.Model):
     expiry_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        if self.color is None:
-            return f"{self.product.slug} - {self.size} - {self.other} -  {self.quantity}"
-        elif self.size is None:
-            return f"{self.product.slug} - {self.color} - {self.other} - {self.quantity}"
-        elif self.other is None:
-            return f"{self.product.slug} - {self.size} - {self.color} - {self.quantity}"
-        else:
-            return f"{self.product.slug} - {self.size} - {self.color} - {self.other} - {self.quantity}"
+        return f"{self.product.slug} - {self.id} - {self.quantity}"
