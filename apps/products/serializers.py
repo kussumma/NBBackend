@@ -1,7 +1,5 @@
 from rest_framework import serializers
 
-from apps.accounts.serializers import BasicUserSerializer
-
 from .models import (
     Category,
     Subcategory,
@@ -43,10 +41,6 @@ class RatingSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProductSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(read_only=True)
-    subcategory = SubcategorySerializer(read_only=True)
-    brand = BrandSerializer(read_only=True)
-    
     class Meta:
         model = Product
         fields = '__all__'

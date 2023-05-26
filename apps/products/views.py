@@ -28,12 +28,6 @@ class ProductViewSet(viewsets.ModelViewSet):
     ordering = ['-created_at']
     lookup_field = 'slug'
 
-    def get_object(self):
-        """Increment the number of views of the product."""
-        obj = super().get_object()
-        obj.increment_views()
-        return obj
-
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -92,4 +86,3 @@ class StockViewSet(viewsets.ModelViewSet):
     filterset_fields = ['purchase_date', 'expiry_date']
     ordering_fields = ['product__name', 'purchase_date', 'expiry_date']
     ordering = ['-purchase_date']
-
