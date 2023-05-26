@@ -76,6 +76,7 @@ class Product(models.Model):
     tags = models.ManyToManyField(Tag, related_name='product_tags')
     cover = models.ImageField(upload_to='products/', default='products/no_picture.png')
     tutorial = models.URLField(null=True, blank=True)
+    views = models.IntegerField(default=0)
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -87,6 +88,10 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def increment_views(self):
+        self.views += 1
+        self.save()
 
 class Rating(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
