@@ -5,6 +5,7 @@ from apps.accounts.serializers import BasicUserSerializer
 from .models import (
     Category,
     Subcategory,
+    Tag,
     Brand,
     Product,
     Rating,
@@ -19,6 +20,11 @@ class CategorySerializer(serializers.ModelSerializer):
 class SubcategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Subcategory
+        fields = '__all__'
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
         fields = '__all__'
 
 class BrandSerializer(serializers.ModelSerializer):

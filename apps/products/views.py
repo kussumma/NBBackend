@@ -3,8 +3,16 @@ from django.contrib.auth import get_user_model
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Category, Product, Subcategory, Brand, Rating, Stock
-from .serializers import CategorySerializer, ProductSerializer, SubcategorySerializer, BrandSerializer, RatingSerializer, StockSerializer
+from .models import Category, Product, Subcategory, Tag, Brand, Rating, Stock
+from .serializers import (
+    CategorySerializer, 
+    ProductSerializer, 
+    SubcategorySerializer, 
+    TagSerializer,
+    BrandSerializer, 
+    RatingSerializer, 
+    StockSerializer
+)
 from .permissions import IsAdminOrReadOnly, AllowAny
 
 User = get_user_model()
@@ -33,6 +41,16 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class SubcategoryViewSet(viewsets.ModelViewSet):
     queryset = Subcategory.objects.all()
     serializer_class = SubcategorySerializer
+    permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name']
+    ordering_fields = ['name']
+    ordering = ['name']
+    lookup_field = 'slug'
+
+class TagViewSet(viewsets.ModelViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name']

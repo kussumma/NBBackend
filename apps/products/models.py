@@ -36,6 +36,19 @@ class Subcategory(models.Model):
     def __str__(self):
         return self.name
     
+class Tag(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=250)
+    color = models.CharField(max_length=100, null=True, blank=True)
+    slug = models.SlugField(max_length=250, unique=True, null=True, blank=True, editable=False)
+    
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(Tag, self).save(*args,**kwargs)
+
+    def __str__(self):
+        return self.name
+    
 class Brand(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=250)
@@ -60,6 +73,7 @@ class Product(models.Model):
     brand = models.ForeignKey(Brand, related_name='product_brands', on_delete=models.CASCADE)
     category = models.ForeignKey(Category, related_name='product_categories', on_delete=models.CASCADE)
     subcategory = models.ForeignKey(Subcategory, related_name='product_subcategories', on_delete=models.CASCADE)
+    tags = models.ManyToManyField(Tag, related_name='product_tags')
     cover = models.ImageField(upload_to='products/', default='products/no_picture.png')
     tutorial = models.URLField(null=True, blank=True)
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True, editable=False)
