@@ -94,6 +94,7 @@ class Rating(models.Model):
     product = models.ForeignKey(Product, related_name='product_ratings',on_delete=models.CASCADE)
     star = models.IntegerField(default=0)
     review = models.TextField()
+    image = models.ImageField(upload_to='ratings/', default='ratings/no_picture.png')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
