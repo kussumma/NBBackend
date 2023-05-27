@@ -10,7 +10,7 @@ class Category(models.Model):
     name = models.CharField(max_length=250)
     description = models.TextField()
     cover = models.ImageField(upload_to='categories/', default='categories/no_picture.png')
-    icon = models.CharField(max_length=100)
+    icon = models.CharField(max_length=100, null=True, blank=True)
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True, editable=False)
     
     def save(self, *args, **kwargs):
@@ -25,7 +25,7 @@ class Subcategory(models.Model):
     name = models.CharField(max_length=250)
     description = models.TextField()
     cover = models.ImageField(upload_to='subcategories/', default='subcategories/no_picture.png')
-    icon = models.CharField(max_length=100)
+    icon = models.CharField(max_length=100, null=True, blank=True)
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True, editable=False)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     
@@ -53,7 +53,7 @@ class Brand(models.Model):
     name = models.CharField(max_length=250)
     description = models.TextField()
     cover = models.ImageField(upload_to='brands/', default='brands/no_picture.png')
-    icon = models.CharField(max_length=100)
+    icon = models.CharField(max_length=100, null=True, blank=True)
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True, editable=False)
     
     def save(self, *args, **kwargs):

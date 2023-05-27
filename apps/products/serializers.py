@@ -9,11 +9,12 @@ from .models import (
     Rating,
     Stock
 )
+from apps.accounts.serializers import BasicUserSerializer
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name', 'slug']
+        fields = '__all__'
 
 class SubcategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -36,6 +37,8 @@ class StockSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class RatingSerializer(serializers.ModelSerializer):
+    user = BasicUserSerializer(read_only=True)
+
     class Meta:
         model = Rating
         fields = '__all__'
