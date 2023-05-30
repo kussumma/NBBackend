@@ -7,9 +7,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 import uuid
 
-from apps.cart.models import Cart
-
-
 # Create your models here.
 class UserManager(BaseUserManager):
 
@@ -102,9 +99,3 @@ def update_user_last_updated(sender, instance, **kwargs):
     user = instance.user
     user.last_updated = timezone.now()
     user.save()
-
-# Create cart when user is created
-@receiver(post_save, sender=User)
-def create_cart(sender, instance, created, **kwargs):
-    if created:
-        Cart.objects.create(user=instance)
