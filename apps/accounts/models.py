@@ -2,9 +2,6 @@ from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth import get_user_model
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 import uuid
 
 # Create your models here.
@@ -48,8 +45,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     level = models.IntegerField(choices=LEVEL_CHOICES, default=1)
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-    date_joined = models.DateTimeField(default=timezone.now)
-    last_login = models.DateTimeField(default=timezone.now)
+    date_joined = models.DateTimeField(auto_now_add=True)
+    last_login = models.DateTimeField(null=True, blank=True)
     last_updated = models.DateTimeField(auto_now=True)
 
     objects = UserManager()
@@ -68,8 +65,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     
 
 # User details
-User = get_user_model()
-
 class UserDetails(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, related_name='user_details', on_delete=models.CASCADE)
@@ -84,18 +79,4 @@ class UserDetails(models.Model):
     currency = models.CharField(max_length=255, default='IDR')
 
     def __str__(self):
-        return self.user.username
-    
-
-# Create user details when user is created
-@receiver(post_save, sender=User)
-def create_user_details(sender, instance, created, **kwargs):
-    if created:
-        UserDetails.objects.create(user=instance)
-
-# Update user last updated when user details is updated
-@receiver(post_save, sender=UserDetails)
-def update_user_last_updated(sender, instance, **kwargs):
-    user = instance.user
-    user.last_updated = timezone.now()
-    user.save()
+        return f"{self.user.email} - {self.date_of_birth}"
