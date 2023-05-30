@@ -7,6 +7,7 @@ from .models import (
     Brand,
     Product,
     Rating,
+    Wishlist,
     Stock
 )
 from apps.accounts.serializers import BasicUserSerializer
@@ -41,6 +42,13 @@ class RatingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Rating
+        fields = '__all__'
+
+class WishlistSerializer(serializers.ModelSerializer):
+    user = BasicUserSerializer(read_only=True)
+
+    class Meta:
+        model = Wishlist
         fields = '__all__'
 
 class ProductSerializer(serializers.ModelSerializer):

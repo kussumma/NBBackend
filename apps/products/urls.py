@@ -8,6 +8,7 @@ from .views import (
     TagViewSet,
     BrandViewSet,
     RatingViewSet,
+    WishlistViewSet,
     StockViewSet
 )
 
@@ -18,6 +19,7 @@ router.register('subcategory', SubcategoryViewSet, basename='subcategory')
 router.register('tag', TagViewSet, basename='tag')
 router.register('brand', BrandViewSet, basename='brand')
 router.register('rating', RatingViewSet, basename='rating')
+router.register('wishlist', WishlistViewSet, basename='wishlist')
 router.register('stock', StockViewSet, basename='stock')
 
 urlpatterns = [

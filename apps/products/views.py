@@ -4,7 +4,7 @@ from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 
-from .models import Category, Product, Subcategory, Tag, Brand, Rating, Stock
+from .models import Category, Product, Subcategory, Tag, Brand, Rating, Wishlist, Stock
 from .serializers import (
     CategorySerializer, 
     ProductSerializer, 
@@ -12,9 +12,10 @@ from .serializers import (
     TagSerializer,
     BrandSerializer, 
     RatingSerializer, 
+    WishlistSerializer,
     StockSerializer
 )
-from .permissions import IsAdminOrReadOnly, AllowAny
+from .permissions import IsAdminOrReadOnly, IsAuthenticatedOrReadOnly
 
 User = get_user_model()
 
@@ -55,11 +56,20 @@ class ProductViewSet(viewsets.ModelViewSet):
         total_stars = sum([rating.star for rating in ratings])
         average_rating = total_stars / total_ratings
 
+        # count wishlist
+        wishlist = Wishlist.objects.filter(product=instance)
+        total_wishlist = wishlist.count()
+
+        # get 5 latest product with same category and brand
+        related_products = Product.objects.filter(category=instance.category, brand=instance.brand).exclude(id=instance.id)[:5]
+
         return Response({
             'product': serializer.data,
             'stock': stock_serializer.data,
             'total_rating': average_rating,
-            'latest_rating': ratings_serializer.data
+            'latest_rating': ratings_serializer.data,
+            'total_wishlist': total_wishlist,
+            'related_products': ProductSerializer(related_products, many=True).data
         })
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -105,13 +115,24 @@ class BrandViewSet(viewsets.ModelViewSet):
 class RatingViewSet(viewsets.ModelViewSet):
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
     filterset_fields = {
         'product': ['exact'],
         'star': ['exact', 'gte', 'lte'],
     }
     ordering_fields = ['star', 'created_at']
+    ordering = ['-created_at']
+
+class WishlistViewSet(viewsets.ModelViewSet):
+    queryset = Wishlist.objects.all()
+    serializer_class = WishlistSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
+    filterset_fields = {
+        'product': ['exact'],
+    }
+    ordering_fields = ['created_at']
     ordering = ['-created_at']
     
 class StockViewSet(viewsets.ModelViewSet):

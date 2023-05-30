@@ -100,6 +100,16 @@ class Rating(models.Model):
     def __str__(self):
         return f"{self.product.slug} - {self.user.email} - {self.star}"
 
+class Wishlist(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, related_name='user_wishlist', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name='product_wishlist', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.product.slug} - {self.user.email}"
+
 class Stock(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     product = models.ForeignKey(Product, related_name='product_stock', on_delete=models.CASCADE)
