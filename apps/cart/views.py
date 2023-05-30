@@ -1,7 +1,6 @@
 from rest_framework import viewsets, filters
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.permissions import AllowAny
 
 from .models import Cart, CartItem
 from .serializers import CartSerializer, CartItemSerializer
@@ -9,7 +8,6 @@ from .serializers import CartSerializer, CartItemSerializer
 class CartViewSet(viewsets.ModelViewSet):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
-    permission_classes = [AllowAny]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
     search_fields = ['user__email']
     filterset_fields = {
@@ -51,7 +49,6 @@ class CartViewSet(viewsets.ModelViewSet):
 class CartItemViewSet(viewsets.ModelViewSet):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
-    permission_classes = [AllowAny]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
     search_fields = ['cart__user__email', 'product__name']
     filterset_fields = {
