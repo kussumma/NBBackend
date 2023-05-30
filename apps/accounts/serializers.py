@@ -1,13 +1,13 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
-from .models import UserDetails
+from .models import UserDetail
 
 User = get_user_model()
 
 class UserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserDetails
+        model = UserDetail
         exclude = ['user']
 
 class UserSerializer(serializers.ModelSerializer):
