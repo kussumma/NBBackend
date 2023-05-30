@@ -62,8 +62,8 @@ db.sqlite3
 db.sqlite3-journal
 media
 mediafiles
-migration/*
-!migration/__init__.py
+migrations/*
+!migrations/__init__.py
 
 # Flask stuff:
 instance/
