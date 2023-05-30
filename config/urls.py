@@ -19,6 +19,9 @@ urlpatterns = [
     # Products
     path('api/', include('apps.products.urls')),
 
+    # Cart
+    path('api/', include('apps.cart.urls')),
+
 ]
 
 if settings.DEBUG:
