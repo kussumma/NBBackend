@@ -21,7 +21,7 @@ class CartItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='cart_products')
     stock = models.ForeignKey(Stock, on_delete=models.CASCADE, related_name='cart_stocks')
     quantity = models.PositiveIntegerField(default=1)
-    price = models.DecimalField(default=0)
+    price = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
