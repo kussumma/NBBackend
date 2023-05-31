@@ -1,6 +1,7 @@
 from rest_framework import viewsets, filters
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import AllowAny
 
 from .models import Cart, CartItem
 from .serializers import CartSerializer, CartItemSerializer
@@ -8,6 +9,7 @@ from .serializers import CartSerializer, CartItemSerializer
 class CartViewSet(viewsets.ModelViewSet):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
+    permission_classes = [AllowAny]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
     search_fields = ['user__email']
     filterset_fields = {
@@ -17,13 +19,14 @@ class CartViewSet(viewsets.ModelViewSet):
     }
     ordering_fields = ['user', 'created_at', 'updated_at']
     ordering = ['-created_at']
+    lookup_field = 'user'
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
 
         # get cart items
-        cart_items = CartItem.objects.filter(cart=instance)
+        cart_items = CartItem.objects.filter(cart=instance, is_active=True)
         cart_items_serializer = CartItemSerializer(cart_items, many=True)
 
         # count total items
@@ -49,6 +52,7 @@ class CartViewSet(viewsets.ModelViewSet):
 class CartItemViewSet(viewsets.ModelViewSet):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
+    permission_classes = [AllowAny]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
     search_fields = ['cart__user__email', 'product__name']
     filterset_fields = {

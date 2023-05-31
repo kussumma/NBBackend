@@ -29,7 +29,7 @@ class CartItem(models.Model):
         return f'{self.cart.user.email} - {self.product.slug} - {self.quantity}'
     
     def save(self, *args, **kwargs):
-        self.price = self.product.price * self.quantity
+        self.price = self.stock.price * self.quantity
         super().save(*args, **kwargs)
 
 
