@@ -18,6 +18,8 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class SubcategorySerializer(serializers.ModelSerializer):
+    category_name = serializers.CharField(source='category.name', read_only=True)
+
     class Meta:
         model = Subcategory
         fields = '__all__'
@@ -33,23 +35,35 @@ class BrandSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class StockSerializer(serializers.ModelSerializer):
+    product_name = serializers.CharField(source='product.name', read_only=True)
+
     class Meta:
         model = Stock
         fields = '__all__'
 
 class RatingSerializer(serializers.ModelSerializer):
-    user = BasicUserSerializer(read_only=True)
+    user_data = serializers.SerializerMethodField()
 
     class Meta:
         model = Rating
         fields = '__all__'
 
+    def get_user_data(self, obj):
+        user = obj.user
+        user_serializer = BasicUserSerializer(user)
+        return user_serializer.data
+
 class WishlistSerializer(serializers.ModelSerializer):
-    user = BasicUserSerializer(read_only=True)
+    user_data = serializers.SerializerMethodField()
 
     class Meta:
         model = Wishlist
         fields = '__all__'
+
+    def get_user_data(self, obj):
+        user = obj.user
+        user_serializer = BasicUserSerializer(user)
+        return user_serializer.data
 
 class ProductSerializer(serializers.ModelSerializer):
     min_price = serializers.IntegerField(read_only=True)
