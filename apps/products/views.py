@@ -3,6 +3,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
+from django.db.models import Min, Max
+from django.db.models.functions import Coalesce
 
 from .models import Category, Product, Subcategory, Tag, Brand, Rating, Wishlist, Stock
 from .serializers import (
@@ -30,13 +32,21 @@ class ProductViewSet(viewsets.ModelViewSet):
         'subcategory': ['exact'],
         'tags': ['exact'],
         'brand': ['exact'],
-        'price': ['exact', 'gte', 'lte'],
+        'product_stock__price': ['exact', 'gte', 'lte'],
+        'discount': ['exact', 'gte', 'lte'],
         'created_at': ['exact', 'gte', 'lte'],
         'product_ratings__star': ['exact', 'gte', 'lte'],
     }
-    ordering_fields = ['name', 'price', 'created_at', 'product_ratings__star']
+    ordering_fields = ['name', 'product_stock__price', 'discount', 'created_at', 'product_ratings__star']
     ordering = ['-created_at']
     lookup_field = 'slug'
+
+    def get_queryset(self):
+        queryset = Product.objects.all()
+        return queryset.annotate(
+            min_price=Coalesce(Min('product_stock__price'), 0), 
+            max_price=Coalesce(Max('product_stock__price'), 0)
+        )
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -54,7 +64,12 @@ class ProductViewSet(viewsets.ModelViewSet):
         ratings = Rating.objects.filter(product=instance)
         total_ratings = ratings.count()
         total_stars = sum([rating.star for rating in ratings])
-        average_rating = total_stars / total_ratings
+
+        # calculate average rating
+        try:
+            average_rating = total_stars / total_ratings
+        except ZeroDivisionError:
+            average_rating = 0
 
         # count wishlist
         wishlist = Wishlist.objects.filter(product=instance)

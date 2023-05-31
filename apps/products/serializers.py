@@ -52,6 +52,9 @@ class WishlistSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class ProductSerializer(serializers.ModelSerializer):
+    min_price = serializers.IntegerField(read_only=True)
+    max_price = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = Product
         fields = '__all__'

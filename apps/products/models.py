@@ -66,7 +66,6 @@ class Brand(models.Model):
 class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=250)
-    price = models.IntegerField()
     discount = models.IntegerField(default=0)
     description = models.TextField()
     brand = models.ForeignKey(Brand, related_name='product_brands', on_delete=models.CASCADE)
@@ -113,14 +112,12 @@ class Wishlist(models.Model):
 class Stock(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     product = models.ForeignKey(Product, related_name='product_stock', on_delete=models.CASCADE)
+    price = models.IntegerField(default=0)
     image = models.ImageField(upload_to='stock/', default='stock/no_picture.png')
     size = models.CharField(max_length=100, null=True, blank=True)
     color = models.CharField(max_length=100, null=True, blank=True)
     other = models.CharField(max_length=100, null=True, blank=True)
     quantity = models.IntegerField(default=0)
-    purchase_price = models.IntegerField(default=0)
-    purchase_date = models.DateTimeField(null=True, blank=True)
-    expiry_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.product.slug} - {self.id} - {self.quantity}"
+        return f"{self.product.slug} - {self.price}"
