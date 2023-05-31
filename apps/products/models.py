@@ -73,7 +73,7 @@ class Product(models.Model):
     subcategory = models.ForeignKey(Subcategory, related_name='product_subcategories', on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag, related_name='product_tags')
     cover = models.ImageField(upload_to='products/', default='products/no_picture.png')
-    tutorial = models.URLField(null=True, blank=True)
+    link = models.URLField(null=True, blank=True)
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
