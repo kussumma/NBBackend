@@ -25,6 +25,9 @@ urlpatterns = [
     # Coupons
     path('api/', include('apps.coupons.urls')),
 
+    # Orders
+    path('api/', include('apps.orders.urls')),
+
 ]
 
 if settings.DEBUG:
