@@ -21,6 +21,7 @@ class Coupon(models.Model):
     name = models.CharField(max_length=100)
     discount_type = models.ForeignKey(DiscountType, on_delete=models.CASCADE)
     discount_value = models.PositiveBigIntegerField(default=0)
+    min_purchase = models.PositiveBigIntegerField(default=0)
     valid_from = models.DateTimeField()
     valid_to = models.DateTimeField()
     is_active = models.BooleanField(default=True)

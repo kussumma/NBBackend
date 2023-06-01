@@ -52,6 +52,7 @@ class Brand(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=250)
     description = models.TextField()
+    origin = models.CharField(max_length=250, null=True, blank=True)
     cover = models.ImageField(upload_to='brands/', default='brands/no_picture.png')
     icon = models.CharField(max_length=100, null=True, blank=True)
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True, editable=False)
