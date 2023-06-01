@@ -22,6 +22,9 @@ urlpatterns = [
     # Cart
     path('api/', include('apps.cart.urls')),
 
+    # Coupons
+    path('api/', include('apps.coupons.urls')),
+
 ]
 
 if settings.DEBUG:
