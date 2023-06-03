@@ -9,6 +9,17 @@ from apps.products.models import Product, Stock
 from apps.coupons.models import Coupon
 
 
+STATUS_CHOICES = (
+    (0, 'Pending'),
+    (1, 'Confirmed'),
+    (2, 'Shipped'),
+    (3, 'Delivered'),
+    (4, 'Canceled'),
+    (5, 'Returned'),
+    (6, 'Refunded'),
+    (7, 'Completed'),
+)
+
 class Order(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     ref_code = models.CharField(max_length=100, unique=True, editable=False)
@@ -17,14 +28,7 @@ class Order(models.Model):
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True, related_name='coupon_orders')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    is_ordered = models.BooleanField(default=False)
-    is_delivered = models.BooleanField(default=False)
-    is_canceled = models.BooleanField(default=False)
-    is_returned = models.BooleanField(default=False)
-    is_refunded = models.BooleanField(default=False)
-    is_paid = models.BooleanField(default=False)
-    is_shipped = models.BooleanField(default=False)
-    is_completed = models.BooleanField(default=False)
+    status = models.IntegerField(choices=STATUS_CHOICES, default=0)
 
     def __str__(self):
         return f'{self.user.email} - {self.created_at}'
