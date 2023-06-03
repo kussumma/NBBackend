@@ -58,9 +58,8 @@ class CartItemViewSet(viewsets.ModelViewSet):
         'stock': ['exact'],
         'quantity': ['exact', 'gte', 'lte'],
         'created_at': ['exact', 'gte', 'lte'],
-        'is_active': ['exact'],
     }
-    ordering_fields = ['cart', 'product', 'stock', 'quantity', 'created_at', 'is_active']
+    ordering_fields = ['cart', 'product', 'stock', 'quantity', 'created_at']
     ordering = ['-created_at']
 
     def get_queryset(self):

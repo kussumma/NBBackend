@@ -23,7 +23,7 @@ class CartItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     price = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
-    is_active = models.BooleanField(default=True)
+    is_selected = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.cart.user.email} - {self.product.slug} - {self.quantity}'
