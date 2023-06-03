@@ -1,9 +1,9 @@
 import secrets
 import hashlib
 import uuid
-import datetime
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -48,15 +48,15 @@ class Coupon(models.Model):
         return self.hashed_code == hashed_input
 
     def is_valid(self):
-        now = datetime.timezone.now()
+        now = timezone.now()
         return self.is_active and self.valid_from <= now and self.valid_to >= now
 
 class CouponUser(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    is_used = models.BooleanField(default=False)
-    used_at = models.DateTimeField(null=True, blank=True)
+    is_used = models.BooleanField(default=True)
+    used_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'{self.coupon.name} - {self.user}'
