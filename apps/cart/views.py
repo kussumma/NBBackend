@@ -31,7 +31,7 @@ class CartViewSet(viewsets.ModelViewSet):
         total_items = sum([item.quantity for item in cart_items])
 
         # count total price
-        total_price = sum([item.price for item in cart_items])
+        total_price = sum([item.total_price for item in cart_items])
 
         return Response({
             'cart': serializer.data,
