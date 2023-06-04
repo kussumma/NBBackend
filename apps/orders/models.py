@@ -47,7 +47,7 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='order_products')
     stock = models.ForeignKey(Stock, on_delete=models.CASCADE, related_name='order_stocks')
     quantity = models.PositiveIntegerField(default=1)
-    price = models.PositiveIntegerField(default=0)
+    total_price = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
 
@@ -55,5 +55,5 @@ class OrderItem(models.Model):
         return f'{self.order.user.email} - {self.product.slug} - {self.quantity}'
     
     def save(self, *args, **kwargs):
-        self.price = self.stock.price * self.quantity
+        self.total_price = self.stock.price * self.quantity
         super().save(*args, **kwargs)

@@ -45,12 +45,12 @@ class OrderCreateView(generics.CreateAPIView):
         # calculate total price
         total_price = 0
         for cart_item in cart_items:
-            total_price += cart_item.price
+            total_price += cart_item.total_price
 
         # check if coupon is valid for this order
         if coupon:
             if coupon.min_purchase > total_price:
-                raise serializers.ValidationError('Total purchase must less than minimum purchase required for this coupon')
+                raise serializers.ValidationError('Total purchase must be higher than minimum purchase required for this coupon')
             
             # calculate discount price
             total_price -= (( coupon.discount_value * total_price ) / 100)
@@ -65,8 +65,13 @@ class OrderCreateView(generics.CreateAPIView):
                 product=cart_item.product,
                 stock=cart_item.stock,
                 quantity=cart_item.quantity,
-                price=cart_item.price,
+                total_price=cart_item.total_price,
             )
+
+        # recalculating stock
+        for cart_item in cart_items:
+            cart_item.stock.quantity -= cart_item.quantity
+            cart_item.stock.save()
 
         # delete cart items
         cart_items.delete()
