@@ -43,5 +43,12 @@ class CartItem(models.Model):
             self.quantity = 1
         self.save()
 
+    def set_as_selected(self):
+        if self.is_selected:
+            self.is_selected = False
+        else:
+            self.is_selected = True
+        self.save()
+
 
 

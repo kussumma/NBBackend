@@ -1,6 +1,7 @@
 from rest_framework import viewsets, filters, status
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
+from django.shortcuts import get_object_or_404
 
 from .models import Cart, CartItem
 from .serializers import CartSerializer, CartItemSerializer
@@ -64,13 +65,14 @@ class CartItemViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = CartItem.objects.all()
-        cart = self.request.query_params.get('cart', None)
+        cart = get_object_or_404(Cart, user=self.request.user)
+
         if cart is not None:
             queryset = queryset.filter(cart=cart)
         return queryset
     
     def create(self, request, *args, **kwargs):
-        cart = Cart.objects.get(user=request.user)
+        cart = get_object_or_404(Cart, user=request.user)
         product = request.data.get('product', None)
         stock = request.data.get('stock', None)
         quantity = request.data.get('quantity', None)
@@ -97,6 +99,7 @@ class CartItemViewSet(viewsets.ModelViewSet):
 
         increase_quantity = request.data.get('increase_quantity', False)
         decrease_quantity = request.data.get('decrease_quantity', False)
+        set_as_selected = request.data.get('set_as_selected', False)
 
         if increase_quantity:
             # Check if the quantity of this product is enough
@@ -121,6 +124,17 @@ class CartItemViewSet(viewsets.ModelViewSet):
                     'message': 'Sorry, the quantity of this product has reached the minimum.',
                     'quantity': instance.quantity,
                 }, status=status.HTTP_400_BAD_REQUEST)
+            
+        elif set_as_selected:
+            # Set this item as selected
+            if instance.is_selected:
+                instance.is_selected = False
+                serializer = self.get_serializer(instance)
+                return Response(serializer.data)
+            else:
+                instance.is_selected = True
+                serializer = self.get_serializer(instance)
+                return Response(serializer.data)
 
         return super().partial_update(request, *args, **kwargs)
     
