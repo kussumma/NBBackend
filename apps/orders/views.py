@@ -18,9 +18,14 @@ class OrderCreateView(generics.CreateAPIView):
         # get cart items
         user = self.request.user
         cart = Cart.objects.get(user=user)
+        
         try:
             cart_items = CartItem.objects.filter(cart=cart, is_selected=True)
         except CartItem.DoesNotExist:
+            cart_items = None
+
+        # check if cart is empty
+        if cart_items is None or len(cart_items) == 0:
             raise serializers.ValidationError('Cart is empty')
 
         # get the coupon
