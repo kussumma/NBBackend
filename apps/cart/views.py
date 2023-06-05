@@ -1,4 +1,4 @@
-from rest_framework import viewsets, filters
+from rest_framework import viewsets, filters, status
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -68,3 +68,60 @@ class CartItemViewSet(viewsets.ModelViewSet):
         if cart is not None:
             queryset = queryset.filter(cart=cart)
         return queryset
+    
+    def create(self, request, *args, **kwargs):
+        cart = Cart.objects.get(user=request.user)
+        product = request.data.get('product', None)
+        stock = request.data.get('stock', None)
+        quantity = request.data.get('quantity', None)
+
+        if product is not None and stock is not None:
+            # Check if the product is already in the cart
+            cart_item = CartItem.objects.filter(cart=cart, product=product, stock=stock).first()
+            if cart_item is not None:
+                cart_item.increase_quantity(quantity)
+                serializer = self.get_serializer(cart_item)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                serializer = self.get_serializer(data=request.data)
+                serializer.is_valid(raise_exception=True)
+                serializer.save(cart=cart)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response({
+                'message': 'Please provide product and stock.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+    
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        increase_quantity = request.data.get('increase_quantity', False)
+        decrease_quantity = request.data.get('decrease_quantity', False)
+
+        if increase_quantity:
+            # Check if the quantity of this product is enough
+            if instance.quantity < instance.stock.quantity:
+                instance.increase_quantity()
+                serializer = self.get_serializer(instance)
+                return Response(serializer.data)
+            else:
+                return Response({
+                    'message': 'Sorry, the quantity of this product is not enough.',
+                    'quantity': instance.quantity,
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        elif decrease_quantity:
+            # Check if the item quantity is more than 1
+            if instance.quantity > 1:
+                instance.decrease_quantity()
+                serializer = self.get_serializer(instance)
+                return Response(serializer.data)
+            else:
+                return Response({
+                    'message': 'Sorry, the quantity of this product has reached the minimum.',
+                    'quantity': instance.quantity,
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        return super().partial_update(request, *args, **kwargs)
+    
+

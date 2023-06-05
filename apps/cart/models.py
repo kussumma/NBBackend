@@ -32,5 +32,16 @@ class CartItem(models.Model):
         self.total_price = self.stock.price * self.quantity * (1 - self.product.discount / 100)
         super().save(*args, **kwargs)
 
+    def increase_quantity(self, quantity=1):
+        self.quantity += quantity
+        self.save()
+
+    def decrease_quantity(self, quantity=1):
+        if self.quantity > quantity:
+            self.quantity -= quantity
+        else:
+            self.quantity = 1
+        self.save()
+
 
 
