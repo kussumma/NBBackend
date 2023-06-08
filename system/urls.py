@@ -28,6 +28,12 @@ urlpatterns = [
     # Orders
     path('api/', include('apps.orders.urls')),
 
+    # Customers
+    path('api/', include('apps.customers.urls')),
+
+    # Store
+    path('api/', include('apps.store.urls')),
+
 ]
 
 if settings.DEBUG:
