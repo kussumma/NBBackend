@@ -20,6 +20,12 @@ STATUS_CHOICES = (
     (7, 'Completed'),
 )
 
+RETURN_REFUND_STATUS_CHOICES = (
+    (0, 'Pending'),
+    (1, 'Confirmed'),
+    (2, 'Rejected'),
+)
+
 class Order(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     ref_code = models.CharField(max_length=100, unique=True, editable=False)
@@ -57,3 +63,40 @@ class OrderItem(models.Model):
     def save(self, *args, **kwargs):
         self.total_price = self.stock.price * self.quantity
         super().save(*args, **kwargs)
+
+class ReturnOrder(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_return_orders')
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='return_order')
+    order_item = models.ManyToManyField(OrderItem, related_name='return_order_items')
+    detail = models.TextField()
+    request_refund = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    status = models.IntegerField(choices=RETURN_REFUND_STATUS_CHOICES, default=0)
+    result_description = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.order.user.email} - {self.order.ref_code} - {self.created_at}'
+    
+class ReturnImage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    return_order = models.ForeignKey(ReturnOrder, on_delete=models.CASCADE, related_name='return_images')
+    image = models.ImageField(upload_to='return_images/', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.return_order.user.email} - {self.return_order.order.ref_code} - {self.created_at}'
+    
+class RefundOrder(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    return_order = models.OneToOneField(ReturnOrder, on_delete=models.CASCADE, related_name='refund_order')
+    refund_amount = models.PositiveIntegerField(default=0)
+    refund_receipt = models.ImageField(upload_to='refund_receipts/', null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    status = models.IntegerField(choices=RETURN_REFUND_STATUS_CHOICES, default=0)
+    result_description = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.refund_order.user.email} - {self.refund_order.order.ref_code} - {self.created_at}'

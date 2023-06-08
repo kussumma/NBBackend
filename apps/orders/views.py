@@ -1,12 +1,12 @@
 from rest_framework import filters
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from apps.cart.models import Cart, CartItem
 from apps.coupons.models import Coupon, CouponUser
-from .models import Order, OrderItem
-from .serializers import OrderSerializer
+from .models import Order, OrderItem, ReturnOrder, RefundOrder, ReturnImage
+from .serializers import OrderSerializer, ReturnOrderSerializer, RefundOrderSerializer
 
 
 class OrderCreateView(generics.CreateAPIView):
@@ -101,3 +101,59 @@ class OrderDetailView(generics.RetrieveAPIView):
     queryset = Order.objects.all()
     permission_classes = [IsAuthenticated]
     lookup_field = 'id'
+
+class ReturnOrderViewset(viewsets.ModelViewSet):
+    serializer_class = ReturnOrderSerializer
+    queryset = ReturnOrder.objects.all()
+    permission_classes = [IsAuthenticated]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['order__user__email', 'order__ref_code', 'status']
+    ordering_fields = ['order__user', 'order__ref_code', 'created_at', 'updated_at']
+    ordering = ['-created_at']
+
+    def get_queryset(self):
+        user = self.request.user
+        return ReturnOrder.objects.filter(order__user=user)
+    
+    def perform_create(self, serializer):
+        # get order
+        order_id = self.request.data['order']
+        order = Order.objects.get(id=order_id)
+
+        # check if order is already returned
+        try:
+            ReturnOrder.objects.get(order=order)
+            raise serializers.ValidationError('Order is already returned')
+        except ReturnOrder.DoesNotExist:
+            pass
+
+        # create return order
+        serializer.save(order=order)
+
+class RefundOrderViewset(viewsets.ModelViewSet):
+    serializer_class = RefundOrderSerializer
+    queryset = RefundOrder.objects.all()
+    permission_classes = [IsAuthenticated]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['order__user__email', 'order__ref_code', 'status']
+    ordering_fields = ['order__user', 'order__ref_code', 'created_at', 'updated_at']
+    ordering = ['-created_at']
+
+    def get_queryset(self):
+        user = self.request.user
+        return RefundOrder.objects.filter(order__user=user)
+    
+    def perform_create(self, serializer):
+        # get order
+        order_id = self.request.data['order']
+        order = Order.objects.get(id=order_id)
+
+        # check if order is already refunded
+        try:
+            RefundOrder.objects.get(order=order)
+            raise serializers.ValidationError('Order is already refunded')
+        except RefundOrder.DoesNotExist:
+            pass
+
+        # create refund order
+        serializer.save(order=order)
