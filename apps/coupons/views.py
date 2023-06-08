@@ -9,13 +9,17 @@ from apps.products.permissions import (
 from .models import (
     DiscountType,
     Coupon,
-    CouponUser
+    CouponUser,
+    Promo,
+    PromoBanner
 )
 
 from .serializers import (
     DiscountTypeSerializer,
     CouponSerializer,
-    CouponUserSerializer
+    CouponUserSerializer,
+    PromoSerializer,
+    PromoBannerSerializer
 )
 
 class DiscountTypeViewSet(viewsets.ModelViewSet):
@@ -51,3 +55,20 @@ class CouponUserViewSet(viewsets.ModelViewSet):
     search_fields = ['coupon__code', 'user__email']
     ordering_fields = ['coupon__code', 'user__email']
 
+class PromoViewSet(viewsets.ModelViewSet):
+    queryset = Promo.objects.all()
+    serializer_class = PromoSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name']
+    ordering_fields = ['name']
+    ordering = ['name']
+
+class PromoBannerViewSet(viewsets.ModelViewSet):
+    queryset = PromoBanner.objects.all()
+    serializer_class = PromoBannerSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['promo__name', 'name']
+    ordering_fields = ['promo__name', 'name']
+    ordering = ['promo__name', 'name']

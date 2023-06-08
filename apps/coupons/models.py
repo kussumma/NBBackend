@@ -60,4 +60,24 @@ class CouponUser(models.Model):
 
     def __str__(self):
         return f'{self.coupon.name} - {self.user}'
+    
+class Promo(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100)
+    coupon = models.OneToOneField(Coupon, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+    
+class PromoBanner(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    promo = models.ForeignKey(Promo, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='promo_banners')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.promo.name} - {self.id}'
 
