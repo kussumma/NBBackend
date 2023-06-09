@@ -164,6 +164,7 @@ JWT_AUTH_REFRESH_COOKIE = 'ecom-refresh-auth'
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer','JWT'),
     'USER_ID_FIELD': 'email',
+    'UPDATE_LAST_LOGIN': True,
 }
 
 # REST FRAMEWORK
