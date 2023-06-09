@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from .models import Cart, CartItem
-from apps.products.serializers import ProductSerializer, StockSerializer
 
 class CartItemSerializer(serializers.ModelSerializer):
     product_data = serializers.SerializerMethodField()
@@ -29,3 +28,4 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = '__all__'
+        read_only_fields = ['user']
