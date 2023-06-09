@@ -25,7 +25,7 @@ class CartViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance)
 
         # get cart items
-        cart_items = CartItem.objects.filter(cart=instance, is_active=True)
+        cart_items = CartItem.objects.filter(cart=instance)
         cart_items_serializer = CartItemSerializer(cart_items, many=True)
 
         # count total items
@@ -75,7 +75,7 @@ class CartItemViewSet(viewsets.ModelViewSet):
         cart = get_object_or_404(Cart, user=request.user)
         product = request.data.get('product', None)
         stock = request.data.get('stock', None)
-        quantity = request.data.get('quantity', None)
+        quantity = request.data.get('quantity', 1)
 
         if product is not None and stock is not None:
             # Check if the product is already in the cart
@@ -109,7 +109,7 @@ class CartItemViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data)
             else:
                 return Response({
-                    'message': 'Sorry, the quantity of this product is not enough.',
+                    'message': 'Sorry, this product has not enough stock',
                     'quantity': instance.quantity,
                 }, status=status.HTTP_400_BAD_REQUEST)
 
