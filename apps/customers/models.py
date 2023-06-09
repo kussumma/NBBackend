@@ -25,7 +25,7 @@ BUG_STATUS = (
 
 class Favorite(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_favorites')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_favorites', editable=False)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_favorites')
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -34,7 +34,7 @@ class Favorite(models.Model):
     
 class Complaint(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_complaints')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_complaints', editable=False)
     content = models.TextField()
     sugestion = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -54,7 +54,7 @@ class ComplaintImage(models.Model):
     
 class ProductRequest(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_requests')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_requests', editable=False)
     image = models.ImageField(upload_to='requests/')
     title = models.CharField(max_length=255)
     detail = models.TextField()
@@ -67,7 +67,7 @@ class ProductRequest(models.Model):
     
 class FeatureRequest(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_features')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_features', editable=False)
     title = models.CharField(max_length=255)
     detail = models.TextField()
     status = models.CharField(max_length=255, choices=REQUEST_STATUS, default='pending')
@@ -79,7 +79,7 @@ class FeatureRequest(models.Model):
     
 class BugReport(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_reports')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_reports', editable=False)
     title = models.CharField(max_length=255)
     detail = models.TextField()
     how_to_reproduce = models.TextField()
