@@ -72,7 +72,7 @@ GENDER_CHOICES = [
 
 class UserDetail(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.OneToOneField(User, related_name='user_details', on_delete=models.CASCADE, editable=False)
+    user = models.OneToOneField(User, related_name='user_details', on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=20, null=True, blank=True)
     gender = models.CharField(choices=GENDER_CHOICES, max_length=20, default='other')
     date_of_birth = models.DateField(null=True, blank=True)
