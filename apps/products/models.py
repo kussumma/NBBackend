@@ -89,7 +89,7 @@ class Product(models.Model):
 
 class Rating(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, related_name='user_ratings', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='user_ratings', on_delete=models.CASCADE, editable=False)
     product = models.ForeignKey(Product, related_name='product_ratings',on_delete=models.CASCADE)
     star = models.IntegerField(default=0)
     review = models.TextField()
@@ -102,7 +102,7 @@ class Rating(models.Model):
 
 class Wishlist(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, related_name='user_wishlist', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='user_wishlist', on_delete=models.CASCADE, editable=False)
     product = models.ForeignKey(Product, related_name='product_wishlist', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
