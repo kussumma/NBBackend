@@ -67,7 +67,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 # User details
 class UserDetail(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.OneToOneField(User, related_name='user_details', on_delete=models.CASCADE)
+    user = models.OneToOneField(User, related_name='user_details', on_delete=models.CASCADE, editable=False)
     phone_number = models.CharField(max_length=20, null=True, blank=True)
     gender = models.CharField(max_length=10, null=True, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
