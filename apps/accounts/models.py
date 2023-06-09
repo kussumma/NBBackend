@@ -4,7 +4,7 @@ from django.db import models
 from django.utils import timezone
 import uuid
 
-# Create your models here.
+
 class UserManager(BaseUserManager):
 
     def create_user(self, email,  password=None, **kwargs):
@@ -29,12 +29,12 @@ class UserManager(BaseUserManager):
         return self.create_user(email, password, **kwargs)
 
 
-LEVEL_CHOICES = (
-    (1, 'Bronze'),
-    (2, 'Silver'),
-    (3, 'Gold'),
-    (4, 'Platinum'),
-)
+LEVEL_CHOICES = [
+    ('bronze', 'Bronze'),
+    ('silver', 'Silver'),
+    ('gold', 'Gold'),
+    ('platinum', 'Platinum'),
+]
     
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -42,7 +42,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     avatar = models.ImageField(upload_to='avatars/', default='avatars/default.png')
-    level = models.IntegerField(choices=LEVEL_CHOICES, default=1)
+    level = models.CharField(choices=LEVEL_CHOICES, max_length=20, default='bronze')
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
@@ -64,12 +64,17 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
     
 
-# User details
+GENDER_CHOICES = [
+    ('male', 'Male'),
+    ('female', 'Female'),
+    ('other', 'Other'),
+]
+
 class UserDetail(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(User, related_name='user_details', on_delete=models.CASCADE, editable=False)
     phone_number = models.CharField(max_length=20, null=True, blank=True)
-    gender = models.CharField(max_length=10, null=True, blank=True)
+    gender = models.CharField(choices=GENDER_CHOICES, max_length=20, default='other')
     date_of_birth = models.DateField(null=True, blank=True)
     newsletter = models.BooleanField(default=False)
     city = models.CharField(max_length=255, null=True, blank=True)
@@ -79,4 +84,4 @@ class UserDetail(models.Model):
     currency = models.CharField(max_length=255, default='IDR')
 
     def __str__(self):
-        return f"{self.user.email} - {self.date_of_birth}"
+        return f"{self.user.email} - {self.gender}"
