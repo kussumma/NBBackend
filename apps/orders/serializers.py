@@ -12,6 +12,7 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = '__all__'
+        read_only_fields = ['ref_code', 'user']
 
 class ReturnImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,6 +24,7 @@ class ReturnOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReturnOrder
         fields = '__all__'
+        read_only_fields = ['user']
 
 class RefundOrderSerializer(serializers.ModelSerializer):
     class Meta:
