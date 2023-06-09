@@ -4,8 +4,7 @@ from .models import (
     DiscountType,
     Coupon,
     CouponUser,
-    Promo,
-    PromoBanner
+    CouponBanner
 )
 
 class DiscountTypeSerializer(serializers.ModelSerializer):
@@ -17,18 +16,15 @@ class CouponSerializer(serializers.ModelSerializer):
     class Meta:
         model = Coupon
         fields = '__all__'
+        read_only_fields = ['code', 'hashed_code']
 
 class CouponUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CouponUser
         fields = '__all__'
+        read_only_fields = ['user']
 
-class PromoSerializer(serializers.ModelSerializer):
+class CouponBannerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Promo
-        fields = '__all__'
-
-class PromoBannerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PromoBanner
+        model = CouponBanner
         fields = '__all__'

@@ -16,8 +16,8 @@ class DiscountType(models.Model):
 
 class Coupon(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    code = models.CharField(max_length=50, unique=True, editable=False)
-    hashed_code = models.CharField(max_length=64, unique=True, editable=False)
+    code = models.CharField(max_length=50, unique=True)
+    hashed_code = models.CharField(max_length=64, unique=True)
     name = models.CharField(max_length=100)
     discount_type = models.ForeignKey(DiscountType, on_delete=models.CASCADE)
     discount_value = models.PositiveBigIntegerField(default=0)
@@ -54,30 +54,20 @@ class Coupon(models.Model):
 class CouponUser(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_coupons', editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_coupons')
     is_used = models.BooleanField(default=True)
     used_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'{self.coupon.name} - {self.user}'
     
-class Promo(models.Model):
+class CouponBanner(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100)
-    coupon = models.OneToOneField(Coupon, on_delete=models.CASCADE)
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, related_name='coupon_banners')
+    image = models.ImageField(upload_to='coupon_banners')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
-    
-class PromoBanner(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    promo = models.ForeignKey(Promo, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='promo_banners')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f'{self.promo.name} - {self.id}'
+        return f'{self.coupon.name} - {self.image.url}'
 
