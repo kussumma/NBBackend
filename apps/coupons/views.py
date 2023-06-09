@@ -69,6 +69,6 @@ class PromoBannerViewSet(viewsets.ModelViewSet):
     serializer_class = PromoBannerSerializer
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['promo__name', 'name']
-    ordering_fields = ['promo__name', 'name']
-    ordering = ['promo__name', 'name']
+    search_fields = ['promo__name', 'id']
+    ordering_fields = ['promo__name', 'id']
+    ordering = ['promo__name', 'id']

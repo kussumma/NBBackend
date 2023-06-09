@@ -54,7 +54,7 @@ class Coupon(models.Model):
 class CouponUser(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_coupons', editable=False)
     is_used = models.BooleanField(default=True)
     used_at = models.DateTimeField(auto_now_add=True)
 
