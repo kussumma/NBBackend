@@ -29,7 +29,7 @@ RETURN_REFUND_STATUS_CHOICES = (
 class Order(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     ref_code = models.CharField(max_length=100, unique=True, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_orders')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_orders', editable=False)
     final_price = models.PositiveIntegerField(default=0)
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True, related_name='coupon_orders')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -66,7 +66,7 @@ class OrderItem(models.Model):
 
 class ReturnOrder(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_return_orders')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_return_orders', editable=False)
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='return_order')
     order_item = models.ManyToManyField(OrderItem, related_name='return_order_items')
     detail = models.TextField()
