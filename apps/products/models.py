@@ -11,7 +11,7 @@ class Category(models.Model):
     description = models.TextField()
     cover = models.ImageField(upload_to='categories/', default='categories/no_picture.png')
     icon = models.CharField(max_length=100, null=True, blank=True)
-    slug = models.SlugField(max_length=250, unique=True, null=True, blank=True, editable=False)
+    slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
     
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
@@ -26,7 +26,7 @@ class Subcategory(models.Model):
     description = models.TextField()
     cover = models.ImageField(upload_to='subcategories/', default='subcategories/no_picture.png')
     icon = models.CharField(max_length=100, null=True, blank=True)
-    slug = models.SlugField(max_length=250, unique=True, null=True, blank=True, editable=False)
+    slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     
     def save(self, *args, **kwargs):
@@ -39,7 +39,7 @@ class Subcategory(models.Model):
 class Tag(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=250)
-    slug = models.SlugField(max_length=250, unique=True, null=True, blank=True, editable=False)
+    slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
     
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
@@ -55,7 +55,7 @@ class Brand(models.Model):
     origin = models.CharField(max_length=250, null=True, blank=True)
     cover = models.ImageField(upload_to='brands/', default='brands/no_picture.png')
     icon = models.CharField(max_length=100, null=True, blank=True)
-    slug = models.SlugField(max_length=250, unique=True, null=True, blank=True, editable=False)
+    slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
     
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
@@ -75,7 +75,7 @@ class Product(models.Model):
     tags = models.ManyToManyField(Tag, related_name='product_tags')
     cover = models.ImageField(upload_to='products/', default='products/no_picture.png')
     link = models.URLField(null=True, blank=True)
-    slug = models.SlugField(max_length=250, unique=True, null=True, blank=True, editable=False)
+    slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=False)
@@ -89,7 +89,7 @@ class Product(models.Model):
 
 class Rating(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, related_name='user_ratings', on_delete=models.CASCADE, editable=False)
+    user = models.ForeignKey(User, related_name='user_ratings', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, related_name='product_ratings',on_delete=models.CASCADE)
     star = models.IntegerField(default=0)
     review = models.TextField()
@@ -102,7 +102,7 @@ class Rating(models.Model):
 
 class Wishlist(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, related_name='user_wishlist', on_delete=models.CASCADE, editable=False)
+    user = models.ForeignKey(User, related_name='user_wishlist', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, related_name='product_wishlist', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
