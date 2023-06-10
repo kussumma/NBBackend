@@ -34,6 +34,9 @@ urlpatterns = [
     # Store
     path('api/', include('apps.store.urls')),
 
+    # Blogs
+    path('api/', include('apps.blogs.urls')),
+
 ]
 
 if settings.DEBUG:
