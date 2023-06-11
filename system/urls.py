@@ -37,6 +37,9 @@ urlpatterns = [
     # Blogs
     path('api/', include('apps.blogs.urls')),
 
+    # Shipping
+    path('api/', include('apps.shipping.urls')),
+
 ]
 
 if settings.DEBUG:
