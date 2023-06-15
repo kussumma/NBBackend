@@ -14,6 +14,3 @@ class ShippingViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.queryset.filter(order__user=self.request.user)
-        
-    def perform_create(self, serializer):
-        serializer.save(order__user=self.request.user)
