@@ -8,7 +8,8 @@ from .serializers import (
     BlogCategorySerializer, BlogTagSerializer, BlogSerializer, BlogImageSerializer, 
     BlogVideoSerializer, BlogCommentSerializer
 )
-from apps.products.permissions import IsAdminOrReadOnly
+
+from tools.custom_permissions import IsAdminOrReadOnly
 
 User = get_user_model()
 

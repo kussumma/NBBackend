@@ -2,9 +2,7 @@ from rest_framework import viewsets
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 
-from apps.products.permissions import (
-    IsAdminOrReadOnly,
-)
+from tools.custom_permissions import IsAdminOrReadOnly
 
 from .models import (
     DiscountType,

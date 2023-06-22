@@ -17,7 +17,8 @@ from .serializers import (
     WishlistSerializer,
     StockSerializer
 )
-from .permissions import IsAdminOrReadOnly, IsAuthenticatedOrReadOnly
+
+from tools.custom_permissions import IsAdminOrReadOnly, IsAuthenticatedOrReadOnly
 
 User = get_user_model()
 
