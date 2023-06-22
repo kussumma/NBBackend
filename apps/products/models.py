@@ -122,3 +122,11 @@ class Stock(models.Model):
 
     def __str__(self):
         return f"{self.product.slug} - {self.price}"
+    
+class ExtraProductImage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    product = models.ForeignKey(Product, related_name='product_extra_images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='extra_images/', default='extra_images/no_picture.png')
+
+    def __str__(self):
+        return f"{self.product.slug} - {self.image}"
