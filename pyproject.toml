@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "ecombackend"
+name = "nanobeepa"
 version = "0.1.0"
-description = "Backend for Ecommerce"
+description = "Backend for NanoBeepa"
 authors = ["Kusuma <sensnerd@gmail.com>"]
 readme = "README.md"
 
