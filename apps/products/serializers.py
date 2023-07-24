@@ -3,7 +3,7 @@ from rest_framework import serializers
 from .models import (
     Category,
     Subcategory,
-    Tag,
+    Subsubcategory,
     Brand,
     Product,
     Rating,
@@ -25,9 +25,11 @@ class SubcategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['slug']
 
-class TagSerializer(serializers.ModelSerializer):
+class SubsubcategorySerializer(serializers.ModelSerializer):
+    subcategory_name = serializers.CharField(source='subcategory.name', read_only=True)
+    
     class Meta:
-        model = Tag
+        model = Subsubcategory
         fields = '__all__'
         read_only_fields = ['slug']
 

@@ -5,7 +5,7 @@ from .views import (
     ProductViewSet,
     CategoryViewSet,
     SubcategoryViewSet,
-    TagViewSet,
+    SubsubcategoryViewset,
     BrandViewSet,
     RatingViewSet,
     WishlistViewSet,
@@ -16,7 +16,7 @@ router = DefaultRouter()
 router.register('product', ProductViewSet, basename='product')
 router.register('category', CategoryViewSet, basename='category')
 router.register('subcategory', SubcategoryViewSet, basename='subcategory')
-router.register('tag', TagViewSet, basename='tag')
+router.register('subsubcategory', SubsubcategoryViewset, basename='subsubcategory')
 router.register('brand', BrandViewSet, basename='brand')
 router.register('rating', RatingViewSet, basename='rating')
 router.register('wishlist', WishlistViewSet, basename='wishlist')

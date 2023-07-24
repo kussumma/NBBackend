@@ -6,12 +6,12 @@ from rest_framework.response import Response
 from django.db.models import Min, Max
 from django.db.models.functions import Coalesce
 
-from .models import Category, Product, Subcategory, Tag, Brand, Rating, Wishlist, Stock
+from .models import Category, Product, Subcategory, Subsubcategory, Brand, Rating, Wishlist, Stock
 from .serializers import (
     CategorySerializer, 
     ProductSerializer, 
     SubcategorySerializer, 
-    TagSerializer,
+    SubsubcategorySerializer,
     BrandSerializer, 
     RatingSerializer, 
     WishlistSerializer,
@@ -31,7 +31,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     filterset_fields = {
         'category': ['exact'],
         'subcategory': ['exact'],
-        'tags': ['exact'],
+        'subsubcategory': ['exact'],
         'brand': ['exact'],
         'product_stock__price': ['exact', 'gte', 'lte'],
         'discount': ['exact', 'gte', 'lte'],
@@ -108,9 +108,9 @@ class SubcategoryViewSet(viewsets.ModelViewSet):
     ordering = ['name']
     lookup_field = 'slug'
 
-class TagViewSet(viewsets.ModelViewSet):
-    queryset = Tag.objects.all()
-    serializer_class = TagSerializer
+class SubsubcategoryViewset(viewsets.ModelViewSet):
+    queryset = Subsubcategory.objects.all()
+    serializer_class = SubsubcategorySerializer
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name']

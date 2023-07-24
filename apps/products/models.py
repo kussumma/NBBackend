@@ -36,14 +36,17 @@ class Subcategory(models.Model):
     def __str__(self):
         return self.slug
     
-class Tag(models.Model):
+class Subsubcategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=250)
+    description = models.TextField()
+    cover = models.ImageField(upload_to='subsubcategories/', default='subsubcategories/no_picture.png')
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
-    
+    subcategory = models.ForeignKey(Subcategory, on_delete=models.CASCADE)
+
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
-        super(Tag, self).save(*args,**kwargs)
+        super(Subsubcategory, self).save(*args,**kwargs)
 
     def __str__(self):
         return self.slug
@@ -72,7 +75,7 @@ class Product(models.Model):
     brand = models.ForeignKey(Brand, related_name='product_brands', on_delete=models.PROTECT)
     category = models.ForeignKey(Category, related_name='product_categories', on_delete=models.PROTECT)
     subcategory = models.ForeignKey(Subcategory, related_name='product_subcategories', on_delete=models.PROTECT)
-    tags = models.ManyToManyField(Tag, related_name='product_tags')
+    subsubcategory = models.ForeignKey(Subsubcategory, related_name='product_subsubcategories', on_delete=models.PROTECT)
     cover = models.ImageField(upload_to='products/', default='products/no_picture.png')
     link = models.URLField(null=True, blank=True)
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
