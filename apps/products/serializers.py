@@ -12,26 +12,26 @@ from .models import (
 )
 from apps.accounts.serializers import BasicUserSerializer
 
-class CategorySerializer(serializers.ModelSerializer):
+class SubsubcategorySerializer(serializers.ModelSerializer):    
     class Meta:
-        model = Category
+        model = Subsubcategory
         fields = '__all__'
+        read_only_fields = ['slug']
 
 class SubcategorySerializer(serializers.ModelSerializer):
-    category_name = serializers.CharField(source='category.name', read_only=True)
+    subsubcategory = SubsubcategorySerializer(many=True, source='subsubcategories', read_only=True)
 
     class Meta:
         model = Subcategory
         fields = '__all__'
         read_only_fields = ['slug']
 
-class SubsubcategorySerializer(serializers.ModelSerializer):
-    subcategory_name = serializers.CharField(source='subcategory.name', read_only=True)
-    
+class CategorySerializer(serializers.ModelSerializer):
+    subcategory = SubcategorySerializer(many=True, source='subcategories', read_only=True)
+
     class Meta:
-        model = Subsubcategory
+        model = Category
         fields = '__all__'
-        read_only_fields = ['slug']
 
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:

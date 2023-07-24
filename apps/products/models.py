@@ -10,7 +10,6 @@ class Category(models.Model):
     name = models.CharField(max_length=250)
     description = models.TextField()
     cover = models.ImageField(upload_to='categories/', default='categories/no_picture.png')
-    icon = models.CharField(max_length=100, null=True, blank=True)
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
     
     def save(self, *args, **kwargs):
@@ -25,9 +24,8 @@ class Subcategory(models.Model):
     name = models.CharField(max_length=250)
     description = models.TextField()
     cover = models.ImageField(upload_to='subcategories/', default='subcategories/no_picture.png')
-    icon = models.CharField(max_length=100, null=True, blank=True)
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, related_name='subcategories', on_delete=models.CASCADE)
     
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
@@ -42,7 +40,7 @@ class Subsubcategory(models.Model):
     description = models.TextField()
     cover = models.ImageField(upload_to='subsubcategories/', default='subsubcategories/no_picture.png')
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
-    subcategory = models.ForeignKey(Subcategory, on_delete=models.CASCADE)
+    subcategory = models.ForeignKey(Subcategory, related_name='subsubcategories', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
@@ -57,7 +55,6 @@ class Brand(models.Model):
     description = models.TextField()
     origin = models.CharField(max_length=250, null=True, blank=True)
     cover = models.ImageField(upload_to='brands/', default='brands/no_picture.png')
-    icon = models.CharField(max_length=100, null=True, blank=True)
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
     
     def save(self, *args, **kwargs):
