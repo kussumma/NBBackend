@@ -26,12 +26,22 @@ class SubcategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['slug']
 
+class SearchSubcategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'slug']
+
 class CategorySerializer(serializers.ModelSerializer):
     subcategory = SubcategorySerializer(many=True, source='subcategories', read_only=True)
 
     class Meta:
         model = Category
         fields = '__all__'
+
+class SearchCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id', 'name', 'slug']
 
 class BrandSerializer(serializers.ModelSerializer):
     class Meta:
