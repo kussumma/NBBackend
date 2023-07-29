@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'apps.payments',
     'apps.customers',
     'apps.blogs',
+    'apps.search',
 
 ]
 

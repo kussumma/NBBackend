@@ -13,6 +13,9 @@ urlpatterns = [
     path('auth/jwt/logout/', TokenBlacklistView.as_view(), name='token_blacklist'),
     path('auth/', include('djoser.social.urls')),
 
+    # Search
+    path('api/', include('apps.search.urls')),
+
     # Account
     path('api/', include('apps.accounts.urls')),
 
