@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+from datetime import timedelta
 
 # use decouple
 from decouple import config, Csv
@@ -164,6 +165,8 @@ REST_USE_JWT = True
 JWT_AUTH_COOKIE = 'ecom-auth'
 JWT_AUTH_REFRESH_COOKIE = 'ecom-refresh-auth'
 SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
     'AUTH_HEADER_TYPES': ('Bearer','JWT'),
     'USER_ID_FIELD': 'email',
     'UPDATE_LAST_LOGIN': True,
