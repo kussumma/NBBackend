@@ -15,9 +15,10 @@ django-filter = "^23.2"
 python-decouple = "^3.8"
 djangorestframework-simplejwt = "^5.2.2"
 cryptography = "^40.0.2"
-djoser = "^2.2.0"
 pillow = "^9.5.0"
 uuid = "^1.30"
+django-allauth = "^0.54.0"
+dj-rest-auth = "^4.0.1"
 
 
 [build-system]
