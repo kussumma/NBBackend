@@ -36,9 +36,14 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    'djoser',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
-    'social_django',
     'django_filters',
 
     # Local apps
@@ -135,41 +140,72 @@ CORS_ORIGIN_ALLOW_ALL = True
 # AUTHENTICATION
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-    'social_core.backends.google.GoogleOAuth2',
+    'allauth.account.auth_backends.AuthenticationBackend',
 )
 
-# DJOSER SETTINGS
-DJOSER = {
-    'LOGIN_FIELD': 'email',
-    'USER_CREATE_PASSWORD_RETYPE': True,
-    'USERNAME_CHANGED_EMAIL_CONFIRMATION': True,
-    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
-    'SEND_CONFIRMATION_EMAIL': True,
-    'SEND_ACTIVATION_EMAIL': True,
-    'SET_PASSWORD_RETYPE': True,
-    'SET_USERNAME_RETYPE': True,
-    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
-    'USERNAME_RESET_CONFIRM_URL': 'email/reset/confirm/{uid}/{token}',
-    'ACTIVATION_URL': 'activate/{uid}/{token}',
-    'SERIALIZERS': {},
-    'SOCIAL_AUTH_TOKEN_STRATEGY': 'djoser.social.token.jwt.TokenStrategy',
-    'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': ['http://localhost:3000/google'],
-    'SOCIAL_AUTH_GOOGLE_OAUTH2_KEY': config('GOOGLE_OAUTH2_KEY'),
-    'SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET': config('GOOGLE_OAUTH2_SECRET'),
-    'SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE': ['email', 'profile'],
-    'SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA': ['first_name', 'last_name'],
+# ALLAUTH SETTINGS
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+ACCOUNT_LOGIN_REDIRECT_URL = '/'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+SOCIAL_LOGIN_REDIRECT_URL = '/'
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': config('GOOGLE_OAUTH2_KEY'),
+            'secret': config('GOOGLE_OAUTH2_SECRET'),
+            'key': ''
+        },
+        'SCOPE': [
+            'openid',
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'offline',
+        }
+    }
+}
+
+# DJANGO REST AUTH
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_HTTPONLY': False,
 }
 
 # SIMPLE JWT
-REST_USE_JWT = True
-JWT_AUTH_COOKIE = 'ecom-auth'
-JWT_AUTH_REFRESH_COOKIE = 'ecom-refresh-auth'
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
-    'AUTH_HEADER_TYPES': ('Bearer','JWT'),
-    'USER_ID_FIELD': 'email',
-    'UPDATE_LAST_LOGIN': True,
+    "UPDATE_LAST_LOGIN": True,
+
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "USER_ID_FIELD": "email",
+    "USER_ID_CLAIM": "email",
+    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM": "token_type",
+    "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
+
+    "JTI_CLAIM": "jti",
+
+    "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
+    "SLIDING_TOKEN_LIFETIME": timedelta(days=1),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=3),
+
+    "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
+    "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
+    "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
+    "TOKEN_BLACKLIST_SERIALIZER": "rest_framework_simplejwt.serializers.TokenBlacklistSerializer",
+    "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
+    "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
 
 # REST FRAMEWORK
@@ -191,7 +227,7 @@ AUTH_USER_MODEL = 'accounts.User'
 
 # EMAIL
 SITE_ID = 1
-SITE_NAME = '127.0.0.1:8000'
+SITE_NAME = 'NanoBeepa'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
