@@ -9,7 +9,7 @@ from rest_framework_simplejwt.views import (
     TokenBlacklistView
 )
 
-from apps.accounts.views import GoogleLogin, VerifyEmailView
+from apps.accounts.views import GoogleLogin, CustomVerifyEmailView
 
 urlpatterns = [
     # Basic Auth
@@ -17,7 +17,7 @@ urlpatterns = [
     path('auth/', include('dj_rest_auth.urls')),
     path('auth/registration/', include('dj_rest_auth.registration.urls')),
     path('auth/google/', GoogleLogin.as_view(), name='google_login'),
-    path('auth/registration/account-confirm-email/(<key>)/', VerifyEmailView.as_view(), name='account_confirm_email'),
+    path('auth/registration/account-confirm-email/(<key>)/', CustomVerifyEmailView.as_view(), name='account_confirm_email'),
 
     # Jwt
     path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
