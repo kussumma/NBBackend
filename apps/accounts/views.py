@@ -18,7 +18,7 @@ class GoogleLogin(SocialLoginView):
     callback_url = 'http://localhost:3000/google/'
     client_class = OAuth2Client
 
-class VerifyEmailView(VerifyEmailView):
+class CustomVerifyEmailView(VerifyEmailView):
     def get(self, request, key):
         verify_email_url = 'http://127.0.0.1:8000/auth/registration/verify-email/'
 
