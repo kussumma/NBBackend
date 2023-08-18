@@ -4,6 +4,8 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework import filters, status
 from rest_framework.response import Response
 import requests
+from django.shortcuts import redirect
+from django.conf import settings
 
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
@@ -15,19 +17,23 @@ User = get_user_model()
 
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
-    callback_url = 'http://localhost:3000/google/'
+    callback_url = settings.FRONTEND_URL+'/google/'
     client_class = OAuth2Client
 
 class CustomVerifyEmailView(VerifyEmailView):
     def get(self, request, key):
-        verify_email_url = 'http://127.0.0.1:8000/auth/registration/verify-email/'
+        verify_email_url = settings.BACKEND_URL+'/auth/registration/verify-email/'
 
         # make a POST request to the verify-email endpoint with the key
         response = requests.post(verify_email_url, {'key': key})
+        
+        # Redirect user to frontend if the response is successful or not
         if response.status_code == 200:
-            return Response({'message': 'Email verified successfully'}, status=status.HTTP_200_OK)
+            redirect_url = settings.FRONTEND_URL+'/signin/'
+            return redirect(redirect_url)
         else:
-            return Response({'message': 'Email verification failed'}, status=status.HTTP_400_BAD_REQUEST)
+            redirect_url = settings.FRONTEND_URL+'/verification-error/'
+            return redirect(redirect_url)
 
 class UserDetailsView(RetrieveUpdateAPIView):
     serializer_class = UserSerializer

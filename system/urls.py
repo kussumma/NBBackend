@@ -3,11 +3,6 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import  settings
 from django.conf.urls.static import static
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-    TokenBlacklistView
-)
 
 from apps.accounts.views import GoogleLogin, CustomVerifyEmailView
 
@@ -19,11 +14,6 @@ urlpatterns = [
     path('auth/google/', GoogleLogin.as_view(), name='google_login'),
     path('auth/registration/account-confirm-email/(<key>)/', CustomVerifyEmailView.as_view(), name='account_confirm_email'),
 
-    # Jwt
-    path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('auth/token/logout/', TokenBlacklistView.as_view(), name='token_blacklist'),
-    
     # Search
     path('api/', include('apps.search.urls')),
 
