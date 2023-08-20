@@ -4,7 +4,7 @@ from django.urls import path, include
 from django.conf import  settings
 from django.conf.urls.static import static
 
-from apps.accounts.views import GoogleLogin, CustomVerifyEmailView
+from apps.accounts.views import GoogleLogin
 
 urlpatterns = [
     # Basic Auth
@@ -12,7 +12,6 @@ urlpatterns = [
     path('auth/', include('dj_rest_auth.urls')),
     path('auth/registration/', include('dj_rest_auth.registration.urls')),
     path('auth/google/', GoogleLogin.as_view(), name='google_login'),
-    path('auth/registration/account-confirm-email/(<key>)/', CustomVerifyEmailView.as_view(), name='account_confirm_email'),
 
     # Search
     path('api/', include('apps.search.urls')),
