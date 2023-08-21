@@ -21,6 +21,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserDetail
         read_only_fields = ['user']
+        fields = '__all__'
 
 class UserSerializer(serializers.ModelSerializer):
     user_details = UserDetailsSerializer()
