@@ -135,14 +135,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, '../', 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:8000",
-]
-CORS_ORIGIN_WHITELIST = [
-    "http://localhost:3000",
-    "http://localhost:8000",
-]
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', cast=Csv())
+CORS_ORIGIN_WHITELIST = config('CORS_ALLOWED_ORIGINS', cast=Csv())
 CORS_ALLOW_CREDENTIALS = True
 
 # AUTHENTICATION
@@ -212,9 +206,7 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
     "UPDATE_LAST_LOGIN": True,
-
     "AUTH_HEADER_TYPES": ("Bearer",),
-    "USER_ID_FIELD": "email",
 }
 
 # REST FRAMEWORK
