@@ -7,23 +7,25 @@ User = get_user_model()
 
 from apps.products.models import Product, Stock
 from apps.coupons.models import Coupon
+from apps.shipping.models import Shipping
 
 
 STATUS_CHOICES = (
-    (0, 'Pending'),
-    (1, 'Confirmed'),
-    (2, 'Shipped'),
-    (3, 'Delivered'),
-    (4, 'Canceled'),
-    (5, 'Returned'),
-    (6, 'Refunded'),
-    (7, 'Completed'),
+    ('pending', 'Pending'),
+    ('paid', 'Paid'),
+    ('confirmed', 'Confirmed'),
+    ('shipped', 'Shipped'),
+    ('delivered', 'Delivered'),
+    ('canceled', 'Canceled'),
+    ('returned', 'Returned'),
+    ('refunded', 'Refunded'),
+    ('completed', 'Completed'),
 )
 
 RETURN_REFUND_STATUS_CHOICES = (
-    (0, 'Pending'),
-    (1, 'Confirmed'),
-    (2, 'Rejected'),
+    ('pending', 'Pending'),
+    ('confirmed', 'Confirmed'),
+    ('rejected', 'Rejected'),
 )
 
 class Order(models.Model):
@@ -34,7 +36,10 @@ class Order(models.Model):
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True, related_name='coupon_orders')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    status = models.IntegerField(choices=STATUS_CHOICES, default=0)
+    status = models.TextField(choices=STATUS_CHOICES, default='pending')
+    shipping = models.ForeignKey(Shipping, on_delete=models.SET_NULL, null=True, blank=True, related_name='shipping_orders')
+    shipping_price = models.PositiveIntegerField(default=0)
+    shipping_ref_code = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return f'{self.user.email} - {self.created_at}'
@@ -73,7 +78,7 @@ class ReturnOrder(models.Model):
     request_refund = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    status = models.IntegerField(choices=RETURN_REFUND_STATUS_CHOICES, default=0)
+    status = models.TextField(choices=RETURN_REFUND_STATUS_CHOICES, default='pending')
     result_description = models.TextField(null=True, blank=True)
 
     def __str__(self):
@@ -95,7 +100,7 @@ class RefundOrder(models.Model):
     refund_receipt = models.ImageField(upload_to='refund_receipts/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    status = models.IntegerField(choices=RETURN_REFUND_STATUS_CHOICES, default=0)
+    status = models.TextField(choices=RETURN_REFUND_STATUS_CHOICES, default='pending')
     result_description = models.TextField(null=True, blank=True)
 
     def __str__(self):
