@@ -19,6 +19,7 @@ pillow = "^9.5.0"
 uuid = "^1.30"
 django-allauth = "^0.54.0"
 dj-rest-auth = "^4.0.1"
+django-import-export = "^3.2.0"
 
 
 [build-system]
