@@ -10,7 +10,7 @@ class ShippingType(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.code} - {self.name}"
+        return f"{self.name}"
 
 class ShippingRoute(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -57,9 +57,9 @@ class ShippingCommodity(models.Model):
 class Shipping(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_shippings')
-    receiver_name = models.CharField(max_length=100, blank=True, null=True)
-    receiver_phone = models.CharField(max_length=100, blank=True, null=True)
-    receiver_address = models.CharField(max_length=100, blank=True, null=True)
+    receiver_name = models.CharField(max_length=100)
+    receiver_phone = models.CharField(max_length=100)
+    receiver_address = models.CharField(max_length=100)
     origin = models.ForeignKey(ShippingRoute, on_delete=models.CASCADE, related_name='origin_shippings')
     destination = models.ForeignKey(ShippingRoute, on_delete=models.CASCADE, related_name='destination_shippings')
     shipping_type = models.ForeignKey(ShippingType, on_delete=models.CASCADE, related_name='type_shippings')
@@ -68,4 +68,4 @@ class Shipping(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.name} - "
+        return f"{self.user} - {self.destination.route}"
