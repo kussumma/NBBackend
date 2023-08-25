@@ -1,4 +1,4 @@
-from rest_framework import viewsets, filters, status
+from rest_framework import viewsets, filters, status, permissions
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
@@ -10,6 +10,7 @@ class CartViewSet(viewsets.ModelViewSet):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
+    permission_classes = [permissions.IsAuthenticated]
     search_fields = ['user__email']
     filterset_fields = {
         'user': ['exact'],
@@ -20,12 +21,9 @@ class CartViewSet(viewsets.ModelViewSet):
     ordering = ['-created_at']
     lookup_field = 'user'
 
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-
+    def get_cart_data(self, cart):
         # get cart items
-        cart_items = CartItem.objects.filter(cart=instance)
+        cart_items = CartItem.objects.filter(cart=cart)
         cart_items_serializer = CartItemSerializer(cart_items, many=True)
 
         # count total items
@@ -34,16 +32,29 @@ class CartViewSet(viewsets.ModelViewSet):
         # count total price
         total_price = sum([item.total_price for item in cart_items])
 
-        return Response({
-            'cart': serializer.data,
+        return {
+            'cart': self.get_serializer(cart).data,
             'cart_items': cart_items_serializer.data,
             'total_items': total_items,
             'total_price': total_price,
-        })
+        }
+
+    def list(self, request, *args, **kwargs):
+        # get user
+        user = self.request.user
+
+        # get cart
+        cart = get_object_or_404(Cart, user=user)
+
+        return Response(self.get_cart_data(cart))
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        return Response(self.get_cart_data(instance))
     
     def get_queryset(self):
         queryset = Cart.objects.all()
-        user = self.request.query_params.get('user', None)
+        user = self.request.user
         if user is not None:
             queryset = queryset.filter(user=user)
         return queryset
