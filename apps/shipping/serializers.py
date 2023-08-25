@@ -42,3 +42,4 @@ class ShippingWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shipping
         fields = '__all__'
+        read_only_fields = ['user']

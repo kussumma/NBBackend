@@ -61,3 +61,6 @@ class ShippingViewSet(viewsets.ModelViewSet):
         if self.request.method in ['POST', 'PUT', 'PATCH', 'DELETE']:
             return ShippingWriteSerializer
         return ShippingSerializer
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
