@@ -23,12 +23,12 @@ class CartItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     total_price = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
-    is_selected = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.cart.user.email} - {self.product.slug} - {self.quantity}'
     
     def save(self, *args, **kwargs):
+        self.product = self.stock.product
         self.total_price = self.stock.price * self.quantity * (1 - self.product.discount / 100)
         super().save(*args, **kwargs)
 
@@ -41,13 +41,6 @@ class CartItem(models.Model):
             self.quantity -= quantity
         else:
             self.quantity = 1
-        self.save()
-
-    def set_as_selected(self):
-        if self.is_selected:
-            self.is_selected = False
-        else:
-            self.is_selected = True
         self.save()
 
 

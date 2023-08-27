@@ -2,6 +2,7 @@ from rest_framework import viewsets, filters, status, permissions
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ValidationError
 
 from .models import Cart, CartItem
 from .serializers import CartSerializer, CartItemSerializer
@@ -84,13 +85,12 @@ class CartItemViewSet(viewsets.ModelViewSet):
     
     def create(self, request, *args, **kwargs):
         cart = get_object_or_404(Cart, user=request.user)
-        product = request.data.get('product', None)
         stock = request.data.get('stock', None)
         quantity = request.data.get('quantity', 1)
 
-        if product is not None and stock is not None:
+        try:
             # Check if the product is already in the cart
-            cart_item = CartItem.objects.filter(cart=cart, product=product, stock=stock).first()
+            cart_item = CartItem.objects.filter(cart=cart, stock=stock).first()
             if cart_item is not None:
                 cart_item.increase_quantity(quantity)
                 serializer = self.get_serializer(cart_item)
@@ -100,17 +100,16 @@ class CartItemViewSet(viewsets.ModelViewSet):
                 serializer.is_valid(raise_exception=True)
                 serializer.save(cart=cart)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
+        except ValidationError:
             return Response({
-                'message': 'Please provide product and stock.'
+                'message': 'Stock is not valid',
             }, status=status.HTTP_400_BAD_REQUEST)
-    
+        
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
 
         increase_quantity = request.data.get('increase_quantity', False)
         decrease_quantity = request.data.get('decrease_quantity', False)
-        set_as_selected = request.data.get('set_as_selected', False)
 
         if increase_quantity:
             # Check if the quantity of this product is enough
@@ -135,17 +134,6 @@ class CartItemViewSet(viewsets.ModelViewSet):
                     'message': 'Sorry, the quantity of this product has reached the minimum.',
                     'quantity': instance.quantity,
                 }, status=status.HTTP_400_BAD_REQUEST)
-            
-        elif set_as_selected:
-            # Set this item as selected
-            if instance.is_selected:
-                instance.is_selected = False
-                serializer = self.get_serializer(instance)
-                return Response(serializer.data)
-            else:
-                instance.is_selected = True
-                serializer = self.get_serializer(instance)
-                return Response(serializer.data)
 
         return super().partial_update(request, *args, **kwargs)
     

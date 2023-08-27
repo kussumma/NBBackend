@@ -20,7 +20,7 @@ class OrderCreateView(generics.CreateAPIView):
         cart = Cart.objects.get(user=user)
         
         try:
-            cart_items = CartItem.objects.filter(cart=cart, is_selected=True)
+            cart_items = CartItem.objects.filter(cart=cart)
         except CartItem.DoesNotExist:
             cart_items = None
 
