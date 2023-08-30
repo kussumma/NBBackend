@@ -159,8 +159,7 @@ class StockViewSet(viewsets.ModelViewSet):
     search_fields = ['product__name']
     filterset_fields = {
         'product': ['exact'],
-        'purchase_date': ['exact', 'gte', 'lte'],
-        'expiry_date': ['exact', 'gte', 'lte'],
+        'created_at': ['exact', 'gte', 'lte'],
     }
-    ordering_fields = ['product__name', 'purchase_date', 'expiry_date']
-    ordering = ['-purchase_date']
+    ordering_fields = ['product__name', 'created_at']
+    ordering = ['-created_at']
