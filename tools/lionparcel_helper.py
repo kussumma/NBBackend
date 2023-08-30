@@ -41,7 +41,7 @@ class LionParcelHelper:
         }
         return self._make_request(endpoint, params=params)
     
-    def make_booking(self, stt_no_ref_external, stt_goods_estimate_price, stt_origin, stt_destination, stt_sender_name, stt_sender_phone, stt_sender_address, stt_recipient_name, stt_recipient_address, stt_recipient_phone, stt_product_type, stt_pieces):
+    def make_booking(self, stt_goods_estimate_price, stt_origin, stt_destination, stt_sender_name, stt_sender_phone, stt_sender_address, stt_recipient_name, stt_recipient_address, stt_recipient_phone, stt_product_type, stt_pieces):
         """
         Make a booking for a shipment.
 
@@ -61,9 +61,6 @@ class LionParcelHelper:
         """
 
         # validate data
-        if not stt_no_ref_external:
-            raise Exception("stt_no_ref_external is required")
-        
         if not stt_goods_estimate_price:
             raise Exception("stt_goods_estimate_price is required")
         
@@ -102,7 +99,6 @@ class LionParcelHelper:
     
         # create the booking data
         booking_data = {
-            "stt_no_ref_external": stt_no_ref_external,
             "stt_goods_estimate_price": stt_goods_estimate_price,
             "stt_origin": stt_origin,
             "stt_destination": stt_destination,
