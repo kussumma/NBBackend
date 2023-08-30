@@ -187,19 +187,7 @@ REST_AUTH = {
     'JWT_AUTH_SECURE': True,
     'JWT_AUTH_COOKIE': 'nanobeepa-token',
     'JWT_AUTH_REFRESH_COOKIE': 'nanobeepa-refresh-token',
-    'LOGIN_SERIALIZER': 'dj_rest_auth.serializers.LoginSerializer',
     'REGISTER_SERIALIZER': 'apps.accounts.serializers.CustomRegisterSerializer',
-    'TOKEN_SERIALIZER': 'dj_rest_auth.serializers.TokenSerializer',
-    'JWT_SERIALIZER': 'dj_rest_auth.serializers.JWTSerializer',
-    'JWT_SERIALIZER_WITH_EXPIRATION': 'dj_rest_auth.serializers.JWTSerializerWithExpiration',
-    'JWT_TOKEN_CLAIMS_SERIALIZER': 'rest_framework_simplejwt.serializers.TokenObtainPairSerializer',
-    'USER_DETAILS_SERIALIZER': 'dj_rest_auth.serializers.UserDetailsSerializer',
-    'PASSWORD_RESET_SERIALIZER': 'dj_rest_auth.serializers.PasswordResetSerializer',
-    'PASSWORD_RESET_CONFIRM_SERIALIZER': 'dj_rest_auth.serializers.PasswordResetConfirmSerializer',
-    'PASSWORD_CHANGE_SERIALIZER': 'dj_rest_auth.serializers.PasswordChangeSerializer',
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-    )
 }
 
 # SIMPLE JWT
@@ -232,6 +220,9 @@ SITE_ID = 1
 SITE_NAME = 'NanoBeepa'
 FRONTEND_URL = config('FRONTEND_URL')
 BACKEND_URL = config('BACKEND_URL')
+
+# LION PARCEL API
+LIONPARCEL_API_KEY = config('LIONPARCEL_API_KEY')
 
 # EMAIL
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
