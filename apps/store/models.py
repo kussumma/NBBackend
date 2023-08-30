@@ -8,8 +8,12 @@ class Store(models.Model):
     description = models.TextField(null=True, blank=True)
     motto = models.CharField(max_length=255, null=True, blank=True)
 
+    def __str__(self):
+        return self.name
+
 class Contact(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
     phone = models.CharField(max_length=20)
     email = models.EmailField()
     whatsapp = models.CharField(max_length=20)
@@ -17,9 +21,10 @@ class Contact(models.Model):
     instagram = models.CharField(max_length=255)
     twitter = models.CharField(max_length=255)
     tiktok = models.CharField(max_length=255)
-    offline_address = models.CharField(max_length=255)
     latitude = models.FloatField()
     longitude = models.FloatField()
+    address = models.CharField(max_length=255)
+    origin = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
