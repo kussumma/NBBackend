@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 import uuid
 import secrets
+from datetime import date
 
 User = get_user_model()
 
@@ -12,14 +13,18 @@ from apps.shipping.models import Shipping
 
 STATUS_CHOICES = (
     ('pending', 'Pending'),
-    ('paid', 'Paid'),
     ('confirmed', 'Confirmed'),
-    ('shipped', 'Shipped'),
     ('delivered', 'Delivered'),
     ('canceled', 'Canceled'),
     ('returned', 'Returned'),
     ('refunded', 'Refunded'),
     ('completed', 'Completed'),
+)
+
+PAYMENT_STATUS_CHOICES = (
+    ('pending', 'Pending'),
+    ('paid', 'Paid'),
+    ('failed', 'Failed'),
 )
 
 RETURN_REFUND_STATUS_CHOICES = (
@@ -32,20 +37,37 @@ class Order(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     ref_code = models.CharField(max_length=100, unique=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_orders')
-    final_price = models.PositiveIntegerField(default=0)
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True, related_name='coupon_orders')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.TextField(choices=STATUS_CHOICES, default='pending')
     shipping = models.ForeignKey(Shipping, on_delete=models.SET_NULL, null=True, blank=True, related_name='shipping_orders')
-    shipping_price = models.PositiveIntegerField(default=0)
+    shipping_cost = models.PositiveIntegerField(default=0)
     shipping_ref_code = models.CharField(max_length=100, null=True, blank=True)
+    payment_status = models.TextField(choices=PAYMENT_STATUS_CHOICES, default='pending')
+    payment_ref_code = models.CharField(max_length=100, null=True, blank=True)
+    tax_amount = models.PositiveIntegerField(default=0)
+    subtotal_amount = models.PositiveIntegerField(default=0)
+    total_amount = models.PositiveIntegerField(default=0)
+    note = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return f'{self.user.email} - {self.created_at}'
+        return f'{self.user.email} - {self.generate_ref_code().upper()}'
     
     def generate_ref_code(self):
-        return secrets.token_urlsafe(12)
+        # Get the current year, month, and day
+        today = date.today()
+        year = today.year
+        month = today.month
+        day = today.day
+        
+        # Generate a random 8 random as a secret
+        secret_number = secrets.token_hex(4).upper()
+        
+        # Create the order reference code by combining the date and secret number
+        refcode = f"{year}{month:02d}{day:02d}-{secret_number}"
+        
+        return refcode
     
     def save(self, *args, **kwargs):
         if not self.ref_code:
