@@ -33,6 +33,13 @@ RETURN_REFUND_STATUS_CHOICES = (
     ('rejected', 'Rejected'),
 )
 
+SHIPPING_TYPE_CHOICES = (
+    ('ONEPACK', 'ONEPACK'),
+    ('REGPACK', 'REGPACK'),
+    ('JAGOPACK', 'JAGOPACK'),
+    ('INTERPACK', 'INTERPACK'),
+)
+
 class Order(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     ref_code = models.CharField(max_length=100, unique=True)
@@ -42,6 +49,7 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     status = models.TextField(choices=STATUS_CHOICES, default='pending')
     shipping = models.ForeignKey(Shipping, on_delete=models.SET_NULL, null=True, blank=True, related_name='shipping_orders')
+    shipping_type = models.TextField(choices=SHIPPING_TYPE_CHOICES, default='REGPACK')
     shipping_cost = models.PositiveIntegerField(default=0)
     shipping_ref_code = models.CharField(max_length=100, null=True, blank=True)
     payment_status = models.TextField(choices=PAYMENT_STATUS_CHOICES, default='pending')
@@ -49,10 +57,11 @@ class Order(models.Model):
     tax_amount = models.PositiveIntegerField(default=0)
     subtotal_amount = models.PositiveIntegerField(default=0)
     total_amount = models.PositiveIntegerField(default=0)
+    total_weight = models.PositiveIntegerField(default=0)
     note = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return f'{self.user.email} - {self.generate_ref_code().upper()}'
+        return f'{self.user.email} - {self.ref_code}'
     
     def generate_ref_code(self):
         # Get the current year, month, and day
