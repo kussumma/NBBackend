@@ -2,7 +2,7 @@ from django.contrib import admin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 
-from .models import ShippingType, ShippingRoute, ShippingRoutePerType, ShippingCommodity, Shipping
+from .models import ShippingRoute, Shipping
 
 class ShippingRouteResource(resources.ModelResource):
     class Meta:
@@ -13,8 +13,5 @@ class ShippingRouteResource(resources.ModelResource):
 class ShippingRouteAdmin(ImportExportModelAdmin):
     resource_classes = [ShippingRouteResource]
 
-admin.site.register(ShippingType)
 admin.site.register(ShippingRoute, ShippingRouteAdmin)
-admin.site.register(ShippingRoutePerType)
-admin.site.register(ShippingCommodity)
 admin.site.register(Shipping)
