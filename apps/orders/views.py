@@ -1,6 +1,7 @@
 from rest_framework import filters
 from rest_framework import generics, viewsets
-from rest_framework import serializers
+from rest_framework import serializers, status
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from apps.cart.models import Cart, CartItem
@@ -24,11 +25,7 @@ class OrderCreateView(generics.CreateAPIView):
         
         try:
             cart_items = CartItem.objects.filter(cart=cart, is_selected=True)
-        except CartItem.DoesNotExist:
-            cart_items = None
-
-        # check if cart is empty
-        if cart_items is None or len(cart_items) == 0:
+        except (KeyError, CartItem.DoesNotExist):
             raise serializers.ValidationError('Cart is empty')
 
         # get the coupon
@@ -68,66 +65,56 @@ class OrderCreateView(generics.CreateAPIView):
             shipping_id = self.request.data['shipping']
             shipping = Shipping.objects.get(id=shipping_id)
         except (KeyError, Shipping.DoesNotExist):
-            shipping = None
+            raise serializers.ValidationError('Shipping is required')
+
+        # get shipping type
+        try:
+            shipping_type = self.request.data['shipping_type']
+        except KeyError:
+            raise serializers.ValidationError('Shipping type is required')
 
         # calculate shipping cost
         if shipping:
-            contact = Contact.objects.first()
+            contact = Contact.objects.get(is_active=True)
 
             lionparcel = LionParcelHelper(LIONPARCEL_API_KEY)
 
+            # create stt pieces
+            stt_pieces = []
+            for cart_item in cart_items:
+                stt_pieces.append({
+                    'stt_piece_gross_weight': cart_item.stock.weight,
+                    'stt_piece_length': cart_item.stock.length,
+                    'stt_piece_width': cart_item.stock.width,
+                    'stt_piece_height': cart_item.stock.height,
+                })
+                
             try:
-                shipping_cost = lionparcel.make_booking(
-                    stt_goods_estimate_price=subtotal_amount, 
+                booking = lionparcel.make_booking(
+                    stt_goods_estimate_price=int(subtotal_amount), 
                     stt_origin=contact.origin,
-                    stt_destination=shipping.destination,
+                    stt_destination=shipping.destination.route,
                     stt_sender_name=contact.name,
                     stt_sender_phone=contact.phone,
                     stt_sender_address=contact.address,
-                    stt_recipient_name=shipping.name,
-                    stt_recipient_address=shipping.address, 
-                    stt_recipient_phone=shipping.phone,
-                    stt_product_type=shipping.product_type,
-                    stt_pieces=[
-                        {
-                            'weight': shipping.weight,
-                            'length': shipping.length,
-                            'width': shipping.width,
-                            'height': shipping.height,
-                            'quantity': 1
-                        },
-                    ]
+                    stt_recipient_name=shipping.receiver_name,
+                    stt_recipient_address=shipping.receiver_address, 
+                    stt_recipient_phone=shipping.receiver_phone,
+                    stt_product_type=shipping_type,
+                    stt_pieces=stt_pieces
                 )
+
+                # get shipping cost
+                shipping_cost = booking['stt']['stt_price']
+                shipping_ref_code = booking['stt']['stt_code']
             except Exception as e:
-                print(e)
-
-        else:
-            shipping_cost = 0
-            shipping_ref_code = None
-
+                raise serializers.ValidationError(str(e))
+                 
         # calculate tax amount
         tax_amount = 0
 
         # calculate total price
         total_amount = subtotal_amount + shipping_cost + tax_amount
-
-        # get payment status
-        try:
-            payment_status = self.request.data['payment_status']
-        except KeyError:
-            payment_status = 'pending'
-
-        # get payment ref code
-        try:
-            payment_ref_code = self.request.data['payment_ref_code']
-        except KeyError:
-            payment_ref_code = None
-
-        # get note
-        try:
-            note = self.request.data['note']
-        except KeyError:
-            note = None
 
         # create order
         order = serializer.save(
@@ -138,10 +125,7 @@ class OrderCreateView(generics.CreateAPIView):
             shipping_ref_code=shipping_ref_code,
             tax_amount = tax_amount,
             subtotal_amount=subtotal_amount,
-            total_amount=total_amount,
-            payment_status=payment_status,
-            payment_ref_code=payment_ref_code,
-            note=note
+            total_amount=int(total_amount),
         )
 
         # create order items
