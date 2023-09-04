@@ -26,8 +26,8 @@ class ShippingViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['receiver_name', 'receiver_phone', 'receiver_address', 'origin__city', 'destination__city']
-    ordering_fields = ['origin__city', 'origin__route', 'destination__city', 'destination__route', 'created_at', 'updated_at']
-    ordering = ['origin__city', 'origin__route', 'destination__city', 'destination__route', 'created_at', 'updated_at']
+    ordering_fields = ['destination__city', 'destination__route', 'created_at', 'updated_at']
+    ordering = ['destination__city', 'destination__route', 'created_at', 'updated_at']
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
