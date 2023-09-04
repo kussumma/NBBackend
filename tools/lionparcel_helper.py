@@ -19,7 +19,7 @@ class LionParcelHelper:
         if response.status_code == 200:
             return response.json()
         else:
-            raise Exception(f"API request failed with status code {response.status_code}: {response.text}")
+            raise Exception(response.json()['message']['en'])
 
     def get_tariff(self, origin, destination, weight, commodity):
         """
@@ -93,10 +93,7 @@ class LionParcelHelper:
         
         if not stt_pieces:
             raise Exception("stt_pieces is required")
-        
-        if not isinstance(stt_pieces, dict):
-            raise Exception("stt_pieces must be a dictionary")
-    
+
         # create the booking data
         booking_data = {
             "stt_goods_estimate_price": stt_goods_estimate_price,
