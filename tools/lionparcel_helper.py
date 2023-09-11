@@ -16,10 +16,10 @@ class LionParcelHelper:
         url = f'{self.BASE_URL}/{endpoint}'
         response = requests.request(method, url, headers=headers, params=params, json=data)
 
-        if response.status_code == 200:
+        if response.status_code == 200 or response.status_code == 201:
             return response.json()
         else:
-            raise Exception(response.json()['message']['en'])
+            raise Exception(response.json())
 
     def get_tariff(self, origin, destination, weight, commodity):
         """
@@ -41,7 +41,7 @@ class LionParcelHelper:
         }
         return self._make_request(endpoint, params=params)
     
-    def make_booking(self, stt_goods_estimate_price, stt_origin, stt_destination, stt_sender_name, stt_sender_phone, stt_sender_address, stt_recipient_name, stt_recipient_address, stt_recipient_phone, stt_product_type, stt_pieces):
+    def make_booking(self, stt_goods_estimate_price, stt_origin, stt_destination, stt_sender_name, stt_sender_phone, stt_sender_address, stt_recipient_name, stt_recipient_address, stt_recipient_phone, stt_product_type, stt_commodity_code, stt_pieces):
         """
         Make a booking for a shipment.
 
@@ -56,6 +56,7 @@ class LionParcelHelper:
         :param stt_recipient_address: The address of the recipient.
         :param stt_recipient_phone: The phone number of the recipient.
         :param stt_product_type: The product type of the shipment.
+        :param stt_commodity_code: The commodity code.
         :param stt_pieces: The dictionary containing the pieces information.
         :return: A dictionary containing the booking information.
         """
@@ -91,12 +92,19 @@ class LionParcelHelper:
         if not stt_product_type:
             raise Exception("stt_product_type is required")
         
+        if not stt_commodity_code:
+            raise Exception("stt_commodity_code is required")
+        
         if not stt_pieces:
             raise Exception("stt_pieces is required")
 
         # create the booking data
         booking_data = {
+            "stt_no": "",
+            "stt_no_ref_external": "",
+            "stt_tax_number": "",
             "stt_goods_estimate_price": stt_goods_estimate_price,
+            "stt_goods_status": "",
             "stt_origin": stt_origin,
             "stt_destination": stt_destination,
             "stt_sender_name": stt_sender_name,
@@ -105,11 +113,15 @@ class LionParcelHelper:
             "stt_recipient_name": stt_recipient_name,
             "stt_recipient_address": stt_recipient_address,
             "stt_recipient_phone": stt_recipient_phone,
+            "stt_insurance_type": "free",
             "stt_product_type": stt_product_type,
-            "stt_commodity_code": 'COS 2',
+            "stt_commodity_code": stt_commodity_code,
             "stt_is_cod": False,
             "stt_is_woodpacking": False,
             "stt_pieces": stt_pieces,
+            "stt_piece_per_pack": 0,
+            "stt_next_commodity": "",
+            "stt_cod_amount": 0
         }
 
         # reformat the data to follow the API format
