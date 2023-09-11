@@ -1,12 +1,13 @@
 from rest_framework import filters
 from rest_framework import generics, viewsets
-from rest_framework import serializers, status
-from rest_framework.response import Response
+from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from django.db import transaction
+import math
 
 from apps.cart.models import Cart, CartItem
 from apps.coupons.models import Coupon, CouponUser
-from .models import Order, OrderItem, ReturnOrder, RefundOrder, ReturnImage
+from .models import Order, OrderItem, ReturnOrder, RefundOrder
 from .serializers import OrderSerializer, ReturnOrderSerializer, RefundOrderSerializer
 from apps.shipping.models import Shipping
 from tools.lionparcel_helper import LionParcelHelper
@@ -46,11 +47,13 @@ class OrderCreateView(generics.CreateAPIView):
             # check if coupon is valid
             if coupon.is_valid() is False:
                 raise serializers.ValidationError('Coupon is not valid or expired')
-
-        # calculate subtotal amount
+            
+        # calculate subtotal amount and total weight
         subtotal_amount = 0
+        total_weight = 0
         for cart_item in cart_items:
             subtotal_amount += cart_item.total_price
+            total_weight += cart_item.stock.weight * cart_item.quantity
 
         # check if coupon is valid for this order
         if coupon:
@@ -66,6 +69,13 @@ class OrderCreateView(generics.CreateAPIView):
             shipping = Shipping.objects.get(id=shipping_id)
         except (KeyError, Shipping.DoesNotExist):
             raise serializers.ValidationError('Shipping is required')
+        
+        # get shipping cost
+        try:
+            shipping_cost = self.request.data['shipping_cost']
+            shipping_cost = int(shipping_cost)
+        except KeyError:
+            raise serializers.ValidationError('Please select shipping package')
 
         # get shipping type
         try:
@@ -101,54 +111,60 @@ class OrderCreateView(generics.CreateAPIView):
                     stt_recipient_address=shipping.receiver_address, 
                     stt_recipient_phone=shipping.receiver_phone,
                     stt_product_type=shipping_type,
+                    stt_commodity_code=contact.commodity,
                     stt_pieces=stt_pieces
                 )
 
-                # get shipping cost
-                shipping_cost = booking['stt']['stt_price']
-                shipping_ref_code = booking['stt']['stt_code']
+                # get shipping ref code
+                if booking['success']:
+                    shipping_ref_code = booking['data']['stt'][0]['stt_no']
+                else:
+                    raise serializers.ValidationError(booking['message']['en'])
+            
             except Exception as e:
                 raise serializers.ValidationError(str(e))
                  
         # calculate tax amount
-        tax_amount = 0
+        tax_amount = math.ceil(( subtotal_amount * 10 ) / 100)
 
         # calculate total price
         total_amount = subtotal_amount + shipping_cost + tax_amount
 
-        # create order
-        order = serializer.save(
-            user=user, 
-            coupon=coupon, 
-            shipping=shipping, 
-            shipping_cost=shipping_cost, 
-            shipping_ref_code=shipping_ref_code,
-            tax_amount = tax_amount,
-            subtotal_amount=subtotal_amount,
-            total_amount=int(total_amount),
-        )
-
-        # create order items
-        for cart_item in cart_items:
-            OrderItem.objects.create(
-                order=order,
-                product=cart_item.product,
-                stock=cart_item.stock,
-                quantity=cart_item.quantity,
-                total_price=cart_item.total_price,
+        # use transaction atomic when creating order
+        with transaction.atomic():
+            order = serializer.save(
+                user=user, 
+                coupon=coupon, 
+                shipping=shipping, 
+                shipping_cost=shipping_cost, 
+                shipping_ref_code=shipping_ref_code,
+                tax_amount = tax_amount,
+                subtotal_amount=subtotal_amount,
+                total_amount=math.ceil(total_amount),
+                total_weight=math.ceil(total_weight)
             )
 
-        # recalculating stock
-        for cart_item in cart_items:
-            cart_item.stock.quantity -= cart_item.quantity
-            cart_item.stock.save()
+            # create order items
+            for cart_item in cart_items:
+                OrderItem.objects.create(
+                    order=order,
+                    product=cart_item.product,
+                    stock=cart_item.stock,
+                    quantity=cart_item.quantity,
+                    total_price=cart_item.total_price,
+                )
 
-        # delete cart items
-        cart_items.delete()
+            # recalculating stock
+            for cart_item in cart_items:
+                cart_item.stock.quantity -= cart_item.quantity
+                cart_item.stock.save()
 
-        # set coupon as used
-        if coupon:
-            CouponUser.objects.create(coupon=coupon, user=user)
+            # delete cart items
+            cart_items.delete()
+
+            # set coupon as used
+            if coupon:
+                CouponUser.objects.create(coupon=coupon, user=user)
 
         return order
     
