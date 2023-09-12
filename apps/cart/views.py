@@ -1,4 +1,5 @@
 from rest_framework import viewsets, filters, status, permissions
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
@@ -143,5 +144,14 @@ class CartItemViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
 
         return super().partial_update(request, *args, **kwargs)
-    
 
+class SelectedItemAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = self.request.user
+        cart = Cart.objects.get(user=user)
+        cart_items = CartItem.objects.filter(cart=cart, is_selected=True)
+        serializer = CartItemSerializer(cart_items, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
