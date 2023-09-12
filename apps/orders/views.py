@@ -75,7 +75,7 @@ class OrderCreateView(generics.CreateAPIView):
             shipping_cost = self.request.data['shipping_cost']
             shipping_cost = int(shipping_cost)
         except KeyError:
-            raise serializers.ValidationError('Please select shipping package')
+            raise serializers.ValidationError('Shipping cost is required')
 
         # get shipping type
         try:
@@ -98,22 +98,25 @@ class OrderCreateView(generics.CreateAPIView):
                     'stt_piece_width': cart_item.stock.width,
                     'stt_piece_height': cart_item.stock.height,
                 })
+
+            # create booking data
+            booking_data = {
+                "stt_goods_estimate_price": 0,
+                "stt_origin": contact.origin,
+                "stt_destination": shipping.destination.route,
+                "stt_sender_name": contact.name,
+                "stt_sender_phone": contact.phone,
+                "stt_sender_address": contact.address,
+                "stt_recipient_name": shipping.receiver_name,
+                "stt_recipient_address": shipping.receiver_address,
+                "stt_recipient_phone": shipping.receiver_phone,
+                "stt_product_type": shipping_type,
+                "stt_commodity_code": contact.commodity,
+                "stt_pieces": stt_pieces
+            }
                 
             try:
-                booking = lionparcel.make_booking(
-                    stt_goods_estimate_price=int(subtotal_amount), 
-                    stt_origin=contact.origin,
-                    stt_destination=shipping.destination.route,
-                    stt_sender_name=contact.name,
-                    stt_sender_phone=contact.phone,
-                    stt_sender_address=contact.address,
-                    stt_recipient_name=shipping.receiver_name,
-                    stt_recipient_address=shipping.receiver_address, 
-                    stt_recipient_phone=shipping.receiver_phone,
-                    stt_product_type=shipping_type,
-                    stt_commodity_code=contact.commodity,
-                    stt_pieces=stt_pieces
-                )
+                booking = lionparcel.make_booking(booking_data)
 
                 # get shipping ref code
                 if booking['success']:

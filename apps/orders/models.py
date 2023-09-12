@@ -74,7 +74,7 @@ class Order(models.Model):
         secret_number = secrets.token_hex(4).upper()
         
         # Create the order reference code by combining the date and secret number
-        refcode = f"{year}{month:02d}{day:02d}-{secret_number}"
+        refcode = f"{year}{month:02d}{day:02d}{secret_number}"
         
         return refcode
     
