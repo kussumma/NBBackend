@@ -111,7 +111,7 @@ class CartItemViewSet(viewsets.ModelViewSet):
 
         increase_quantity = request.data.get('increase_quantity', False)
         decrease_quantity = request.data.get('decrease_quantity', False)
-        set_as_selected = request.data.get('set_as_selected', False)
+        set_as_selected = request.data.get('set_as_selected', True)
 
         if increase_quantity:
             # Check if the quantity of this product is enough
@@ -137,9 +137,9 @@ class CartItemViewSet(viewsets.ModelViewSet):
                     'quantity': instance.quantity,
                 }, status=status.HTTP_400_BAD_REQUEST)
             
-        elif set_as_selected:
+        elif set_as_selected is not None:
             # Set this item as selected
-            instance.set_as_selected()
+            instance.set_as_selected(set_as_selected)
             serializer = self.get_serializer(instance)
             return Response(serializer.data)
 
