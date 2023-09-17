@@ -1,5 +1,6 @@
 from rest_framework import viewsets, permissions, filters, views, status
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 
 from .models import Shipping, ShippingRoute
 from .serializers import (
@@ -38,7 +39,24 @@ class ShippingViewSet(viewsets.ModelViewSet):
         return ShippingSerializer
     
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        # check if the shipping reach the maximum limit
+        user = self.request.user
+        shipping_count = Shipping.objects.filter(user=user).count()
+
+        if shipping_count >= 5:
+            raise ValidationError("Maximum limit reached, you can only have 5 shipping address.")
+        
+        serializer.save(user=user)
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        set_as_default = request.data.get('set_as_default', False)
+        if set_as_default:
+            Shipping.objects.filter(user=instance.user).update(is_default=False)
+            instance.is_default = True
+            instance.save()
+        return super().partial_update(request, *args, **kwargs)
 
 class ShippingTariffAPIView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -56,14 +74,8 @@ class ShippingTariffAPIView(views.APIView):
         if not cart_items:
             return Response({"error": "cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # get shipping
-        shipping = request.GET.get('shipping')
-
-        if not shipping:
-            return Response({"error": "shipping is required"}, status=status.HTTP_400_BAD_REQUEST)
-        
         try:
-            shipping = Shipping.objects.get(id=shipping)
+            shipping = Shipping.objects.get(user=user, is_default=True)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
