@@ -8,7 +8,7 @@ User = get_user_model()
 
 from apps.products.models import Product, Stock
 from apps.coupons.models import Coupon
-from apps.shipping.models import Shipping
+from apps.shipping.models import Shipping, ShippingRoute
 
 
 STATUS_CHOICES = (
@@ -48,10 +48,6 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.TextField(choices=STATUS_CHOICES, default='pending')
-    shipping = models.ForeignKey(Shipping, on_delete=models.SET_NULL, null=True, blank=True, related_name='shipping_orders')
-    shipping_type = models.TextField(choices=SHIPPING_TYPE_CHOICES, default='REGPACK')
-    shipping_cost = models.PositiveIntegerField(default=0)
-    shipping_ref_code = models.CharField(max_length=100, null=True, blank=True)
     payment_status = models.TextField(choices=PAYMENT_STATUS_CHOICES, default='pending')
     payment_ref_code = models.CharField(max_length=100, null=True, blank=True)
     tax_amount = models.PositiveIntegerField(default=0)
@@ -82,6 +78,22 @@ class Order(models.Model):
         if not self.ref_code:
             self.ref_code = self.generate_ref_code().upper()
         super().save(*args, **kwargs)
+
+class ShippingOrder(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='shipping_order')
+    receiver_name = models.CharField(max_length=100)
+    receiver_phone = models.CharField(max_length=100)
+    receiver_address = models.CharField(max_length=100)
+    destination = models.ForeignKey(ShippingRoute, on_delete=models.CASCADE, related_name='destination_shippings_orders')
+    shipping_type = models.TextField(choices=SHIPPING_TYPE_CHOICES, default='REGPACK')
+    shipping_cost = models.PositiveIntegerField(default=0)
+    shipping_ref_code = models.CharField(max_length=100, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.order.ref_code} - {self.destination.route}"
     
 class OrderItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -99,6 +111,8 @@ class OrderItem(models.Model):
     def save(self, *args, **kwargs):
         self.total_price = self.stock.price * self.quantity
         super().save(*args, **kwargs)
+
+
 
 class ReturnOrder(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

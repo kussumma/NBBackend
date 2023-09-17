@@ -7,7 +7,7 @@ import math
 
 from apps.cart.models import Cart, CartItem
 from apps.coupons.models import Coupon, CouponUser
-from .models import Order, OrderItem, ReturnOrder, RefundOrder
+from .models import Order, OrderItem, ReturnOrder, RefundOrder, ShippingOrder
 from .serializers import OrderSerializer, ReturnOrderSerializer, RefundOrderSerializer
 from apps.shipping.models import Shipping
 from tools.lionparcel_helper import LionParcelHelper
@@ -65,8 +65,7 @@ class OrderCreateView(generics.CreateAPIView):
 
         # get shipping details
         try:
-            shipping_id = self.request.data['shipping']
-            shipping = Shipping.objects.get(id=shipping_id)
+            shipping = Shipping.objects.get(user=user, is_default=True)
         except (KeyError, Shipping.DoesNotExist):
             raise serializers.ValidationError('Shipping is required')
         
@@ -137,10 +136,7 @@ class OrderCreateView(generics.CreateAPIView):
         with transaction.atomic():
             order = serializer.save(
                 user=user, 
-                coupon=coupon, 
-                shipping=shipping, 
-                shipping_cost=shipping_cost, 
-                shipping_ref_code=shipping_ref_code,
+                coupon=coupon,
                 tax_amount = tax_amount,
                 subtotal_amount=subtotal_amount,
                 total_amount=math.ceil(total_amount),
@@ -156,6 +152,17 @@ class OrderCreateView(generics.CreateAPIView):
                     quantity=cart_item.quantity,
                     total_price=cart_item.total_price,
                 )
+
+            # create shipping order
+            ShippingOrder.objects.create(
+                order=order,
+                receiver_name=shipping.receiver_name,
+                receiver_phone=shipping.receiver_phone,
+                receiver_address=shipping.receiver_address,
+                destination=shipping.destination,
+                shipping_type=shipping_type,
+                shipping_cost=shipping_cost
+            )
 
             # recalculating stock
             for cart_item in cart_items:
