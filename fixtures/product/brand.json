@@ -1,0 +1,24 @@
+[
+    {
+        "model": "products.brand",
+        "pk": "07456675-287a-461e-b892-da30d439abe6",
+        "fields": {
+            "name": "Crandy",
+            "description": "Test brand 2",
+            "origin": "Korea",
+            "cover": "brands/no_picture.png",
+            "slug": "crandy"
+        }
+    },
+    {
+        "model": "products.brand",
+        "pk": "9c0ea1e4-fee0-4aa2-8b43-5040e513eeac",
+        "fields": {
+            "name": "Brandy",
+            "description": "Test brand 1",
+            "origin": "Indonesia",
+            "cover": "brands/no_picture.png",
+            "slug": "brandy"
+        }
+    }
+]

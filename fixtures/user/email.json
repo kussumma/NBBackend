@@ -1,0 +1,12 @@
+[
+    {
+        "model": "account.emailaddress",
+        "pk": 1,
+        "fields": {
+            "user": "a61a83af-47fd-41d8-ac30-de210c238392",
+            "email": "user@gmail.com",
+            "verified": true,
+            "primary": true
+        }
+    }
+]

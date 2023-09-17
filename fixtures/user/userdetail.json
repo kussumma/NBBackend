@@ -1,0 +1,34 @@
+[
+    {
+        "model": "accounts.userdetail",
+        "pk": "23988657-6a86-4202-bf46-f78d722e3854",
+        "fields": {
+            "user": "a61a83af-47fd-41d8-ac30-de210c238392",
+            "phone_number": null,
+            "gender": "other",
+            "date_of_birth": null,
+            "newsletter": false,
+            "city": null,
+            "country": null,
+            "language": "EN",
+            "theme": "light",
+            "currency": "IDR"
+        }
+    },
+    {
+        "model": "accounts.userdetail",
+        "pk": "c7bf63a4-834a-4669-872c-d0d6cb598ab5",
+        "fields": {
+            "user": "324a38d1-2a21-48fc-839a-59960e08b576",
+            "phone_number": null,
+            "gender": "other",
+            "date_of_birth": null,
+            "newsletter": false,
+            "city": null,
+            "country": null,
+            "language": "EN",
+            "theme": "light",
+            "currency": "IDR"
+        }
+    }
+]

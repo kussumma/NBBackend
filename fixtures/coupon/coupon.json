@@ -1,0 +1,17 @@
+[
+{
+    "model": "coupons.coupon",
+    "pk": "8e028e1e-feec-4483-a969-97a948ad5d74",
+    "fields": {
+        "code": "A1B2C3D4",
+        "hashed_code": "76b9579a121716fddcc6a8dc42eef1fb9a76243772d484745086b2442dbbdde4",
+        "name": "Dummy Coupon",
+        "discount_type": "28c0d4b1-b1d4-451a-afad-5589e2f633e7",
+        "discount_value": 10,
+        "min_purchase": 100000,
+        "valid_from": "2023-09-17T10:00:31Z",
+        "valid_to": "2024-10-17T10:00:52Z",
+        "is_active": true
+    }
+}
+]

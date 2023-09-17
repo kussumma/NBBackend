@@ -1,0 +1,46 @@
+[
+    {
+        "model": "products.subsubcategory",
+        "pk": "4f0074a8-caea-48a5-ab84-431728b83410",
+        "fields": {
+            "name": "BBBSubsubcategory",
+            "description": "test subsubcategory",
+            "cover": "subsubcategories/no_picture.png",
+            "slug": "bbbsubsubcategory",
+            "subcategory": "3549345c-8ad3-4111-a564-e22264985531"
+        }
+    },
+    {
+        "model": "products.subsubcategory",
+        "pk": "a160e97b-8d0b-4762-bac8-61fded04abfe",
+        "fields": {
+            "name": "AAASubsubcategory",
+            "description": "test subsubcategory",
+            "cover": "subsubcategories/no_picture.png",
+            "slug": "aaasubsubcategory",
+            "subcategory": "e489737d-9527-4e22-9ee7-310bfa863344"
+        }
+    },
+    {
+        "model": "products.subsubcategory",
+        "pk": "c5ff5c28-9e2f-40d5-838a-7d6f1eee0d63",
+        "fields": {
+            "name": "AABSubsubcategory",
+            "description": "test subsubcategory",
+            "cover": "subsubcategories/no_picture.png",
+            "slug": "aabsubsubcategory",
+            "subcategory": "4df4e309-17be-46f3-9a8b-67045058b862"
+        }
+    },
+    {
+        "model": "products.subsubcategory",
+        "pk": "dc27ceaf-9a0f-4741-8e78-8acd76ecd691",
+        "fields": {
+            "name": "BBASubsubcategory",
+            "description": "test subsubcategory",
+            "cover": "subsubcategories/no_picture.png",
+            "slug": "bbasubsubcategory",
+            "subcategory": "762790a9-a232-4851-8f32-db3decbe643a"
+        }
+    }
+]
