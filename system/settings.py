@@ -224,6 +224,13 @@ BACKEND_URL = config('BACKEND_URL')
 # LION PARCEL API
 LIONPARCEL_API_KEY = config('LIONPARCEL_API_KEY')
 
+# MIDTRANS
+MIDTRANS = {
+    'MERCHANT_ID': config('MIDTRANS_MERCHANT_ID'),
+    'SERVER_KEY': config('MIDTRANS_SERVER_KEY'),
+    'CLIENT_KEY': config('MIDTRANS_CLIENT_KEY'),
+}
+
 # EMAIL
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config('EMAIL_HOST')
