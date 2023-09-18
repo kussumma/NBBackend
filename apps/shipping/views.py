@@ -1,17 +1,24 @@
 from rest_framework import viewsets, permissions, filters, views, status
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
+from tools.custom_permissions import IsAdminOrReadOnly
+import math
 
-from .models import Shipping, ShippingRoute
+from .models import Shipping, ShippingRoute, ShippingGroup, ShippingType, ShippingGroupItem, ShippingGroupTariff
 from .serializers import (
     ShippingSerializer, 
     ShippingWriteSerializer, 
-    ShippingRouteSerializer, 
+    ShippingRouteSerializer,
+    ShippingGroupItemSerializer,
+    ShippingGroupTariffSerializer,
+    ShippingTypeSerializer,
+    ShippingGroupSerializer
 )
 from tools.lionparcel_helper import LionParcelHelper
 from system.settings import LIONPARCEL_API_KEY
 from apps.store.models import Contact
 from apps.cart.models import Cart, CartItem
+from .helpers import lionparcel_tariff_mapping
 
 class ShippingRouteViewSet(viewsets.ModelViewSet):
     queryset = ShippingRoute.objects.all()
@@ -90,6 +97,10 @@ class ShippingTariffAPIView(views.APIView):
         for cart_item in cart_items:
             weight += cart_item.stock.weight * cart_item.quantity
 
+        # convert the weight to kg from gram and round it up
+        if weight > 0:
+            weight = math.ceil(weight / 1000)
+
         lionparcel = LionParcelHelper(LIONPARCEL_API_KEY)
         try:
             response = lionparcel.get_tariff(
@@ -101,4 +112,45 @@ class ShippingTariffAPIView(views.APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
+        try:
+            response = lionparcel_tariff_mapping(response)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
         return Response(response, status=status.HTTP_200_OK)
+    
+class ShippingGroupViewSet(viewsets.ModelViewSet):
+    queryset = ShippingGroup.objects.all()
+    serializer_class = ShippingGroupSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name']
+    ordering_fields = ['name', 'created_at', 'updated_at']
+    ordering = ['name', 'created_at', 'updated_at']
+
+class ShippingGroupItemViewSet(viewsets.ModelViewSet):
+    queryset = ShippingGroupItem.objects.all()
+    serializer_class = ShippingGroupItemSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['shipping_group__name', 'shipping_route__route']
+    ordering_fields = ['shipping_group__name', 'shipping_route__route', 'created_at', 'updated_at']
+    ordering = ['shipping_group__name', 'shipping_route__route', 'created_at', 'updated_at']
+
+class ShippingGroupTariffViewSet(viewsets.ModelViewSet):
+    queryset = ShippingGroupTariff.objects.all()
+    serializer_class = ShippingGroupTariffSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['shipping_group__name', 'shipping_type__name']
+    ordering_fields = ['shipping_group__name', 'shipping_type__name', 'created_at', 'updated_at']
+    ordering = ['shipping_group__name', 'shipping_type__name', 'created_at', 'updated_at']
+
+class ShippingTypeViewSet(viewsets.ModelViewSet):
+    queryset = ShippingType.objects.all()
+    serializer_class = ShippingTypeSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name']
+    ordering_fields = ['name', 'created_at', 'updated_at']
+    ordering = ['name', 'created_at', 'updated_at']
