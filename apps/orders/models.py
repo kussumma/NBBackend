@@ -33,13 +33,6 @@ RETURN_REFUND_STATUS_CHOICES = (
     ('rejected', 'Rejected'),
 )
 
-SHIPPING_TYPE_CHOICES = (
-    ('ONEPACK', 'ONEPACK'),
-    ('REGPACK', 'REGPACK'),
-    ('JAGOPACK', 'JAGOPACK'),
-    ('INTERPACK', 'INTERPACK'),
-)
-
 class Order(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     ref_code = models.CharField(max_length=100, unique=True)
@@ -86,7 +79,7 @@ class ShippingOrder(models.Model):
     receiver_phone = models.CharField(max_length=100)
     receiver_address = models.CharField(max_length=100)
     destination = models.ForeignKey(ShippingRoute, on_delete=models.CASCADE, related_name='destination_shippings_orders')
-    shipping_type = models.TextField(choices=SHIPPING_TYPE_CHOICES, default='REGPACK')
+    shipping_type = models.TextField(max_length=100, blank=True, null=True)
     shipping_cost = models.PositiveIntegerField(default=0)
     shipping_ref_code = models.CharField(max_length=100, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
