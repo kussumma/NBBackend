@@ -1,20 +1,20 @@
 from rest_framework import serializers
 
-from .models import Order, OrderItem, ReturnOrder, RefundOrder, ReturnImage, ShippingOrder
+from .models import Order, OrderItem, ReturnOrder, RefundOrder, ReturnImage, OrderShipping
 
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = '__all__'
 
-class ShippingOrderSerializer(serializers.ModelSerializer):
+class OrderShippingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ShippingOrder
+        model = OrderShipping
         fields = '__all__'
 
 class OrderSerializer(serializers.ModelSerializer):
     order_items = OrderItemSerializer(many=True, read_only=True)
-    shipping_order = ShippingOrderSerializer(read_only=True)
+    order_shipping = OrderShippingSerializer(read_only=True)
     class Meta:
         model = Order
         fields = '__all__'
