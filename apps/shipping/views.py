@@ -14,10 +14,9 @@ from .serializers import (
     ShippingTypeSerializer,
     ShippingGroupSerializer
 )
-from tools.lionparcel_helper import LionParcelHelper
-from system.settings import LIONPARCEL_API_KEY
-from apps.store.models import Contact
 from apps.cart.models import Cart, CartItem
+
+from .helpers import lionparcel_original_tariff
 from .helpers import lionparcel_tariff_mapping
 
 class ShippingRouteViewSet(viewsets.ModelViewSet):
@@ -68,11 +67,12 @@ class ShippingViewSet(viewsets.ModelViewSet):
 class ShippingTariffAPIView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request):
-        # get cart items
+    def get(self, request, *args, **kwargs):
         user = self.request.user
+
+        # get cart and items
         cart = Cart.objects.get(user=user)
-        
+            
         try:
             cart_items = CartItem.objects.filter(cart=cart, is_selected=True)
         except CartItem.DoesNotExist:
@@ -80,17 +80,6 @@ class ShippingTariffAPIView(views.APIView):
 
         if not cart_items:
             return Response({"error": "cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            shipping = Shipping.objects.get(user=user, is_default=True)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
-        # get store contact
-        try:
-            store = Contact.objects.get(is_active=True)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
         weight = 0
 
@@ -101,19 +90,18 @@ class ShippingTariffAPIView(views.APIView):
         if weight > 0:
             weight = math.ceil(weight / 1000)
 
-        lionparcel = LionParcelHelper(LIONPARCEL_API_KEY)
         try:
-            response = lionparcel.get_tariff(
-                origin=store.origin,
-                destination=shipping.destination.route,
-                weight=weight,
-                commodity=store.commodity,
-            )
+            shipping = Shipping.objects.get(user=user, is_default=True)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            original_tariff = lionparcel_original_tariff(weight, shipping)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            response = lionparcel_tariff_mapping(response)
+            response = lionparcel_tariff_mapping(original_tariff)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         

@@ -1,4 +1,32 @@
+from rest_framework import status
+from rest_framework.response import Response
+import math
+from django.conf import settings
+
 from .models import ShippingGroupTariff
+from apps.store.models import Contact
+from tools.lionparcel_helper import LionParcelHelper
+
+def lionparcel_original_tariff(weight, shipping):
+
+    # get store contact
+    try:
+        store = Contact.objects.get(is_active=True)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    lionparcel = LionParcelHelper(settings.LIONPARCEL_API_KEY)
+    try:
+        response = lionparcel.get_tariff(
+            origin=store.origin,
+            destination=shipping.destination.route,
+            weight=weight,
+            commodity=store.commodity,
+        )
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+    return response
 
 def lionparcel_tariff_mapping(api_response: dict):
     # get the weight
@@ -19,6 +47,7 @@ def lionparcel_tariff_mapping(api_response: dict):
         product = result_item.get('product')
         is_embargo = result_item.get('is_embargo')
         estimasi_sla = result_item.get('estimasi_sla')
+        tariff = result_item.get('total_normal_tariff')
 
         # check the product is not embargo
         if not is_embargo:
@@ -49,7 +78,7 @@ def lionparcel_tariff_mapping(api_response: dict):
                 default_result.append({
                     'weight': weight,
                     'destination': destination,
-                    'total_tariff': 0,
+                    'total_tariff': tariff,
                     'shipping_type': product,
                     'is_embargo': is_embargo,
                     'estimasi_sla': estimasi_sla,
