@@ -1,39 +1,41 @@
-from rest_framework import filters
-from rest_framework import generics, viewsets
-from rest_framework import serializers
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework import filters, serializers, viewsets, status
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
 import math
 
 from apps.cart.models import Cart, CartItem
 from apps.coupons.models import Coupon, CouponUser
-from .models import Order, OrderItem, ReturnOrder, RefundOrder, ShippingOrder
+from .models import Order, OrderItem, ReturnOrder, RefundOrder, OrderShipping
 from .serializers import OrderSerializer, ReturnOrderSerializer, RefundOrderSerializer
 from apps.shipping.models import Shipping
-from tools.lionparcel_helper import LionParcelHelper
-from system.settings import LIONPARCEL_API_KEY
-from apps.store.models import Contact
 
-class OrderCreateView(generics.CreateAPIView):
+from apps.shipping.helpers import lionparcel_original_tariff
+from apps.shipping.helpers import lionparcel_tariff_mapping
+
+class OrderViewset(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
     queryset = Order.objects.all()
     permission_classes = [IsAuthenticated]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['user__email', 'ref_code']
+    ordering_fields = ['user__email', 'ref_code', 'created_at', 'updated_at']
+    ordering = ['-created_at']
 
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
         # get cart items
         user = self.request.user
         cart = Cart.objects.get(user=user)
         
-        try:
-            cart_items = CartItem.objects.filter(cart=cart, is_selected=True)
-        except (KeyError, CartItem.DoesNotExist):
-            raise serializers.ValidationError('Cart is empty')
-
+        cart_items = CartItem.objects.filter(cart=cart, is_selected=True)
+        if not cart_items:
+            return Response({'message': 'Cart is empty'}, status=status.HTTP_400_BAD_REQUEST)
+        
         # get the coupon
-        try:
-            coupon_id = self.request.data['coupon']
+        coupon_id = request.data.get('coupon')
+        if coupon_id:
             coupon = Coupon.objects.get(id=coupon_id)
-        except (KeyError, Coupon.DoesNotExist):
+        else:
             coupon = None
 
         # check if coupon is already used
@@ -45,7 +47,7 @@ class OrderCreateView(generics.CreateAPIView):
                 pass
             
             # check if coupon is valid
-            if coupon.is_valid() is False:
+            if not coupon.is_valid():
                 raise serializers.ValidationError('Coupon is not valid or expired')
             
         # calculate subtotal amount and total weight
@@ -55,6 +57,10 @@ class OrderCreateView(generics.CreateAPIView):
             subtotal_amount += cart_item.total_price
             total_weight += cart_item.stock.weight * cart_item.quantity
 
+        # convert to kg
+        if total_weight > 0:
+            total_weight = math.ceil(total_weight / 1000)
+
         # check if coupon is valid for this order
         if coupon:
             if coupon.min_purchase > subtotal_amount:
@@ -62,107 +68,79 @@ class OrderCreateView(generics.CreateAPIView):
             
             # calculate discount price
             subtotal_amount -= (( coupon.discount_value * subtotal_amount ) / 100)
+            if coupon:
+                coupon_code = coupon.code
+        else:
+            coupon_code = None
 
         # get shipping details
-        try:
-            shipping = Shipping.objects.get(user=user, is_default=True)
-        except (KeyError, Shipping.DoesNotExist):
-            raise serializers.ValidationError('Shipping is required')
+        shipping = Shipping.objects.get(user=user, is_default=True)
+        if not shipping:
+            return Response({'message': 'Default shipping is not set'}, status=status.HTTP_400_BAD_REQUEST)
         
-        # get shipping cost
-        try:
-            shipping_cost = self.request.data['shipping_cost']
-            shipping_cost = int(shipping_cost)
-        except KeyError:
-            raise serializers.ValidationError('Shipping cost is required')
-
         # get shipping type
+        shipping_type = request.data.get('shipping_type')
+        if not shipping_type:
+            return Response({'message': 'Shipping type is not set'}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            shipping_type = self.request.data['shipping_type']
-        except KeyError:
-            raise serializers.ValidationError('Shipping type is required')
-
-        # calculate shipping cost
-        if shipping:
-            contact = Contact.objects.get(is_active=True)
-
-            lionparcel = LionParcelHelper(LIONPARCEL_API_KEY)
-
-            # create stt pieces
-            stt_pieces = []
-            for cart_item in cart_items:
-                stt_pieces.append({
-                    'stt_piece_gross_weight': cart_item.stock.weight,
-                    'stt_piece_length': cart_item.stock.length,
-                    'stt_piece_width': cart_item.stock.width,
-                    'stt_piece_height': cart_item.stock.height,
-                })
-
-            # create booking data
-            booking_data = {
-                "stt_goods_estimate_price": 0,
-                "stt_origin": contact.origin,
-                "stt_destination": shipping.destination.route,
-                "stt_sender_name": contact.name,
-                "stt_sender_phone": contact.phone,
-                "stt_sender_address": contact.address,
-                "stt_recipient_name": shipping.receiver_name,
-                "stt_recipient_address": shipping.receiver_address,
-                "stt_recipient_phone": shipping.receiver_phone,
-                "stt_product_type": shipping_type,
-                "stt_commodity_code": contact.commodity,
-                "stt_pieces": stt_pieces
-            }
-                
-            try:
-                booking = lionparcel.make_booking(booking_data)
-
-                # get shipping ref code
-                if booking['success']:
-                    shipping_ref_code = booking['data']['stt'][0]['stt_no']
-                else:
-                    raise serializers.ValidationError(booking['message']['en'])
-            
-            except Exception as e:
-                raise serializers.ValidationError(str(e))
+            original_tariff = lionparcel_original_tariff(total_weight, shipping)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            response = lionparcel_tariff_mapping(original_tariff)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # shipping cost & estimation
+        shipping_cost = 0
+        shipping_estimation = None
+        
+        # search the shipping type in response list
+        for item in response:
+            if item.get('shipping_type') == shipping_type:
+                shipping_cost = item.get('total_tariff')
+                shipping_estimation = item.get('estimasi_sla')
                  
         # calculate tax amount
-        tax_amount = math.ceil(( subtotal_amount * 10 ) / 100)
+        tax_amount = math.ceil(( ( subtotal_amount + shipping_cost ) * 10 ) / 100)
 
         # calculate total price
         total_amount = subtotal_amount + shipping_cost + tax_amount
 
         # use transaction atomic when creating order
         with transaction.atomic():
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
             order = serializer.save(
-                user=user, 
-                coupon=coupon,
+                user = user, 
+                coupon = coupon_code,
                 tax_amount = tax_amount,
-                subtotal_amount=subtotal_amount,
-                total_amount=math.ceil(total_amount),
-                total_weight=math.ceil(total_weight)
+                shipping_amount = shipping_cost,
+                subtotal_amount = subtotal_amount,
+                total_amount = math.ceil(total_amount),
+                total_weight = math.ceil(total_weight)
             )
 
             # create order items
             for cart_item in cart_items:
                 OrderItem.objects.create(
-                    order=order,
-                    product=cart_item.product,
-                    stock=cart_item.stock,
-                    quantity=cart_item.quantity,
-                    total_price=cart_item.total_price,
+                    order = order,
+                    quantity = cart_item.quantity,
+                    product_name = cart_item.product.name,
+                    product_discount = cart_item.product.discount,
+                    stock_price = cart_item.stock.price,
+                    stock_image = cart_item.stock.image,
+                    stock_size = cart_item.stock.size,
+                    stock_color = cart_item.stock.color,
+                    stock_other = cart_item.stock.other,
+                    stock_weight = cart_item.stock.weight,
+                    stock_length = cart_item.stock.length,
+                    stock_width = cart_item.stock.width,
+                    stock_height = cart_item.stock.height
                 )
-
-            # create shipping order
-            ShippingOrder.objects.create(
-                order=order,
-                receiver_name=shipping.receiver_name,
-                receiver_phone=shipping.receiver_phone,
-                receiver_address=shipping.receiver_address,
-                destination=shipping.destination,
-                shipping_type=shipping_type,
-                shipping_cost=shipping_cost
-            )
 
             # recalculating stock
             for cart_item in cart_items:
@@ -176,22 +154,18 @@ class OrderCreateView(generics.CreateAPIView):
             if coupon:
                 CouponUser.objects.create(coupon=coupon, user=user)
 
-        return order
-    
-class OrderListView(generics.ListAPIView):
-    serializer_class = OrderSerializer
-    queryset = Order.objects.all()
-    permission_classes = [IsAdminUser]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['user__email', 'coupon__code']
-    ordering_fields = ['user', 'coupon', 'created_at', 'updated_at']
-    ordering = ['-created_at']
-    
-class OrderDetailView(generics.RetrieveAPIView):
-    serializer_class = OrderSerializer
-    queryset = Order.objects.all()
-    permission_classes = [IsAuthenticated]
-    lookup_field = 'id'
+            # create shipping order
+            OrderShipping.objects.create(
+                order=order,
+                receiver_name=shipping.receiver_name,
+                receiver_phone=shipping.receiver_phone,
+                receiver_address=shipping.receiver_address,
+                destination_route=shipping.destination,
+                shipping_type=shipping_type,
+                shipping_estimation=shipping_estimation
+            )
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class ReturnOrderViewset(viewsets.ModelViewSet):
     serializer_class = ReturnOrderSerializer
