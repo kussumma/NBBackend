@@ -75,7 +75,7 @@ class LionParcelHelper:
         :return: A dictionary containing the tariff information.
         """
 
-        endpoint = '/v3/tariffv3'
+        endpoint = '/v3/tariff'
         params = {
             'origin': origin,
             'destination': destination,
