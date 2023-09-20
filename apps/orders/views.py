@@ -8,7 +8,7 @@ from apps.cart.models import Cart, CartItem
 from apps.coupons.models import Coupon, CouponUser
 from .models import Order, OrderItem, ReturnOrder, RefundOrder, OrderShipping
 from .serializers import OrderSerializer, ReturnOrderSerializer, RefundOrderSerializer
-from apps.shipping.models import Shipping
+from apps.shipping.models import Shipping, ShippingType
 
 from apps.shipping.helpers import lionparcel_original_tariff
 from apps.shipping.helpers import lionparcel_tariff_mapping
@@ -80,8 +80,10 @@ class OrderViewset(viewsets.ModelViewSet):
         
         # get shipping type
         shipping_type = request.data.get('shipping_type')
-        if not shipping_type:
-            return Response({'message': 'Shipping type is not set'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            registered_shipping_type = ShippingType.objects.get(code=shipping_type)
+        except ShippingType.DoesNotExist:
+            return Response({'message': 'Shipping type is not found'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             original_tariff = lionparcel_original_tariff(total_weight, shipping)
@@ -99,7 +101,9 @@ class OrderViewset(viewsets.ModelViewSet):
         
         # search the shipping type in response list
         for item in response:
-            if item.get('shipping_type') == shipping_type:
+            if item.get('shipping_type') == registered_shipping_type.code:
+                shipping_type = item.get('shipping_type')
+                shipping_type_name = item.get('shipping_type_name')
                 shipping_cost = item.get('total_tariff')
                 shipping_estimation = item.get('estimasi_sla')
                  
@@ -162,6 +166,7 @@ class OrderViewset(viewsets.ModelViewSet):
                 receiver_address=shipping.receiver_address,
                 destination_route=shipping.destination,
                 shipping_type=shipping_type,
+                shipping_type_name=shipping_type_name,
                 shipping_estimation=shipping_estimation
             )
 

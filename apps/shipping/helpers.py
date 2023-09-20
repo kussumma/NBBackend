@@ -1,14 +1,12 @@
 from rest_framework import status
 from rest_framework.response import Response
-import math
 from django.conf import settings
 
-from .models import ShippingGroupTariff
+from .models import ShippingGroupTariff, ShippingType
 from apps.store.models import Contact
 from tools.lionparcel_helper import LionParcelHelper
 
 def lionparcel_original_tariff(weight, shipping):
-
     # get store contact
     try:
         store = Contact.objects.get(is_active=True)
@@ -38,6 +36,11 @@ def lionparcel_tariff_mapping(api_response: dict):
     # get the result from the response
     result = api_response.get('result')
 
+    # get all enabled shipping types
+    shipping_types = ShippingType.objects.all()
+    if not shipping_types:
+        raise Exception('No shipping types found.')
+
     # create new list to store the filtered result
     filtered_result = []
     default_result = []
@@ -47,7 +50,7 @@ def lionparcel_tariff_mapping(api_response: dict):
         product = result_item.get('product')
         is_embargo = result_item.get('is_embargo')
         estimasi_sla = result_item.get('estimasi_sla')
-        tariff = result_item.get('total_normal_tariff')
+        tariff = result_item.get('total_tariff')
 
         # check the product is not embargo
         if not is_embargo:
@@ -70,19 +73,23 @@ def lionparcel_tariff_mapping(api_response: dict):
                     'destination': destination,
                     'total_tariff': new_tariff,
                     'shipping_type': product,
+                    'shipping_type_name': shipping_tariff.shipping_type.name,
                     'is_embargo': is_embargo,
                     'estimasi_sla': estimasi_sla,
                     'shipping_group': group_name
                 })
             else:
-                default_result.append({
-                    'weight': weight,
-                    'destination': destination,
-                    'total_tariff': tariff,
-                    'shipping_type': product,
-                    'is_embargo': is_embargo,
-                    'estimasi_sla': estimasi_sla,
-                    'shipping_group': None
-                })
+                for shipping_type in shipping_types:
+                    if shipping_type.code == product:
+                        filtered_result.append({
+                            'weight': weight,
+                            'destination': destination,
+                            'total_tariff': tariff,
+                            'shipping_type': product,
+                            'shipping_type_name': shipping_type.name,
+                            'is_embargo': is_embargo,
+                            'estimasi_sla': estimasi_sla,
+                            'shipping_group': None
+                        })
 
     return filtered_result if filtered_result else default_result

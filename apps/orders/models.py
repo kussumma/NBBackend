@@ -65,7 +65,7 @@ class Order(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.ref_code:
-            self.ref_code = self.generate_ref_code().upper()
+            self.ref_code = self.generate_ref_code()
         super().save(*args, **kwargs)
 
 class OrderShipping(models.Model):
@@ -76,6 +76,7 @@ class OrderShipping(models.Model):
     receiver_address = models.CharField(max_length=250)
     destination_route = models.CharField(max_length=250)
     shipping_type = models.TextField(max_length=100, blank=True, null=True)
+    shipping_type_name = models.TextField(max_length=100, blank=True, null=True)
     shipping_ref_code = models.CharField(max_length=100, null=True, blank=True)
     shipping_estimation = models.CharField(max_length=100, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
