@@ -88,12 +88,12 @@ class OrderViewset(viewsets.ModelViewSet):
         try:
             original_tariff = lionparcel_original_tariff(total_weight, shipping)
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             response = lionparcel_tariff_mapping(original_tariff)
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
         # shipping cost & estimation
         shipping_cost = 0
@@ -164,7 +164,7 @@ class OrderViewset(viewsets.ModelViewSet):
                 receiver_name=shipping.receiver_name,
                 receiver_phone=shipping.receiver_phone,
                 receiver_address=shipping.receiver_address,
-                destination_route=shipping.destination,
+                destination_route=shipping.destination.route,
                 shipping_type=shipping_type,
                 shipping_type_name=shipping_type_name,
                 shipping_estimation=shipping_estimation
