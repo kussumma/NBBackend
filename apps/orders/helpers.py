@@ -10,19 +10,19 @@ from tools.lionparcel_helper import LionParcelHelper
 def lionparcel_booking(order_id):
     order = Order.objects.get(id=order_id)
     if not order:
-        return Response({'message': 'Order not found'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'Order not found'}, status=status.HTTP_400_BAD_REQUEST)
     
     order_items = OrderItem.objects.filter(order=order)
     if not order_items:
-        return Response({'message': 'Order items not found'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'Order items not found'}, status=status.HTTP_400_BAD_REQUEST)
     
     shipping = OrderShipping.objects.get(order=order)
     if not shipping:
-        return Response({'message': 'Shipping not found'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'Shipping not found'}, status=status.HTTP_400_BAD_REQUEST)
     
     contact = Contact.objects.get(is_active=True)
     if not contact:
-        return Response({'message': 'Active contact not found'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': 'Active contact not found'}, status=status.HTTP_400_BAD_REQUEST)
     
     lionparcel = LionParcelHelper(settings.LIONPARCEL_API_KEY)
 

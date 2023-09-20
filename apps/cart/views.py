@@ -103,7 +103,7 @@ class CartItemViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         except ValidationError:
             return Response({
-                'message': 'Stock is not valid',
+                'error': 'Stock is not valid',
             }, status=status.HTTP_400_BAD_REQUEST)
         
     def partial_update(self, request, *args, **kwargs):
@@ -121,7 +121,7 @@ class CartItemViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data)
             else:
                 return Response({
-                    'message': 'Sorry, this product has not enough stock',
+                    'error': 'Sorry, this product has not enough stock',
                     'quantity': instance.quantity,
                 }, status=status.HTTP_400_BAD_REQUEST)
 
@@ -133,7 +133,7 @@ class CartItemViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data)
             else:
                 return Response({
-                    'message': 'Sorry, the quantity of this product has reached the minimum.',
+                    'error': 'Sorry, the quantity of this product has reached the minimum.',
                     'quantity': instance.quantity,
                 }, status=status.HTTP_400_BAD_REQUEST)
             

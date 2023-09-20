@@ -29,7 +29,7 @@ class OrderViewset(viewsets.ModelViewSet):
         
         cart_items = CartItem.objects.filter(cart=cart, is_selected=True)
         if not cart_items:
-            return Response({'message': 'Cart is empty'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Cart is empty'}, status=status.HTTP_400_BAD_REQUEST)
         
         # get the coupon
         coupon_id = request.data.get('coupon')
@@ -76,24 +76,24 @@ class OrderViewset(viewsets.ModelViewSet):
         # get shipping details
         shipping = Shipping.objects.get(user=user, is_default=True)
         if not shipping:
-            return Response({'message': 'Default shipping is not set'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Default shipping is not set'}, status=status.HTTP_400_BAD_REQUEST)
         
         # get shipping type
         shipping_type = request.data.get('shipping_type')
         try:
             registered_shipping_type = ShippingType.objects.get(code=shipping_type)
         except ShippingType.DoesNotExist:
-            return Response({'message': 'Shipping type is not found'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Shipping type is not found'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             original_tariff = lionparcel_original_tariff(total_weight, shipping)
         except Exception as e:
-            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
             response = lionparcel_tariff_mapping(original_tariff)
         except Exception as e:
-            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
         # shipping cost & estimation
         shipping_cost = 0
