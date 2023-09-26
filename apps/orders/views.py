@@ -1,8 +1,10 @@
+from django.shortcuts import render
 from rest_framework import filters, serializers, viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
 import math
+import datetime
 
 from apps.cart.models import Cart, CartItem
 from apps.coupons.models import Coupon, CouponUser
@@ -128,47 +130,47 @@ class OrderViewset(viewsets.ModelViewSet):
                 total_weight = math.ceil(total_weight)
             )
 
-            # create order items
-            for cart_item in cart_items:
-                OrderItem.objects.create(
-                    order = order,
-                    quantity = cart_item.quantity,
-                    product_name = cart_item.product.name,
-                    product_discount = cart_item.product.discount,
-                    stock_price = cart_item.stock.price,
-                    stock_image = cart_item.stock.image,
-                    stock_size = cart_item.stock.size,
-                    stock_color = cart_item.stock.color,
-                    stock_other = cart_item.stock.other,
-                    stock_weight = cart_item.stock.weight,
-                    stock_length = cart_item.stock.length,
-                    stock_width = cart_item.stock.width,
-                    stock_height = cart_item.stock.height
-                )
-
-            # recalculating stock
-            for cart_item in cart_items:
-                cart_item.stock.quantity -= cart_item.quantity
-                cart_item.stock.save()
-
-            # delete cart items
-            cart_items.delete()
-
-            # set coupon as used
-            if coupon:
-                CouponUser.objects.create(coupon=coupon, user=user)
-
-            # create shipping order
-            OrderShipping.objects.create(
-                order=order,
-                receiver_name=shipping.receiver_name,
-                receiver_phone=shipping.receiver_phone,
-                receiver_address=shipping.receiver_address,
-                destination_route=shipping.destination.route,
-                shipping_type=shipping_type,
-                shipping_type_name=shipping_type_name,
-                shipping_estimation=shipping_estimation
+        # create order items
+        for cart_item in cart_items:
+            OrderItem.objects.create(
+                order = order,
+                quantity = cart_item.quantity,
+                product_name = cart_item.product.name,
+                product_discount = cart_item.product.discount,
+                stock_price = cart_item.stock.price,
+                stock_image = cart_item.stock.image,
+                stock_size = cart_item.stock.size,
+                stock_color = cart_item.stock.color,
+                stock_other = cart_item.stock.other,
+                stock_weight = cart_item.stock.weight,
+                stock_length = cart_item.stock.length,
+                stock_width = cart_item.stock.width,
+                stock_height = cart_item.stock.height
             )
+
+        # recalculating stock
+        for cart_item in cart_items:
+            cart_item.stock.quantity -= cart_item.quantity
+            cart_item.stock.save()
+
+        # delete cart items
+        cart_items.delete()
+
+        # set coupon as used
+        if coupon:
+            CouponUser.objects.create(coupon=coupon, user=user)
+
+        # create shipping order
+        OrderShipping.objects.create(
+            order=order,
+            receiver_name=shipping.receiver_name,
+            receiver_phone=shipping.receiver_phone,
+            receiver_address=shipping.receiver_address,
+            destination_route=shipping.destination.route,
+            shipping_type=shipping_type,
+            shipping_type_name=shipping_type_name,
+            shipping_estimation=shipping_estimation
+        )
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
