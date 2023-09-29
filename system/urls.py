@@ -42,6 +42,9 @@ urlpatterns = [
     # Shipping
     path('api/', include('apps.shipping.urls')),
 
+    # Payments
+    path('api/', include('apps.payments.urls')),
+
 ]
 
 if settings.DEBUG:
