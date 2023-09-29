@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth import get_user_model
 import uuid
 import secrets
-from datetime import date
 
 User = get_user_model()
 
@@ -46,20 +45,14 @@ class Order(models.Model):
     note = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return f'{self.user.email} - {self.ref_code}'
+        return f'{self.created_at} - {self.user.email} - {self.ref_code}'
     
-    def generate_ref_code(self):
-        # Get the current year, month, and day
-        today = date.today()
-        year = today.year
-        month = today.month
-        day = today.day
+    def generate_ref_code(self):        
+        # Generate a random 16-digit hex number
+        secret_number = secrets.token_hex(8)
         
-        # Generate a random 8 random as a secret
-        secret_number = secrets.token_hex(4).upper()
-        
-        # Create the order reference code by combining the date and secret number
-        refcode = f"{year}{month:02d}{day:02d}{secret_number}"
+        # Create the order reference code by secret number
+        refcode = secret_number.upper()
         
         return refcode
     
