@@ -1,15 +1,17 @@
 from django.db import models
 import uuid
 
+
 class Store(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
-    logo = models.ImageField(upload_to='stores/')
+    logo = models.ImageField(upload_to="stores/")
     description = models.TextField(null=True, blank=True)
     motto = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.name
+
 
 class Contact(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -25,36 +27,39 @@ class Contact(models.Model):
     longitude = models.FloatField()
     address = models.CharField(max_length=255)
     origin = models.CharField(max_length=255)
-    commodity = models.CharField(max_length=255, default='COS 2')
+    commodity = models.CharField(max_length=255, default="COS 2")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
-    
+
+
 class About(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return self.title
-    
+
+
 class Partner(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
-    logo = models.ImageField(upload_to='partners/')
+    logo = models.ImageField(upload_to="partners/")
     description = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
-    
+
     def __str__(self):
         return self.name
-    
+
+
 class Policy(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
@@ -67,7 +72,8 @@ class Policy(models.Model):
 
     def __str__(self):
         return self.title
-    
+
+
 class FAQ(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     question = models.CharField(max_length=255)
@@ -79,7 +85,8 @@ class FAQ(models.Model):
 
     def __str__(self):
         return self.question
-    
+
+
 class CopyRight(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
@@ -89,5 +96,3 @@ class CopyRight(models.Model):
 
     def __str__(self):
         return self.title
-    
-

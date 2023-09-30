@@ -8,12 +8,13 @@ from rest_framework.permissions import AllowAny
 
 from apps.orders.models import Order
 
+
 class PaymentAPIViews(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
         # get order id from request
-        order_id = request.data.get('order_id')
+        order_id = request.data.get("order_id")
         try:
             # get order from database
             order = Order.objects.get(id=order_id)
@@ -27,35 +28,30 @@ class PaymentAPIViews(APIView):
             # get user first & last name
             user_first_name = order.user.first_name
             user_last_name = order.user.last_name
-            
+
             # get order user email
             user_email = order.user.email
 
             # get order user phone
             user_phone = order.user.user_details.phone_number
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
         # create snap client
-        snap = Snap(
-            is_production=False,
-            server_key=settings.MIDTRANS['SERVER_KEY']
-        )
+        snap = Snap(is_production=False, server_key=settings.MIDTRANS["SERVER_KEY"])
 
         # create transaction details
         param = {
-            'transaction_details': {
-                'order_id': ref_code,
-                'gross_amount': total_amount,
-                'credit_card': {
-                    'secure': True
+            "transaction_details": {
+                "order_id": ref_code,
+                "gross_amount": total_amount,
+                "credit_card": {"secure": True},
+                "customer_details": {
+                    "first_name": user_first_name,
+                    "last_name": user_last_name,
+                    "email": user_email,
+                    "phone": user_phone,
                 },
-                'customer_details': {
-                    'first_name': user_first_name,
-                    'last_name': user_last_name,
-                    'email': user_email,
-                    'phone': user_phone
-                }
             }
         }
 
@@ -63,31 +59,30 @@ class PaymentAPIViews(APIView):
         try:
             transaction_token = snap.create_transaction(param)
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         # return transaction token
-        return Response({'data': transaction_token}, status=status.HTTP_200_OK)
-    
+        return Response({"data": transaction_token}, status=status.HTTP_200_OK)
+
+
 class FinishPaymentAPIViews(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
         # get order id from request
-        order_id = request.data.get('order_id')
-        
-        snap = Snap(
-            is_production=False,
-            server_key=settings.MIDTRANS['SERVER_KEY']
-        )
+        order_id = request.data.get("order_id")
+
+        snap = Snap(is_production=False, server_key=settings.MIDTRANS["SERVER_KEY"])
 
         # get transaction status
         try:
             transaction_status = snap.transaction.status(order_id)
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
-        return Response({'data': transaction_status}, status=status.HTTP_200_OK)
-    
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"data": transaction_status}, status=status.HTTP_200_OK)
+
+
 def payment_testing(request):
     # create view to test payment
-    return render(request, 'payment/test.html')
+    return render(request, "payment/test.html")

@@ -7,12 +7,14 @@ from django.utils import timezone
 
 User = get_user_model()
 
+
 class DiscountType(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
+
 
 class Coupon(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -40,34 +42,39 @@ class Coupon(models.Model):
 
     def hash_code(self):
         sha256 = hashlib.sha256()
-        sha256.update(self.code.encode('utf-8'))
+        sha256.update(self.code.encode("utf-8"))
         return sha256.hexdigest()
 
     def verify_code(self, code):
-        hashed_input = hashlib.sha256(code.encode('utf-8')).hexdigest()
+        hashed_input = hashlib.sha256(code.encode("utf-8")).hexdigest()
         return self.hashed_code == hashed_input
 
     def is_valid(self):
         now = timezone.now()
         return self.is_active and self.valid_from <= now and self.valid_to >= now
 
+
 class CouponUser(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_coupons')
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="user_coupons"
+    )
     is_used = models.BooleanField(default=True)
     used_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'{self.coupon.name} - {self.user}'
-    
+        return f"{self.coupon.name} - {self.user}"
+
+
 class CouponBanner(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, related_name='coupon_banners')
-    image = models.ImageField(upload_to='coupon_banners')
+    coupon = models.ForeignKey(
+        Coupon, on_delete=models.CASCADE, related_name="coupon_banners"
+    )
+    image = models.ImageField(upload_to="coupon_banners")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'{self.coupon.name} - {self.image.url}'
-
+        return f"{self.coupon.name} - {self.image.url}"

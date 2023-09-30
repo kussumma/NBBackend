@@ -1,7 +1,13 @@
 from django.contrib import admin
 
 from .models import (
-    Favorite, Complaint, ComplaintImage, ProductRequest, FeatureRequest, BugReport, BugReportImage
+    Favorite,
+    Complaint,
+    ComplaintImage,
+    ProductRequest,
+    FeatureRequest,
+    BugReport,
+    BugReportImage,
 )
 
 admin.site.register(Favorite)

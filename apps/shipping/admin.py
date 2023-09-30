@@ -8,17 +8,20 @@ from .models import (
     ShippingGroup,
     ShippingGroupItem,
     ShippingGroupTariff,
-    ShippingType
+    ShippingType,
 )
+
 
 class ShippingRouteResource(resources.ModelResource):
     class Meta:
         model = ShippingRoute
-        fields = ('code', 'city', 'route', 'is_city')
-        import_id_fields = ('code', 'city', 'route')
+        fields = ("code", "city", "route", "is_city")
+        import_id_fields = ("code", "city", "route")
+
 
 class ShippingRouteAdmin(ImportExportModelAdmin):
     resource_classes = [ShippingRouteResource]
+
 
 admin.site.register(ShippingRoute, ShippingRouteAdmin)
 admin.site.register(Shipping)

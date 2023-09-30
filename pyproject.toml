@@ -21,6 +21,7 @@ django-allauth = "^0.54.0"
 dj-rest-auth = "^4.0.1"
 django-import-export = "^3.2.0"
 midtransclient = "^1.4.1"
+black = "^23.9.1"
 
 
 [build-system]

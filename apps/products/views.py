@@ -6,47 +6,67 @@ from rest_framework.response import Response
 from django.db.models import Min, Max
 from django.db.models.functions import Coalesce
 
-from .models import Category, Product, Subcategory, Subsubcategory, Brand, Rating, Wishlist, Stock
+from .models import (
+    Category,
+    Product,
+    Subcategory,
+    Subsubcategory,
+    Brand,
+    Rating,
+    Wishlist,
+    Stock,
+)
 from .serializers import (
-    CategorySerializer, 
-    ProductSerializer, 
-    SubcategorySerializer, 
+    CategorySerializer,
+    ProductSerializer,
+    SubcategorySerializer,
     SubsubcategorySerializer,
-    BrandSerializer, 
-    RatingSerializer, 
+    BrandSerializer,
+    RatingSerializer,
     WishlistSerializer,
-    StockSerializer
+    StockSerializer,
 )
 
 from tools.custom_permissions import IsAdminOrReadOnly, IsAuthenticatedOrReadOnly
 
 User = get_user_model()
 
+
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAdminOrReadOnly]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
-    search_fields = ['name', 'description']
+    filter_backends = [
+        filters.SearchFilter,
+        filters.OrderingFilter,
+        DjangoFilterBackend,
+    ]
+    search_fields = ["name", "description"]
     filterset_fields = {
-        'category': ['exact'],
-        'subcategory': ['exact'],
-        'subsubcategory': ['exact'],
-        'brand': ['exact'],
-        'product_stock__price': ['exact', 'gte', 'lte'],
-        'discount': ['exact', 'gte', 'lte'],
-        'created_at': ['exact', 'gte', 'lte'],
-        'product_ratings__star': ['exact', 'gte', 'lte'],
+        "category": ["exact"],
+        "subcategory": ["exact"],
+        "subsubcategory": ["exact"],
+        "brand": ["exact"],
+        "product_stock__price": ["exact", "gte", "lte"],
+        "discount": ["exact", "gte", "lte"],
+        "created_at": ["exact", "gte", "lte"],
+        "product_ratings__star": ["exact", "gte", "lte"],
     }
-    ordering_fields = ['name', 'product_stock__price', 'discount', 'created_at', 'product_ratings__star']
-    ordering = ['-created_at']
-    lookup_field = 'slug'
+    ordering_fields = [
+        "name",
+        "product_stock__price",
+        "discount",
+        "created_at",
+        "product_ratings__star",
+    ]
+    ordering = ["-created_at"]
+    lookup_field = "slug"
 
     def get_queryset(self):
         queryset = Product.objects.all()
         return queryset.annotate(
-            min_price=Coalesce(Min('product_stock__price'), 0), 
-            max_price=Coalesce(Max('product_stock__price'), 0)
+            min_price=Coalesce(Min("product_stock__price"), 0),
+            max_price=Coalesce(Max("product_stock__price"), 0),
         )
 
     def retrieve(self, request, *args, **kwargs):
@@ -58,7 +78,9 @@ class ProductViewSet(viewsets.ModelViewSet):
         stock_serializer = StockSerializer(stock, many=True)
 
         # get 5 latest ratings with 5 stars
-        ratings = Rating.objects.filter(product=instance, star=5).order_by('-created_at')[:5]
+        ratings = Rating.objects.filter(product=instance, star=5).order_by(
+            "-created_at"
+        )[:5]
         ratings_serializer = RatingSerializer(ratings, many=True)
 
         # acumulate all ratings
@@ -77,68 +99,78 @@ class ProductViewSet(viewsets.ModelViewSet):
         total_wishlist = wishlist.count()
 
         # get 5 latest product with same category and brand
-        related_products = Product.objects.filter(category=instance.category, brand=instance.brand).exclude(id=instance.id)[:5]
+        related_products = Product.objects.filter(
+            category=instance.category, brand=instance.brand
+        ).exclude(id=instance.id)[:5]
 
-        return Response({
-            'product': serializer.data,
-            'stock': stock_serializer.data,
-            'total_rating': average_rating,
-            'latest_rating': ratings_serializer.data,
-            'total_wishlist': total_wishlist,
-            'related_products': ProductSerializer(related_products, many=True).data
-        })
+        return Response(
+            {
+                "product": serializer.data,
+                "stock": stock_serializer.data,
+                "total_rating": average_rating,
+                "latest_rating": ratings_serializer.data,
+                "total_wishlist": total_wishlist,
+                "related_products": ProductSerializer(related_products, many=True).data,
+            }
+        )
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['name']
-    ordering_fields = ['name']
-    ordering = ['name']
-    lookup_field = 'slug'
-    
+    search_fields = ["name"]
+    ordering_fields = ["name"]
+    ordering = ["name"]
+    lookup_field = "slug"
+
+
 class SubcategoryViewSet(viewsets.ModelViewSet):
     queryset = Subcategory.objects.all()
     serializer_class = SubcategorySerializer
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['name']
-    ordering_fields = ['name']
-    ordering = ['name']
-    lookup_field = 'slug'
+    search_fields = ["name"]
+    ordering_fields = ["name"]
+    ordering = ["name"]
+    lookup_field = "slug"
+
 
 class SubsubcategoryViewset(viewsets.ModelViewSet):
     queryset = Subsubcategory.objects.all()
     serializer_class = SubsubcategorySerializer
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['name']
-    ordering_fields = ['name']
-    ordering = ['name']
-    lookup_field = 'slug'
-    
+    search_fields = ["name"]
+    ordering_fields = ["name"]
+    ordering = ["name"]
+    lookup_field = "slug"
+
+
 class BrandViewSet(viewsets.ModelViewSet):
     queryset = Brand.objects.all()
     serializer_class = BrandSerializer
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['name']
-    ordering_fields = ['name']
-    ordering = ['name']
-    lookup_field = 'slug'
-    
+    search_fields = ["name"]
+    ordering_fields = ["name"]
+    ordering = ["name"]
+    lookup_field = "slug"
+
+
 class RatingViewSet(viewsets.ModelViewSet):
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
     filterset_fields = {
-        'product': ['exact'],
-        'star': ['exact', 'gte', 'lte'],
+        "product": ["exact"],
+        "star": ["exact", "gte", "lte"],
     }
-    ordering_fields = ['star', 'created_at']
-    ordering = ['-created_at']
+    ordering_fields = ["star", "created_at"]
+    ordering = ["-created_at"]
+
 
 class WishlistViewSet(viewsets.ModelViewSet):
     queryset = Wishlist.objects.all()
@@ -146,20 +178,25 @@ class WishlistViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
     filterset_fields = {
-        'product': ['exact'],
+        "product": ["exact"],
     }
-    ordering_fields = ['created_at']
-    ordering = ['-created_at']
-    
+    ordering_fields = ["created_at"]
+    ordering = ["-created_at"]
+
+
 class StockViewSet(viewsets.ModelViewSet):
     queryset = Stock.objects.all()
     serializer_class = StockSerializer
     permission_classes = [IsAdminOrReadOnly]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
-    search_fields = ['product__name']
+    filter_backends = [
+        filters.SearchFilter,
+        filters.OrderingFilter,
+        DjangoFilterBackend,
+    ]
+    search_fields = ["product__name"]
     filterset_fields = {
-        'product': ['exact'],
-        'created_at': ['exact', 'gte', 'lte'],
+        "product": ["exact"],
+        "created_at": ["exact", "gte", "lte"],
     }
-    ordering_fields = ['product__name', 'created_at']
-    ordering = ['-created_at']
+    ordering_fields = ["product__name", "created_at"]
+    ordering = ["-created_at"]

@@ -29,13 +29,20 @@ Fields:
 - `BASE_URL`: The base URL of the Lion Parcel API.
 """
 
+
 class LionParcelHelper:
-    BASE_URL = 'https://api-stg-middleware.thelionparcel.com'
-    
+    BASE_URL = "https://api-stg-middleware.thelionparcel.com"
+
     def __init__(self, api_key):
         self.api_key = api_key
 
-    def _make_request(self, endpoint: str, method: str = 'GET', params: Optional[Dict[str, Any]] = None, data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def _make_request(
+        self,
+        endpoint: str,
+        method: str = "GET",
+        params: Optional[Dict[str, Any]] = None,
+        data: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
         """
         Makes an HTTP request to the Lion Parcel API.
 
@@ -52,19 +59,23 @@ class LionParcelHelper:
             Exception: If the response status code is not 200 or 201.
         """
         headers = {
-            'Authorization': f'Basic {self.api_key}',
-            'Content-Type': 'application/json',
+            "Authorization": f"Basic {self.api_key}",
+            "Content-Type": "application/json",
         }
 
         url = urljoin(self.BASE_URL, endpoint)
-        response = requests.request(method, url, headers=headers, params=params, json=data)
+        response = requests.request(
+            method, url, headers=headers, params=params, json=data
+        )
 
         if response.status_code in [200, 201]:
             return response.json()
         else:
             raise Exception(response.json())
 
-    def get_tariff(self, origin: str, destination: str, weight: int, commodity: str) -> Dict[str, Any]:
+    def get_tariff(
+        self, origin: str, destination: str, weight: int, commodity: str
+    ) -> Dict[str, Any]:
         """
         Get tariff information for a shipment by origin, destination, weight, and commodity.
 
@@ -75,15 +86,15 @@ class LionParcelHelper:
         :return: A dictionary containing the tariff information.
         """
 
-        endpoint = '/v3/tariff'
+        endpoint = "/v3/tariff"
         params = {
-            'origin': origin,
-            'destination': destination,
-            'weight': weight,
-            'commodity': commodity,
+            "origin": origin,
+            "destination": destination,
+            "weight": weight,
+            "commodity": commodity,
         }
         return self._make_request(endpoint, params=params)
-    
+
     def make_booking(self, booking_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Creates a booking using the provided booking data.
@@ -119,12 +130,12 @@ class LionParcelHelper:
 
         # validate the booking data
         if not isinstance(booking_data, dict):
-            raise ValueError('booking_data must be a dictionary')
-        
+            raise ValueError("booking_data must be a dictionary")
+
         # validate key in booking_data
         for key in booking_data:
             if booking_data[key] is None:
-                raise ValueError(f'{key} is required')
+                raise ValueError(f"{key} is required")
 
         # create the booking data
         booking_data = {
@@ -149,16 +160,14 @@ class LionParcelHelper:
             "stt_pieces": booking_data["stt_pieces"],
             "stt_piece_per_pack": 0,
             "stt_next_commodity": "",
-            "stt_cod_amount": 0
+            "stt_cod_amount": 0,
         }
 
         # reformat the data to follow the API format
-        booking_data = {
-            "stt": booking_data
-        }
+        booking_data = {"stt": booking_data}
 
-        endpoint = '/client/booking'
-        return self._make_request(endpoint, method='POST', data=booking_data)
+        endpoint = "/client/booking"
+        return self._make_request(endpoint, method="POST", data=booking_data)
 
     def get_booking(self, booking_id: str) -> Dict[str, Any]:
         """
@@ -168,5 +177,5 @@ class LionParcelHelper:
         :return: A dictionary containing the booking information.
         """
 
-        endpoint = f'/v3/stt/track?q={booking_id}'
+        endpoint = f"/v3/stt/track?q={booking_id}"
         return self._make_request(endpoint)

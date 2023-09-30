@@ -8,20 +8,25 @@ from django.core.exceptions import ValidationError
 from .models import Cart, CartItem
 from .serializers import CartSerializer, CartItemSerializer
 
+
 class CartViewSet(viewsets.ModelViewSet):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
+    filter_backends = [
+        filters.SearchFilter,
+        filters.OrderingFilter,
+        DjangoFilterBackend,
+    ]
     permission_classes = [permissions.IsAuthenticated]
-    search_fields = ['user__email']
+    search_fields = ["user__email"]
     filterset_fields = {
-        'user': ['exact'],
-        'created_at': ['exact', 'gte', 'lte'],
-        'updated_at': ['exact', 'gte', 'lte'],
+        "user": ["exact"],
+        "created_at": ["exact", "gte", "lte"],
+        "updated_at": ["exact", "gte", "lte"],
     }
-    ordering_fields = ['user', 'created_at', 'updated_at']
-    ordering = ['-created_at']
-    lookup_field = 'user'
+    ordering_fields = ["user", "created_at", "updated_at"]
+    ordering = ["-created_at"]
+    lookup_field = "user"
 
     def get_cart_data(self, cart):
         # get cart items
@@ -35,10 +40,10 @@ class CartViewSet(viewsets.ModelViewSet):
         total_price = sum([item.total_price for item in cart_items])
 
         return {
-            'cart': self.get_serializer(cart).data,
-            'cart_items': cart_items_serializer.data,
-            'total_items': total_items,
-            'total_price': total_price,
+            "cart": self.get_serializer(cart).data,
+            "cart_items": cart_items_serializer.data,
+            "total_items": total_items,
+            "total_price": total_price,
         }
 
     def list(self, request, *args, **kwargs):
@@ -53,28 +58,33 @@ class CartViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         return Response(self.get_cart_data(instance))
-    
+
     def get_queryset(self):
         queryset = Cart.objects.all()
         user = self.request.user
         if user is not None:
             queryset = queryset.filter(user=user)
         return queryset
-    
+
+
 class CartItemViewSet(viewsets.ModelViewSet):
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter, DjangoFilterBackend]
-    search_fields = ['cart__user__email', 'product__name']
+    filter_backends = [
+        filters.SearchFilter,
+        filters.OrderingFilter,
+        DjangoFilterBackend,
+    ]
+    search_fields = ["cart__user__email", "product__name"]
     filterset_fields = {
-        'cart': ['exact'],
-        'product': ['exact'],
-        'stock': ['exact'],
-        'quantity': ['exact', 'gte', 'lte'],
-        'created_at': ['exact', 'gte', 'lte'],
+        "cart": ["exact"],
+        "product": ["exact"],
+        "stock": ["exact"],
+        "quantity": ["exact", "gte", "lte"],
+        "created_at": ["exact", "gte", "lte"],
     }
-    ordering_fields = ['cart', 'product', 'stock', 'quantity', 'created_at']
-    ordering = ['-created_at']
+    ordering_fields = ["cart", "product", "stock", "quantity", "created_at"]
+    ordering = ["-created_at"]
 
     def get_queryset(self):
         queryset = CartItem.objects.all()
@@ -83,11 +93,11 @@ class CartItemViewSet(viewsets.ModelViewSet):
         if cart is not None:
             queryset = queryset.filter(cart=cart)
         return queryset
-    
+
     def create(self, request, *args, **kwargs):
         cart = get_object_or_404(Cart, user=request.user)
-        stock = request.data.get('stock', None)
-        quantity = request.data.get('quantity', 1)
+        stock = request.data.get("stock", None)
+        quantity = request.data.get("quantity", 1)
 
         try:
             # Check if the product is already in the cart
@@ -102,16 +112,19 @@ class CartItemViewSet(viewsets.ModelViewSet):
                 serializer.save(cart=cart)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         except ValidationError:
-            return Response({
-                'error': 'Stock is not valid',
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response(
+                {
+                    "error": "Stock is not valid",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
 
-        increase_quantity = request.data.get('increase_quantity', False)
-        decrease_quantity = request.data.get('decrease_quantity', False)
-        set_as_selected = request.data.get('set_as_selected', True)
+        increase_quantity = request.data.get("increase_quantity", False)
+        decrease_quantity = request.data.get("decrease_quantity", False)
+        set_as_selected = request.data.get("set_as_selected", True)
 
         if increase_quantity:
             # Check if the quantity of this product is enough
@@ -120,10 +133,13 @@ class CartItemViewSet(viewsets.ModelViewSet):
                 serializer = self.get_serializer(instance)
                 return Response(serializer.data)
             else:
-                return Response({
-                    'error': 'Sorry, this product has not enough stock',
-                    'quantity': instance.quantity,
-                }, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {
+                        "error": "Sorry, this product has not enough stock",
+                        "quantity": instance.quantity,
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         elif decrease_quantity:
             # Check if the item quantity is more than 1
@@ -132,11 +148,14 @@ class CartItemViewSet(viewsets.ModelViewSet):
                 serializer = self.get_serializer(instance)
                 return Response(serializer.data)
             else:
-                return Response({
-                    'error': 'Sorry, the quantity of this product has reached the minimum.',
-                    'quantity': instance.quantity,
-                }, status=status.HTTP_400_BAD_REQUEST)
-            
+                return Response(
+                    {
+                        "error": "Sorry, the quantity of this product has reached the minimum.",
+                        "quantity": instance.quantity,
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
         elif set_as_selected is not None:
             # Set this item as selected
             instance.set_as_selected(set_as_selected)
@@ -144,6 +163,7 @@ class CartItemViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
 
         return super().partial_update(request, *args, **kwargs)
+
 
 class SelectedItemAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]

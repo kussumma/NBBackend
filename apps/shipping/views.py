@@ -4,65 +4,88 @@ from rest_framework.exceptions import ValidationError
 from tools.custom_permissions import IsAdminOrReadOnly
 import math
 
-from .models import Shipping, ShippingRoute, ShippingGroup, ShippingType, ShippingGroupItem, ShippingGroupTariff
+from .models import (
+    Shipping,
+    ShippingRoute,
+    ShippingGroup,
+    ShippingType,
+    ShippingGroupItem,
+    ShippingGroupTariff,
+)
 from .serializers import (
-    ShippingSerializer, 
-    ShippingWriteSerializer, 
+    ShippingSerializer,
+    ShippingWriteSerializer,
     ShippingRouteSerializer,
     ShippingGroupItemSerializer,
     ShippingGroupTariffSerializer,
     ShippingTypeSerializer,
-    ShippingGroupSerializer
+    ShippingGroupSerializer,
 )
 from apps.cart.models import Cart, CartItem
 
 from .helpers import lionparcel_original_tariff
 from .helpers import lionparcel_tariff_mapping
 
+
 class ShippingRouteViewSet(viewsets.ModelViewSet):
     queryset = ShippingRoute.objects.all()
     serializer_class = ShippingRouteSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['city', 'route']
-    ordering_fields = ['city', 'route', 'created_at', 'updated_at']
-    ordering = ['city', 'route', 'created_at', 'updated_at']
+    search_fields = ["city", "route"]
+    ordering_fields = ["city", "route", "created_at", "updated_at"]
+    ordering = ["city", "route", "created_at", "updated_at"]
+
 
 class ShippingViewSet(viewsets.ModelViewSet):
     queryset = Shipping.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['receiver_name', 'receiver_phone', 'receiver_address', 'origin__city', 'destination__city']
-    ordering_fields = ['destination__city', 'destination__route', 'created_at', 'updated_at']
-    ordering = ['destination__city', 'destination__route', 'created_at', 'updated_at']
+    search_fields = [
+        "receiver_name",
+        "receiver_phone",
+        "receiver_address",
+        "origin__city",
+        "destination__city",
+    ]
+    ordering_fields = [
+        "destination__city",
+        "destination__route",
+        "created_at",
+        "updated_at",
+    ]
+    ordering = ["destination__city", "destination__route", "created_at", "updated_at"]
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
-    
+
     def get_serializer_class(self):
-        if self.request.method in ['POST', 'PUT', 'PATCH', 'DELETE']:
+        if self.request.method in ["POST", "PUT", "PATCH", "DELETE"]:
             return ShippingWriteSerializer
         return ShippingSerializer
-    
+
     def perform_create(self, serializer):
         # check if the shipping reach the maximum limit
         user = self.request.user
         shipping_count = Shipping.objects.filter(user=user).count()
 
         if shipping_count >= 5:
-            raise ValidationError("Maximum limit reached, you can only have 5 shipping address.")
-        
+            raise ValidationError(
+                "Maximum limit reached, you can only have 5 shipping address."
+            )
+
         serializer.save(user=user)
 
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
 
-        set_as_default = request.data.get('set_as_default', False)
+        set_as_default = request.data.get("set_as_default", False)
         if set_as_default:
             Shipping.objects.filter(user=instance.user).update(is_default=False)
             instance.is_default = True
             instance.save()
         return super().partial_update(request, *args, **kwargs)
+
 
 class ShippingTariffAPIView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -72,15 +95,17 @@ class ShippingTariffAPIView(views.APIView):
 
         # get cart and items
         cart = Cart.objects.get(user=user)
-            
+
         try:
             cart_items = CartItem.objects.filter(cart=cart, is_selected=True)
         except CartItem.DoesNotExist:
             cart_items = None
 
         if not cart_items:
-            return Response({"error": "cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response(
+                {"error": "cart is empty"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
         weight = 0
 
         for cart_item in cart_items:
@@ -99,46 +124,70 @@ class ShippingTariffAPIView(views.APIView):
             original_tariff = lionparcel_original_tariff(weight, shipping)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         try:
             response = lionparcel_tariff_mapping(original_tariff)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         return Response(response, status=status.HTTP_200_OK)
-    
+
+
 class ShippingGroupViewSet(viewsets.ModelViewSet):
     queryset = ShippingGroup.objects.all()
     serializer_class = ShippingGroupSerializer
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['name']
-    ordering_fields = ['name', 'created_at', 'updated_at']
-    ordering = ['name', 'created_at', 'updated_at']
+    search_fields = ["name"]
+    ordering_fields = ["name", "created_at", "updated_at"]
+    ordering = ["name", "created_at", "updated_at"]
+
 
 class ShippingGroupItemViewSet(viewsets.ModelViewSet):
     queryset = ShippingGroupItem.objects.all()
     serializer_class = ShippingGroupItemSerializer
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['shipping_group__name', 'shipping_route__route']
-    ordering_fields = ['shipping_group__name', 'shipping_route__route', 'created_at', 'updated_at']
-    ordering = ['shipping_group__name', 'shipping_route__route', 'created_at', 'updated_at']
+    search_fields = ["shipping_group__name", "shipping_route__route"]
+    ordering_fields = [
+        "shipping_group__name",
+        "shipping_route__route",
+        "created_at",
+        "updated_at",
+    ]
+    ordering = [
+        "shipping_group__name",
+        "shipping_route__route",
+        "created_at",
+        "updated_at",
+    ]
+
 
 class ShippingGroupTariffViewSet(viewsets.ModelViewSet):
     queryset = ShippingGroupTariff.objects.all()
     serializer_class = ShippingGroupTariffSerializer
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['shipping_group__name', 'shipping_type__name']
-    ordering_fields = ['shipping_group__name', 'shipping_type__name', 'created_at', 'updated_at']
-    ordering = ['shipping_group__name', 'shipping_type__name', 'created_at', 'updated_at']
+    search_fields = ["shipping_group__name", "shipping_type__name"]
+    ordering_fields = [
+        "shipping_group__name",
+        "shipping_type__name",
+        "created_at",
+        "updated_at",
+    ]
+    ordering = [
+        "shipping_group__name",
+        "shipping_type__name",
+        "created_at",
+        "updated_at",
+    ]
+
 
 class ShippingTypeViewSet(viewsets.ModelViewSet):
     queryset = ShippingType.objects.all()
     serializer_class = ShippingTypeSerializer
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['name']
-    ordering_fields = ['name', 'created_at', 'updated_at']
-    ordering = ['name', 'created_at', 'updated_at']
+    search_fields = ["name"]
+    ordering_fields = ["name", "created_at", "updated_at"]
+    ordering = ["name", "created_at", "updated_at"]

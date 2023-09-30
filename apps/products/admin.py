@@ -1,6 +1,15 @@
 from django.contrib import admin
 
-from .models import Category, Product, Subcategory, Subsubcategory, Brand, Rating, Wishlist, Stock
+from .models import (
+    Category,
+    Product,
+    Subcategory,
+    Subsubcategory,
+    Brand,
+    Rating,
+    Wishlist,
+    Stock,
+)
 
 admin.site.register(Category)
 admin.site.register(Product)
