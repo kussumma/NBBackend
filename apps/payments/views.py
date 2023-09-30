@@ -4,13 +4,13 @@ from django.conf import settings
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import render
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
 
 from apps.orders.models import Order
 
 
 class PaymentAPIViews(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         # get order id from request
@@ -66,7 +66,7 @@ class PaymentAPIViews(APIView):
 
 
 class FinishPaymentAPIViews(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         # get order id from request
