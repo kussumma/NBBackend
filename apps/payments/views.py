@@ -42,17 +42,14 @@ class PaymentAPIViews(APIView):
 
         # create transaction details
         param = {
-            "transaction_details": {
-                "order_id": ref_code,
-                "gross_amount": total_amount,
-                "credit_card": {"secure": True},
-                "customer_details": {
-                    "first_name": user_first_name,
-                    "last_name": user_last_name,
-                    "email": user_email,
-                    "phone": user_phone,
-                },
-            }
+            "transaction_details": {"order_id": ref_code, "gross_amount": total_amount},
+            "credit_card": {"secure": True},
+            "customer_details": {
+                "first_name": user_first_name,
+                "last_name": user_last_name,
+                "email": user_email,
+                "phone": user_phone,
+            },
         }
 
         # create transaction token
