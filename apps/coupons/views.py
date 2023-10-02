@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.response import Response
 
 from tools.custom_permissions import IsAdminOrReadOnly
 
@@ -33,16 +34,19 @@ class CouponViewSet(viewsets.ModelViewSet):
         filters.OrderingFilter,
         DjangoFilterBackend,
     ]
-    search_fields = ["code", "name"]
-    ordering_fields = ["name", "code", "valid_from", "valid_to"]
+    search_fields = ["name", "created_at", "updated_at"]
+    ordering_fields = ["name", "created_at", "updated_at"]
     filterset_fields = {
         "discount_type": ["exact"],
-        "code": ["exact"],
         "is_active": ["exact"],
         "valid_from": ["exact", "gte", "lte"],
         "valid_to": ["exact", "gte", "lte"],
     }
-    ordering = ["name", "code", "valid_from", "valid_to"]
+    ordering = ["name", "created_at", "updated_at"]
+
+    def get_queryset(self):
+        queryset = Coupon.objects.filter(is_active=True, is_private=False)
+        return queryset
 
 
 class CouponUserViewSet(viewsets.ModelViewSet):
