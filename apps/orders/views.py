@@ -33,27 +33,52 @@ class OrderViewset(viewsets.ModelViewSet):
         cart_items = CartItem.objects.filter(cart=cart, is_selected=True)
         if not cart_items:
             return Response(
-                {"error": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "No item found in the cart"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         # get the coupon
-        coupon_id = request.data.get("coupon")
-        if coupon_id:
-            coupon = Coupon.objects.get(id=coupon_id)
-        else:
-            coupon = None
+        coupon_code_input = request.data.get("coupon")
+        if coupon_code_input:
+            # divide coupon code into prefix and code
+            coupon_prefix = coupon_code_input[:8]
+            coupon_code = coupon_code_input[8:]
 
-        # check if coupon is already used
-        if coupon:
             try:
-                CouponUser.objects.get(coupon=coupon, user=user)
-                raise serializers.ValidationError("Coupon is already used")
-            except CouponUser.DoesNotExist:
-                pass
+                coupon = Coupon.objects.get(prefix_code=coupon_prefix)
+            except Coupon.DoesNotExist:
+                return Response(
+                    {"error": "Coupon is not valid"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # check if coupon is verified
+            if not coupon.is_verified(coupon_code):
+                return Response(
+                    {"error": "Coupon is not valid"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             # check if coupon is valid
             if not coupon.is_valid():
-                raise serializers.ValidationError("Coupon is not valid or expired")
+                return Response(
+                    {"error": "Coupon is not valid"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # check if coupon is already used
+            try:
+                coupon_user = CouponUser.objects.get(coupon=coupon, user=user)
+            except CouponUser.DoesNotExist:
+                pass
+
+            if coupon.is_limited and coupon_user:
+                return Response(
+                    {"error": "Coupon is already used"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        else:
+            coupon = None
 
         # calculate subtotal amount and total weight
         subtotal_amount = 0
@@ -70,15 +95,16 @@ class OrderViewset(viewsets.ModelViewSet):
         if coupon:
             if coupon.min_purchase > subtotal_amount:
                 raise serializers.ValidationError(
-                    "Total purchase must be higher than minimum purchase required for this coupon"
+                    "Total purchase must be higher than minimum purchase allowed for this coupon"
+                )
+
+            if coupon.is_private and coupon.max_purchase > subtotal_amount:
+                raise serializers.ValidationError(
+                    "Total purchase must be lower than maximum purchase allowed for this coupon"
                 )
 
             # calculate discount price
             subtotal_amount -= (coupon.discount_value * subtotal_amount) / 100
-            if coupon:
-                coupon_code = coupon.code
-        else:
-            coupon_code = None
 
         # get shipping details
         shipping = Shipping.objects.get(user=user, is_default=True)
@@ -133,7 +159,7 @@ class OrderViewset(viewsets.ModelViewSet):
 
             order = serializer.save(
                 user=user,
-                coupon=coupon_code,
+                coupon=coupon_code_input,
                 tax_amount=tax_amount,
                 shipping_amount=shipping_cost,
                 subtotal_amount=subtotal_amount,
@@ -168,7 +194,7 @@ class OrderViewset(viewsets.ModelViewSet):
         cart_items.delete()
 
         # set coupon as used
-        if coupon:
+        if coupon and coupon.is_limited:
             CouponUser.objects.create(coupon=coupon, user=user)
 
         # create shipping order
