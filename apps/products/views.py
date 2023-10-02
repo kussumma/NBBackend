@@ -5,6 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from django.db.models import Min, Max
 from django.db.models.functions import Coalesce
+from rest_framework import serializers
 
 from .models import (
     Category,
@@ -182,6 +183,25 @@ class WishlistViewSet(viewsets.ModelViewSet):
     }
     ordering_fields = ["created_at"]
     ordering = ["-created_at"]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Wishlist.objects.filter(user=user)
+
+    def perform_create(self, serializer):
+        # get product
+        product_id = self.request.data["product"]
+        product = Product.objects.get(id=product_id)
+
+        # check if product is already in wishlist
+        try:
+            Wishlist.objects.get(product=product, user=self.request.user)
+            raise serializers.ValidationError("Product is already in wishlist")
+        except Wishlist.DoesNotExist:
+            pass
+
+        # create wishlist
+        serializer.save(user=self.request.user)
 
 
 class StockViewSet(viewsets.ModelViewSet):

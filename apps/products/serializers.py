@@ -84,6 +84,7 @@ class RatingSerializer(serializers.ModelSerializer):
 
 class WishlistSerializer(serializers.ModelSerializer):
     user_data = serializers.SerializerMethodField()
+    product_details = serializers.SerializerMethodField()
 
     class Meta:
         model = Wishlist
@@ -94,6 +95,11 @@ class WishlistSerializer(serializers.ModelSerializer):
         user = obj.user
         user_serializer = BasicUserSerializer(user)
         return user_serializer.data
+
+    def get_product_details(self, obj):
+        product = obj.product
+        product_serializer = ProductSerializer(product)
+        return product_serializer.data
 
 
 class ProductSerializer(serializers.ModelSerializer):
