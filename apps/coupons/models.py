@@ -30,10 +30,12 @@ class DiscountType(models.Model):
 class Coupon(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     code = models.BinaryField(max_length=250, unique=True, editable=False)
-    name = models.CharField(max_length=100)
+    prefix_code = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=250, unique=True)
     discount_type = models.ForeignKey(DiscountType, on_delete=models.CASCADE)
     discount_value = models.PositiveBigIntegerField(default=0)
     min_purchase = models.PositiveBigIntegerField(default=0)
+    max_purchase = models.PositiveBigIntegerField(default=0)
     valid_from = models.DateTimeField()
     valid_to = models.DateTimeField()
     is_active = models.BooleanField(default=True)
@@ -43,15 +45,26 @@ class Coupon(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.name} - {self.prefix_code}{self.decode_coupon_code(self.code).decode()}"
 
     def save(self, *args, **kwargs):
         self.code = self.generate_code()
+        if self.prefix_code.upper() == "RANDOM":
+            self.prefix_code = self.generate_prefix_code()
         super().save(*args, **kwargs)
 
     def generate_code(self):
-        code = secrets.token_urlsafe(8).upper()
+        code = secrets.token_urlsafe(12).upper()[:8]
         return fernet.encrypt(code.encode())
+
+    def generate_prefix_code(self):
+        prefix = secrets.token_urlsafe(12).upper()[:8]
+        return prefix
+
+    def is_verified(self, code):
+        code = code.encode()
+        decrypted_code = fernet.decrypt(self.code)
+        return code == decrypted_code
 
     def decode_coupon_code(self, code):
         return fernet.decrypt(code)

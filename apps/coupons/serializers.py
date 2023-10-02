@@ -10,21 +10,21 @@ class DiscountTypeSerializer(serializers.ModelSerializer):
 
 
 class CouponSerializer(serializers.ModelSerializer):
-    decrypted_code = serializers.SerializerMethodField()
+    private_code = serializers.SerializerMethodField()
 
     class Meta:
         model = Coupon
-        fields = "__all__"
         read_only_fields = ["created_at", "updated_at"]
+        exclude = ["code"]
 
-    def get_decrypted_code(self, obj):
-        if not obj.is_private and obj.code:
-            try:
-                code = obj.code
-                decrypted_code = obj.decode_coupon_code(code)
-            except:
-                decrypted_code = None
-        return decrypted_code
+    def get_private_code(self, obj):
+        if not obj.is_private:
+            code = obj.code
+            private_code = obj.decode_coupon_code(code)
+        else:
+            private_code = None
+
+        return private_code
 
 
 class CouponUserSerializer(serializers.ModelSerializer):
