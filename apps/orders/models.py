@@ -8,17 +8,18 @@ User = get_user_model()
 STATUS_CHOICES = (
     ("pending", "Pending"),
     ("confirmed", "Confirmed"),
-    ("delivered", "Delivered"),
-    ("canceled", "Canceled"),
+    ("shipping", "Shipping"),
     ("returned", "Returned"),
     ("refunded", "Refunded"),
-    ("completed", "Completed"),
+    ("complete", "Complete"),
 )
 
 PAYMENT_STATUS_CHOICES = (
     ("pending", "Pending"),
-    ("paid", "Paid"),
-    ("failed", "Failed"),
+    ("capture", "Capture"),
+    ("settlement", "Settlement"),
+    ("cancel", "Cancel"),
+    ("expired", "Expired"),
 )
 
 RETURN_REFUND_STATUS_CHOICES = (
@@ -37,7 +38,7 @@ class Order(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     status = models.TextField(choices=STATUS_CHOICES, default="pending")
     payment_status = models.TextField(choices=PAYMENT_STATUS_CHOICES, default="pending")
-    payment_ref_code = models.CharField(max_length=100, null=True, blank=True)
+    payment_ref_code = models.UUIDField(null=True, blank=True)
     tax_amount = models.PositiveIntegerField(default=0)
     shipping_amount = models.PositiveIntegerField(default=0)
     subtotal_amount = models.PositiveIntegerField(default=0)
