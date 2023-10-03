@@ -4,6 +4,7 @@ from django.conf import settings
 
 from .models import ShippingGroupTariff, ShippingType
 from apps.store.models import Contact
+from apps.orders.models import Order
 from tools.lionparcel_helper import LionParcelHelper
 
 
@@ -98,3 +99,26 @@ def lionparcel_tariff_mapping(api_response: dict):
                         )
 
     return filtered_result if filtered_result else default_result
+
+
+def lionparcel_track_status(shipping_ref_code):
+    lionparcel = LionParcelHelper(settings.LIONPARCEL_API_KEY)
+    try:
+        response = lionparcel.track_booking(shipping_ref_code)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    # get the latest status from the response list
+    current_status = response["stts"][0].get("current_status")
+    if current_status == "POD":
+        # update the order status to completed
+        try:
+            order = Order.objects.get(
+                order_shipping__shipping_ref_code=shipping_ref_code
+            )
+            order.status = "complete"
+            order.save()
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    return response["stts"][0].get("history")

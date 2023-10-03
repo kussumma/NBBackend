@@ -169,9 +169,9 @@ class LionParcelHelper:
         endpoint = "/client/booking"
         return self._make_request(endpoint, method="POST", data=booking_data)
 
-    def get_booking(self, booking_id: str) -> Dict[str, Any]:
+    def track_booking(self, booking_id: str) -> Dict[str, Any]:
         """
-        Get booking information by booking ID (STT or External Reference Number)
+        Track booking information by booking ID (STT or External Reference Number)
 
         :param booking_id: The booking ID.
         :return: A dictionary containing the booking information.

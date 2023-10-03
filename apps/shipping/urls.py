@@ -5,6 +5,7 @@ from .views import (
     ShippingViewSet,
     ShippingRouteViewSet,
     ShippingTariffAPIView,
+    ShippingStatusAPIView,
     ShippingTypeViewSet,
     ShippingGroupViewSet,
     ShippingGroupItemViewSet,
@@ -28,4 +29,7 @@ router.register(
 urlpatterns = [
     path("v1/", include(router.urls)),
     path("v1/tariff/", ShippingTariffAPIView.as_view(), name="shipping-tariff"),
+    path(
+        "v1/shipping-status/", ShippingStatusAPIView.as_view(), name="shipping-status"
+    ),
 ]

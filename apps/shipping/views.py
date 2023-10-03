@@ -22,9 +22,11 @@ from .serializers import (
     ShippingGroupSerializer,
 )
 from apps.cart.models import Cart, CartItem
+from apps.orders.models import OrderShipping
 
 from .helpers import lionparcel_original_tariff
 from .helpers import lionparcel_tariff_mapping
+from .helpers import lionparcel_track_status
 
 
 class ShippingRouteViewSet(viewsets.ModelViewSet):
@@ -127,6 +129,29 @@ class ShippingTariffAPIView(views.APIView):
 
         try:
             response = lionparcel_tariff_mapping(original_tariff)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(response, status=status.HTTP_200_OK)
+
+
+class ShippingStatusAPIView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        shipping_ref_code = request.data.get("shipping_ref_code")
+
+        try:
+            ordershipping = OrderShipping.objects.get(
+                shipping_ref_code=shipping_ref_code
+            )
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        shipping_ref_code = ordershipping.shipping_ref_code
+
+        try:
+            response = lionparcel_track_status(shipping_ref_code)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
