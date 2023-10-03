@@ -1,10 +1,8 @@
-from django.shortcuts import render
-from rest_framework import filters, serializers, viewsets, status
+from rest_framework import filters, serializers, viewsets, status, views
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.db import transaction
 import math
-import datetime
 
 from apps.cart.models import Cart, CartItem
 from apps.coupons.models import Coupon, CouponUser
@@ -14,6 +12,8 @@ from apps.shipping.models import Shipping, ShippingType
 
 from apps.shipping.helpers import lionparcel_original_tariff
 from apps.shipping.helpers import lionparcel_tariff_mapping
+from .helpers import lionparcel_booking
+from .helpers import send_order_confirmation_email
 
 
 class OrderViewset(viewsets.ModelViewSet):
@@ -268,3 +268,55 @@ class RefundOrderViewset(viewsets.ModelViewSet):
 
         # create refund order
         serializer.save(order=order)
+
+
+class ConfirmOrderAPIView(views.APIView):
+    permission_classes = [IsAdminUser]
+
+    def post(self, request, *args, **kwargs):
+        order_id = self.kwargs.get("pk")
+
+        try:
+            order = Order.objects.get(id=order_id)
+        except Order.DoesNotExist:
+            return Response(
+                {"error": "Order not found"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # send email to user
+        try:
+            send_order_confirmation_email(order_id)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        # update order status
+        order.status = "confirmed"
+        order.save()
+
+        return Response({"success": "Order is confirmed"}, status=status.HTTP_200_OK)
+
+
+class BookShipmentAPIView(views.APIView):
+    permission_classes = [IsAdminUser]
+
+    def post(self, request, *args, **kwargs):
+        order_id = self.kwargs.get("pk")
+
+        try:
+            order = Order.objects.get(id=order_id)
+        except Order.DoesNotExist:
+            return Response(
+                {"error": "Order not found"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # booking shipment
+        try:
+            lionparcel_booking(order_id)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        # update order status
+        order.status = "shipping"
+        order.save()
+
+        return Response({"success": "Order is shipped"}, status=status.HTTP_200_OK)

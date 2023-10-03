@@ -47,7 +47,7 @@ class Order(models.Model):
     note = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.created_at} - {self.user.email} - {self.ref_code}"
+        return f"{self.user.email} - {self.ref_code}"
 
     def generate_ref_code(self):
         # Generate a random 16-digit hex number

@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.urls import reverse
+from django.utils.html import format_html
 
 from .models import (
     Order,
@@ -9,7 +11,42 @@ from .models import (
     OrderShipping,
 )
 
-admin.site.register(Order)
+
+class OrderAdmin(admin.ModelAdmin):
+    list_filter = ("status", "payment_status", "created_at", "updated_at")
+    search_fields = ("ref_code", "user__email")
+
+    def get_list_display(self, request):
+        if request.user.is_superuser:
+            return (
+                "ref_code",
+                "created_at",
+                "confirm_order",
+                "payment_status",
+            )
+        else:
+            return ("ref_code", "created_at", "status", "payment_status")
+
+    def confirm_order(self, obj):
+        if obj.status == "confirmed":
+            url = reverse("book-shipment", args=[obj.pk])
+            return format_html('<a href="{}">Book Shipment</a>', url)
+        elif obj.status == "pending":
+            url = reverse("confirm-order", args=[obj.pk])
+            return format_html('<a href="{}">Confirm Order</a>', url)
+        elif obj.status == "shipping":
+            return "Shipping"
+        elif obj.status == "complete":
+            return "Complete"
+        elif obj.status == "refunded":
+            return "Refunded"
+        elif obj.status == "returned":
+            return "Returned"
+        else:
+            return "-"
+
+
+admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderItem)
 admin.site.register(OrderShipping)
 admin.site.register(ReturnOrder)

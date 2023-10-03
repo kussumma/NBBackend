@@ -6,6 +6,9 @@ from django.conf.urls.static import static
 from apps.accounts.views import GoogleLogin
 
 urlpatterns = [
+    # admin
+    path("admin/", admin.site.urls),
+    path("", include("apps.orders.admin_urls")),
     # Basic Auth
     path("auth/", include("dj_rest_auth.urls")),
     path("auth/registration/", include("dj_rest_auth.registration.urls")),
@@ -35,6 +38,5 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    urlpatterns += (path("admin/", admin.site.urls),)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
