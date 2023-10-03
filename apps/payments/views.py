@@ -73,13 +73,8 @@ class FinishPaymentAPIViews(APIView):
 
         # get transaction status
         try:
-            transaction_status = snap.transaction.status(order_id)
+            transaction_status = snap.transactions.status(order_id)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"data": transaction_status}, status=status.HTTP_200_OK)
-
-
-def payment_testing(request):
-    # create view to test payment
-    return render(request, "payment/test.html")
+        return Response(transaction_status, status=status.HTTP_200_OK)
