@@ -173,5 +173,16 @@ class SelectedItemAPIView(APIView):
         cart = Cart.objects.get(user=user)
         cart_items = CartItem.objects.filter(cart=cart, is_selected=True)
         serializer = CartItemSerializer(cart_items, many=True)
+        subtotal_price = sum([item.total_price for item in cart_items])
+        total_items = sum([item.quantity for item in cart_items])
+        total_products = len(cart_items)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            {
+                "cart_items": serializer.data,
+                "total_price": subtotal_price,
+                "total_items": total_items,
+                "total_products": total_products,
+            },
+            status=status.HTTP_200_OK,
+        )
