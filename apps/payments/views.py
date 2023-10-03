@@ -20,7 +20,7 @@ class PaymentAPIViews(APIView):
             order = Order.objects.get(id=order_id)
 
             # get ref code
-            ref_code = order.ref_code
+            order_id = order.id
 
             # get order total amount
             total_amount = order.total_amount
@@ -42,7 +42,7 @@ class PaymentAPIViews(APIView):
 
         # create transaction details
         param = {
-            "transaction_details": {"order_id": ref_code, "gross_amount": total_amount},
+            "transaction_details": {"order_id": order_id, "gross_amount": total_amount},
             "credit_card": {"secure": True},
             "customer_details": {
                 "first_name": user_first_name,
@@ -62,7 +62,7 @@ class PaymentAPIViews(APIView):
         return Response({"data": transaction_token}, status=status.HTTP_200_OK)
 
 
-class FinishPaymentAPIViews(APIView):
+class PaymentStatusAPIViews(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -76,5 +76,16 @@ class FinishPaymentAPIViews(APIView):
             transaction_status = snap.transactions.status(order_id)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        # update order status
+        if transaction_status["transaction_status"]:
+            # update order status
+            try:
+                order = Order.objects.get(id=order_id)
+                order.payment_status = transaction_status["transaction_status"]
+                order.payment_ref_code = transaction_status["transaction_id"]
+                order.save()
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(transaction_status, status=status.HTTP_200_OK)
