@@ -49,8 +49,10 @@ class Coupon(models.Model):
 
     def save(self, *args, **kwargs):
         self.code = self.generate_code()
-        if self.prefix_code.upper() == "RANDOM":
+        if self.prefix_code.upper() == "RANDOM" or len(self.prefix_code) < 8:
             self.prefix_code = self.generate_prefix_code()
+        else:
+            self.prefix_code = self.prefix_code.upper()[:8]
         super().save(*args, **kwargs)
 
     def generate_code(self):
