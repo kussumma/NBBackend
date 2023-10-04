@@ -3,7 +3,6 @@ from midtransclient import Snap
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework import status
-from django.shortcuts import render
 from rest_framework.permissions import IsAuthenticated
 
 from apps.orders.models import Order
@@ -38,7 +37,9 @@ class PaymentAPIViews(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         # create snap client
-        snap = Snap(is_production=False, server_key=settings.MIDTRANS["SERVER_KEY"])
+        snap = Snap(
+            is_production=settings.DEBUG, server_key=settings.MIDTRANS["SERVER_KEY"]
+        )
 
         # create transaction details
         param = {
@@ -69,7 +70,9 @@ class PaymentStatusAPIViews(APIView):
         # get order id from request
         order_id = request.data.get("order_id")
 
-        snap = Snap(is_production=False, server_key=settings.MIDTRANS["SERVER_KEY"])
+        snap = Snap(
+            is_production=settings.DEBUG, server_key=settings.MIDTRANS["SERVER_KEY"]
+        )
 
         # get transaction status
         try:
