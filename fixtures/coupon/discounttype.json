@@ -1,9 +1,9 @@
 [
-{
-    "model": "coupons.discounttype",
-    "pk": "28c0d4b1-b1d4-451a-afad-5589e2f633e7",
-    "fields": {
-        "name": "Grand Opening"
+    {
+        "model": "coupons.discounttype",
+        "pk": "28c0d4b1-b1d4-451a-afad-5589e2f633e7",
+        "fields": {
+            "name": "Grand Opening"
+        }
     }
-}
 ]

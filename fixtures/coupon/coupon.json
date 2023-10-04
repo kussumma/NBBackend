@@ -1,17 +1,22 @@
 [
-{
-    "model": "coupons.coupon",
-    "pk": "8e028e1e-feec-4483-a969-97a948ad5d74",
-    "fields": {
-        "code": "A1B2C3D4",
-        "hashed_code": "76b9579a121716fddcc6a8dc42eef1fb9a76243772d484745086b2442dbbdde4",
-        "name": "Dummy Coupon",
-        "discount_type": "28c0d4b1-b1d4-451a-afad-5589e2f633e7",
-        "discount_value": 10,
-        "min_purchase": 100000,
-        "valid_from": "2023-09-17T10:00:31Z",
-        "valid_to": "2024-10-17T10:00:52Z",
-        "is_active": true
+    {
+        "model": "coupons.coupon",
+        "pk": "165430e9-03cd-4933-ae2a-076bb4de9697",
+        "fields": {
+            "code": "Z0FBQUFBQmxITGlPVjE3aWtlOU1CTjh6RkE3MmRVSi02djFlVEhibXhkUHBXQV9oNTRXd0puNU5DZC1CbTF4em80YjFXc1dLNTFNaDdmQnlVcE45XzU2cGVha0thWFQyVnc9PQ==",
+            "prefix_code": "NBFREEBY",
+            "name": "FREE VOUCHER",
+            "discount_type": "28c0d4b1-b1d4-451a-afad-5589e2f633e7",
+            "discount_value": 10,
+            "min_purchase": 100000,
+            "max_purchase": 0,
+            "valid_from": "2023-10-04T00:57:32Z",
+            "valid_to": "2023-10-07T00:57:38Z",
+            "is_active": true,
+            "is_private": false,
+            "is_limited": false,
+            "created_at": "2023-10-04T00:57:50.108Z",
+            "updated_at": "2023-10-04T00:57:50.108Z"
+        }
     }
-}
 ]
