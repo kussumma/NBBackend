@@ -108,7 +108,7 @@
     <mj-section background-color="#000">
       <mj-column>
         <mj-text color="lightgrey" align="center" font-size="14px">
-          Copyright © {{order.year}} NanoBeepa. All rights reserved.
+          Copyright © {% now 'Y' %} NanoBeepa. All rights reserved.
           <br>
           PT. Inayat Bunga perdana
         </mj-text>

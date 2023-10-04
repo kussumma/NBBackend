@@ -1,0 +1,18 @@
+Dear {{ user.first_name }},
+
+You're receiving this email because you recently use this email address to register an account at NanoBeepa (https://nanobeepa.com). 
+If it's you, please click the link below to activate your account:
+
+{{ activate_url }}
+
+If you didn't register an account at NanoBeepa, please ignore this email.
+
+Thank you for choosing NanoBeepa.
+
+
+Copyright © {% now 'Y' %} NanoBeepa. All rights reserved.
+PT. Inayat Bunga perdana
+
+Email support: cs@nanobeepa.com
+WhatsApp support: +6281238995951
+Website: https://nanobeepa.com
