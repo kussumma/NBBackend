@@ -3,16 +3,14 @@
     <mj-font name="Poppins" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" />
     <mj-style>
       .text-gold {
-        background: linear-gradient(to top, #b8880f, #f6d636);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #f9d342;
       }
     </mj-style>
     <mj-attributes>
-      <mj-text font-size="16px" font-family="Poppins" line-height="1.5" />
+      <mj-text font-size="14px" font-family="Poppins" line-height="1.5" />
       <mj-section background-color="white" padding="20px 0" />
       <mj-column padding="0" />
-      <mj-table font-family="Poppins" />
+      <mj-table font-family="Poppins" font-size="14px" />
       <mj-button font-family="Poppins" background-color="#000000" color="#ffffff" border-radius="8px" font-size="14px" align="center" />
     </mj-attributes>
   </mj-head>
@@ -24,8 +22,8 @@
     </mj-section>
     <mj-section>
       <mj-column>
-        <mj-text css-class="text-gold" align="center" font-weight="bold" font-size="20px">NanoBeepa</mj-text>
-        <mj-text align="center" font-weight="bold" font-size="20px">Shipping Confirmation</mj-text>
+        <mj-text css-class="text-gold" align="center" font-weight="bold" font-size="18px">NanoBeepa</mj-text>
+        <mj-text align="center" font-weight="bold" font-size="16px">Shipping Confirmation</mj-text>
       </mj-column>
     </mj-section>
     <mj-section>
@@ -44,7 +42,7 @@
         <mj-text font-weight="bold" align="center">
           Resi/STT: {{order.shipping_ref_code}}
         </mj-text>
-        <mj-text font-size="14px" align="center">
+        <mj-text font-weight="bold" align="center">
           Order Date: {{order.order_date}}
         </mj-text>
       </mj-column>
@@ -58,10 +56,10 @@
     </mj-section>
     <mj-section>
       <mj-column>
-        <mj-text align="center" font-weight="bold" font-size="14px">Shipment Information</mj-text>
-        <mj-text align="center" font-style="italic" font-size="14px">For shipment issues, please contact our shipment
+        <mj-text align="center" font-weight="bold">Shipment Information</mj-text>
+        <mj-text align="center" font-style="italic">For shipment issues, please contact our shipment
           partner's directly for assistance.</mj-text>
-        <mj-text align="center" font-size="14px">
+        <mj-text align="center">
           <b>Partner:</b> Lion Parcel
           <br>
           <b>Website:</b> <a target="_blank" class="text-gold" href="https://lionparcel.com">https://lionparcel.com</a>
@@ -81,19 +79,18 @@
     </mj-section>
     <mj-section background-color="#000">
       <mj-column>
-        <mj-text color="lightgrey" align="center" font-size="14px">
+        <mj-text color="lightgrey" align="center">
           Copyright © {{order.year}} NanoBeepa. All rights reserved.
-        </mj-text>
-        <mj-text color="lightgrey" align="center" font-size="14px">
+          <br>
           PT. Inayat Bunga perdana
         </mj-text>
-        <mj-text font-size="14px" color="lightgrey" align="center">
+        <mj-text color="lightgrey" align="center">
           Email support: <a class="text-gold" href="mailto:cs@nanobeepa.com">cs@nanobeepa.com</a>
         </mj-text>
-        <mj-text font-size="14px" color="lightgrey" align="center">
-          WhatsApp support: <a target="_blank" class="text-gold" href="https://wa.me/628123456789">+628123456789</a>
+        <mj-text color="lightgrey" align="center">
+          WhatsApp support: <a target="_blank" class="text-gold" href="https://wa.me/6281238995951">+6281238995951</a>
         </mj-text>
-        <mj-text font-size="14px" color="lightgrey" align="center">
+        <mj-text color="lightgrey" align="center">
           Website: <a target="_blank" class="text-gold" href="https://nanobeepa.com">https://nanobeepa.com</a>
         </mj-text>
       </mj-column>
