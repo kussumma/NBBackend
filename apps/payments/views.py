@@ -18,8 +18,8 @@ class PaymentAPIViews(APIView):
             # get order from database
             order = Order.objects.get(id=order_id)
 
-            # get ref code
-            order_id = order.id
+            # get order id
+            order_id = str(order.pk)
 
             # get order total amount
             total_amount = order.total_amount
@@ -38,12 +38,15 @@ class PaymentAPIViews(APIView):
 
         # create snap client
         snap = Snap(
-            is_production=settings.DEBUG, server_key=settings.MIDTRANS["SERVER_KEY"]
+            is_production=not settings.DEBUG, server_key=settings.MIDTRANS["SERVER_KEY"]
         )
 
         # create transaction details
         param = {
-            "transaction_details": {"order_id": order_id, "gross_amount": total_amount},
+            "transaction_details": {
+                "order_id": order_id,
+                "gross_amount": total_amount,
+            },
             "credit_card": {"secure": True},
             "customer_details": {
                 "first_name": user_first_name,
@@ -70,6 +73,15 @@ class PaymentStatusAPIViews(APIView):
         # get order id from request
         order_id = request.data.get("order_id")
 
+        try:
+            # get order from database
+            order = Order.objects.get(id=order_id)
+
+            # get order id
+            order_id = str(order.pk)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
         snap = Snap(
             is_production=settings.DEBUG, server_key=settings.MIDTRANS["SERVER_KEY"]
         )
@@ -84,7 +96,6 @@ class PaymentStatusAPIViews(APIView):
         if transaction_status["transaction_status"]:
             # update order status
             try:
-                order = Order.objects.get(id=order_id)
                 order.payment_status = transaction_status["transaction_status"]
                 order.payment_ref_code = transaction_status["transaction_id"]
                 order.save()
