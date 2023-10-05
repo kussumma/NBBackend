@@ -1,6 +1,12 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from dj_rest_auth.registration.serializers import RegisterSerializer
+from dj_rest_auth.serializers import PasswordResetSerializer
+from allauth.account.forms import ResetPasswordForm as AllAuthPasswordResetForm
+from allauth.account.utils import user_pk_to_url_str
+from allauth.account.adapter import get_adapter
+from django.contrib.auth.tokens import default_token_generator
+from django.conf import settings
 
 from .models import UserDetail
 
@@ -17,6 +23,45 @@ class CustomRegisterSerializer(RegisterSerializer):
         user.last_name = self.data.get("last_name")
         user.save()
         return user
+
+
+class CustomAllAuthPasswordResetForm(AllAuthPasswordResetForm):
+    def _send_unknown_account_mail(self, request, email):
+        signup_url = settings.FRONTEND_URL + "/signup/"
+        context = {
+            "current_site": settings.FRONTEND_URL,
+            "email": email,
+            "request": request,
+            "signup_url": signup_url,
+        }
+        get_adapter().send_mail("account/email/unknown_account", email, context)
+
+    def _send_password_reset_mail(self, request, email, users, **kwargs):
+        token_generator = kwargs.get("token_generator", default_token_generator)
+
+        for user in users:
+            temp_key = token_generator.make_token(user)
+
+            # send the password reset email
+            uid = user_pk_to_url_str(user)
+            url = (
+                settings.FRONTEND_URL + "/reset-password/" + uid + "/" + temp_key + "/"
+            )
+            context = {
+                "current_site": settings.FRONTEND_URL,
+                "user": user,
+                "password_reset_url": url,
+                "uid": uid,
+                "key": temp_key,
+                "request": request,
+            }
+            get_adapter().send_mail("account/email/password_reset_key", email, context)
+
+
+class CustomPasswordResetSerializer(PasswordResetSerializer):
+    @property
+    def password_reset_form_class(self):
+        return CustomAllAuthPasswordResetForm
 
 
 class UserDetailsSerializer(serializers.ModelSerializer):
