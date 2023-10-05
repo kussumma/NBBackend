@@ -4,6 +4,7 @@ from django.conf import settings
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from decouple import config
 
 from apps.orders.models import Order
 
@@ -37,6 +38,7 @@ class PaymentAPIViews(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         # create snap client
+        # settings.DEBUG will be True if the environment is development
         snap = Snap(
             is_production=not settings.DEBUG, server_key=settings.MIDTRANS["SERVER_KEY"]
         )
@@ -83,7 +85,7 @@ class PaymentStatusAPIViews(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         snap = Snap(
-            is_production=settings.DEBUG, server_key=settings.MIDTRANS["SERVER_KEY"]
+            is_production=not settings.DEBUG, server_key=settings.MIDTRANS["SERVER_KEY"]
         )
 
         # get transaction status
