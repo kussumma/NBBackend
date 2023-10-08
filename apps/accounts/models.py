@@ -1,7 +1,6 @@
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
-from django.utils import timezone
 import uuid
 
 
@@ -64,11 +63,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 
-GENDER_CHOICES = [
-    ("male", "Male"),
-    ("female", "Female"),
-    ("other", "Other"),
-]
+GENDER_CHOICES = [("male", "Male"), ("female", "Female")]
 
 
 class UserDetail(models.Model):
@@ -77,7 +72,7 @@ class UserDetail(models.Model):
         User, related_name="user_details", on_delete=models.CASCADE
     )
     phone_number = models.CharField(max_length=20, null=True, blank=True)
-    gender = models.CharField(choices=GENDER_CHOICES, max_length=20, default="other")
+    gender = models.CharField(choices=GENDER_CHOICES, max_length=20, default="female")
     date_of_birth = models.DateField(null=True, blank=True)
     newsletter = models.BooleanField(default=False)
     city = models.CharField(max_length=255, null=True, blank=True)
