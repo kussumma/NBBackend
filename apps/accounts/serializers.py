@@ -83,7 +83,6 @@ class UserSerializer(serializers.ModelSerializer):
         user_details = instance.user_details
 
         if user_details_data:
-            user_details.avatar = user_details_data.get("avatar", user_details.avatar)
             user_details.phone_number = user_details_data.get(
                 "phone_number", user_details.phone_number
             )
