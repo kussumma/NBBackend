@@ -25,6 +25,7 @@ class BlogCategoryViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["name", "description"]
     ordering_fields = ["name", "description"]
+    ordering = ["name"]
     lookup_field = "slug"
 
 
@@ -35,6 +36,7 @@ class BlogTagViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["name"]
     ordering_fields = ["name"]
+    ordering = ["name"]
     lookup_field = "slug"
 
 
@@ -45,6 +47,7 @@ class BlogViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["title", "description"]
     ordering_fields = ["title", "description"]
+    ordering = ["-created_at"]
     lookup_field = "slug"
 
     def retrieve(self, request, slug=None):
@@ -63,6 +66,7 @@ class BlogImageViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ["blog__title"]
+    ordering = ["-created_at"]
 
 
 class BlogVideoViewSet(viewsets.ModelViewSet):
@@ -71,6 +75,7 @@ class BlogVideoViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ["blog__title"]
+    ordering = ["-created_at"]
 
 
 class BlogCommentViewSet(viewsets.ModelViewSet):
@@ -79,13 +84,14 @@ class BlogCommentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ["blog__title"]
+    ordering = ["-created_at"]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
     def get_queryset(self):
         queryset = BlogComment.objects.all()
-        blog = self.request.query_params.get("blog", None)
+        blog = self.request.GET.get("blog", None)
         if blog is not None:
             queryset = queryset.filter(blog__slug=blog)
         return queryset
@@ -97,7 +103,7 @@ class BlogCommentViewSet(viewsets.ModelViewSet):
         serializer = BlogCommentSerializer(comment)
 
         # get the replies using the parent comment
-        replies = comment.replies.all()
+        replies = queryset.filter(parent_comment=comment)
         replies_serializer = BlogCommentSerializer(replies, many=True)
 
         # return the comment and the replies

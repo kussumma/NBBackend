@@ -40,7 +40,7 @@ class BlogTag(models.Model):
 class Blog(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=250)
-    description = models.TextField()
+    content = models.TextField()
     cover = models.ImageField(upload_to="blogs/", default="blogs/no_picture.png")
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
     category = models.ForeignKey(BlogCategory, on_delete=models.PROTECT)
@@ -48,6 +48,7 @@ class Blog(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     author = models.ForeignKey(User, on_delete=models.PROTECT)
+    status = models.BooleanField(default=True)
 
     def __str__(self):
         return self.title
@@ -78,11 +79,16 @@ class BlogComment(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     parent_comment = models.ForeignKey(
-        "self", on_delete=models.CASCADE, null=True, blank=True, related_name="replies"
+        "self",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="replies",
+        related_query_name="reply",
     )
     comment = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.comment
+        return self.pk
