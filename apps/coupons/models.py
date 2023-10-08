@@ -29,7 +29,7 @@ class DiscountType(models.Model):
 
 class Coupon(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    code = models.BinaryField(max_length=250, unique=True, editable=False)
+    code = models.TextField(unique=True, editable=False)
     prefix_code = models.CharField(max_length=100, unique=True)
     name = models.CharField(max_length=250, unique=True)
     discount_type = models.ForeignKey(DiscountType, on_delete=models.CASCADE)
@@ -45,7 +45,7 @@ class Coupon(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.name} - {self.prefix_code}{self.decode_coupon_code(self.code).decode()}"
+        return f"{self.name} - {self.prefix_code}{self.decode_coupon_code(self.code)}"
 
     def save(self, *args, **kwargs):
         self.code = self.generate_code()
@@ -57,7 +57,7 @@ class Coupon(models.Model):
 
     def generate_code(self):
         code = secrets.token_urlsafe(12).upper()[:8]
-        return fernet.encrypt(code.encode())
+        return fernet.encrypt(code.encode()).decode()
 
     def generate_prefix_code(self):
         prefix = secrets.token_urlsafe(12).upper()[:8]
@@ -65,11 +65,12 @@ class Coupon(models.Model):
 
     def is_verified(self, code):
         code = code.encode()
-        decrypted_code = fernet.decrypt(self.code)
+        decrypted_code = fernet.decrypt(self.code.encode())
         return code == decrypted_code
 
     def decode_coupon_code(self, code):
-        return fernet.decrypt(code)
+        code = code.encode()
+        return fernet.decrypt(code).decode()
 
     def is_valid(self):
         now = timezone.now()
