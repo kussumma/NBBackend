@@ -43,7 +43,7 @@
           Resi/STT: {{order.shipping_ref_code}}
         </mj-text>
         <mj-text font-weight="bold" align="center">
-          Order Date: {{order.order_date}}
+          Estimation : {{order.shipping_estimation}}
         </mj-text>
       </mj-column>
     </mj-section>
