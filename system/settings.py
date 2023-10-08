@@ -185,6 +185,7 @@ REST_AUTH = {
     "JWT_AUTH_COOKIE": "nanobeepa-token",
     "JWT_AUTH_REFRESH_COOKIE": "nanobeepa-refresh-token",
     "REGISTER_SERIALIZER": "apps.accounts.serializers.CustomRegisterSerializer",
+    "USER_DETAILS_SERIALIZER": "apps.accounts.serializers.UserSerializer",
     "PASSWORD_RESET_SERIALIZER": "apps.accounts.serializers.CustomPasswordResetSerializer",
 }
 

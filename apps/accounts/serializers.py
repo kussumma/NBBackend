@@ -76,7 +76,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        exclude = ["password", "groups", "user_permissions"]
+        exclude = ["password", "groups", "user_permissions", "is_superuser", "is_staff"]
 
     def update(self, instance, validated_data):
         user_details_data = validated_data.pop("user_details", {})
