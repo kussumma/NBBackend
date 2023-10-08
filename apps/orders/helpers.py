@@ -134,3 +134,51 @@ def send_order_confirmation_email(order_id):
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     return
+
+
+def send_order_shipping_email(order_id):
+    order = Order.objects.get(id=order_id)
+    if not order:
+        return Response(
+            {"error": "Order not found"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if "Hari" in order.order_shipping.shipping_estimation:
+        shipping_estimation = order.order_shipping.shipping_estimation.replace(
+            "Hari", "Days"
+        )
+
+    # send email to user
+    try:
+        # Render the HTML template with the order data
+        data = {
+            "order_ref_code": order.ref_code,
+            "shipping_ref_code": order.order_shipping.shipping_ref_code,
+            "customer_name": f"{order.user.first_name} {order.user.last_name}",
+            "shipping_estimation": shipping_estimation,
+        }
+
+        html_content = render_to_string(
+            "order/email/shipping-confirmation.html", {"order": data}
+        )
+
+        # Create a plain text version of the message for email clients that don't support HTML
+        text_content = strip_tags(html_content)
+
+        # Create the email message object
+        msg = EmailMultiAlternatives(
+            "NanoBeepa - Order Shipping",
+            text_content,
+            settings.DEFAULT_FROM_EMAIL,
+            [order.user.email],
+        )
+
+        # Attach the HTML content to the message
+        msg.attach_alternative(html_content, "text/html")
+
+        # Send the email
+        msg.send(fail_silently=False)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    return

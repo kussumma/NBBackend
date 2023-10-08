@@ -12,9 +12,29 @@ from .models import (
 )
 
 
+class OrderItemInline(admin.StackedInline):
+    model = OrderItem
+    extra = 0
+
+
+class OrderShippingInline(admin.StackedInline):
+    model = OrderShipping
+    extra = 0
+
+
+class ReturnOrderInline(admin.StackedInline):
+    model = ReturnOrder
+    extra = 0
+
+
 class OrderAdmin(admin.ModelAdmin):
     list_filter = ("status", "payment_status", "created_at", "updated_at")
-    search_fields = ("ref_code", "user__email")
+    search_fields = ("ref_code", "user__email", "user__first_name", "user__last_name")
+    inlines = [
+        OrderItemInline,
+        OrderShippingInline,
+        ReturnOrderInline,
+    ]
 
     def get_list_display(self, request):
         if request.user.is_superuser:

@@ -70,7 +70,7 @@ class OrderViewset(viewsets.ModelViewSet):
             try:
                 coupon_user = CouponUser.objects.get(coupon=coupon, user=user)
             except CouponUser.DoesNotExist:
-                pass
+                coupon_user = None
 
             if coupon.is_limited and coupon_user:
                 return Response(
@@ -126,15 +126,21 @@ class OrderViewset(viewsets.ModelViewSet):
 
         try:
             original_tariff = lionparcel_original_tariff(total_weight, shipping)
+            if isinstance(original_tariff, Response):
+                return original_tariff
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             response = lionparcel_tariff_mapping(original_tariff)
+            if isinstance(response, Response):
+                return response
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         # shipping cost & estimation
+        shipping_type = None
+        shipping_type_name = None
         shipping_cost = 0
         shipping_estimation = None
 
@@ -225,10 +231,15 @@ class ReturnOrderViewset(viewsets.ModelViewSet):
         user = self.request.user
         return ReturnOrder.objects.filter(order__user=user)
 
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
         # get order
-        order_id = self.request.data["order"]
-        order = Order.objects.get(id=order_id)
+        order_id = request.data.get("order")
+        try:
+            order = Order.objects.get(id=order_id)
+        except Order.DoesNotExist:
+            return Response(
+                {"error": "Order not found"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         # check if order is already returned
         try:
@@ -238,6 +249,8 @@ class ReturnOrderViewset(viewsets.ModelViewSet):
             pass
 
         # create return order
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         serializer.save(order=order)
 
 
@@ -254,10 +267,15 @@ class RefundOrderViewset(viewsets.ModelViewSet):
         user = self.request.user
         return RefundOrder.objects.filter(order__user=user)
 
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
         # get order
-        order_id = self.request.data["order"]
-        order = Order.objects.get(id=order_id)
+        order_id = request.data.get("order")
+        try:
+            order = Order.objects.get(id=order_id)
+        except Order.DoesNotExist:
+            return Response(
+                {"error": "Order not found"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         # check if order is already refunded
         try:
@@ -267,6 +285,8 @@ class RefundOrderViewset(viewsets.ModelViewSet):
             pass
 
         # create refund order
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         serializer.save(order=order)
 
 

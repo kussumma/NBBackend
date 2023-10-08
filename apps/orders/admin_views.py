@@ -3,7 +3,11 @@ from django.contrib import messages
 
 from apps.orders.models import Order
 
-from .helpers import send_order_confirmation_email, lionparcel_booking
+from .helpers import (
+    send_order_confirmation_email,
+    lionparcel_booking,
+    send_order_shipping_email,
+)
 
 
 def confirm_order_view(request, pk):
@@ -29,6 +33,7 @@ def book_shipment_view(request, pk):
         try:
             order = Order.objects.get(pk=pk)
             lionparcel_booking(order.id)
+            send_order_shipping_email(order.id)
             order.status = "shipping"
             order.save()
             messages.success(
