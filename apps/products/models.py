@@ -81,6 +81,7 @@ class Brand(models.Model):
 
 class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    sku = models.CharField(max_length=250)
     name = models.CharField(max_length=250)
     discount = models.IntegerField(default=0)
     description = models.TextField()
@@ -128,7 +129,7 @@ class Rating(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.product.slug} - {self.user.email} - {self.star}"
+        return f"{self.product.slug} - {self.user.pk} - {self.star}"
 
 
 class Wishlist(models.Model):
@@ -143,7 +144,7 @@ class Wishlist(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.product.slug} - {self.user.email}"
+        return f"{self.product.slug} - {self.user.pk}"
 
 
 class Stock(models.Model):

@@ -42,12 +42,12 @@ class ProductViewSet(viewsets.ModelViewSet):
         filters.OrderingFilter,
         DjangoFilterBackend,
     ]
-    search_fields = ["name", "description"]
+    search_fields = ["name", "sku", "description"]
     filterset_fields = {
-        "category": ["exact"],
-        "subcategory": ["exact"],
-        "subsubcategory": ["exact"],
-        "brand": ["exact"],
+        "category__slug": ["exact"],
+        "subcategory__slug": ["exact"],
+        "subsubcategory__slug": ["exact"],
+        "brand__slug": ["exact"],
         "product_stock__price": ["exact", "gte", "lte"],
         "discount": ["exact", "gte", "lte"],
         "created_at": ["exact", "gte", "lte"],
@@ -188,20 +188,21 @@ class WishlistViewSet(viewsets.ModelViewSet):
         user = self.request.user
         return Wishlist.objects.filter(user=user)
 
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
         # get product
-        product_id = self.request.data["product"]
+        product_id = request.data.get("product")
         product = Product.objects.get(id=product_id)
 
         # check if product is already in wishlist
-        try:
-            Wishlist.objects.get(product=product, user=self.request.user)
+        if Wishlist.objects.filter(product=product, user=request.user).exists():
             raise serializers.ValidationError("Product is already in wishlist")
-        except Wishlist.DoesNotExist:
-            pass
 
         # create wishlist
-        serializer.save(user=self.request.user)
+        serializer = WishlistSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+
+        return Response(serializer.data)
 
 
 class StockViewSet(viewsets.ModelViewSet):
