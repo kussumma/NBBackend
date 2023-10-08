@@ -90,7 +90,6 @@ class UserSerializer(serializers.ModelSerializer):
             user_details.date_of_birth = user_details_data.get(
                 "date_of_birth", user_details.date_of_birth
             )
-            user_details.level = user_details_data.get("level", user_details.level)
             user_details.newsletter = user_details_data.get(
                 "newsletter", user_details.newsletter
             )
