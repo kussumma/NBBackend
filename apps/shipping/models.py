@@ -87,3 +87,8 @@ class Shipping(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.destination.route}"
+
+    def save(self, *args, **kwargs):
+        if self.is_default:
+            Shipping.objects.filter(user=self.user).update(is_default=False)
+        super(Shipping, self).save(*args, **kwargs)
