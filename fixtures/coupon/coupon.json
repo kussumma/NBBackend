@@ -1,22 +1,22 @@
 [
-    {
-        "model": "coupons.coupon",
-        "pk": "165430e9-03cd-4933-ae2a-076bb4de9697",
-        "fields": {
-            "code": "Z0FBQUFBQmxITGlPVjE3aWtlOU1CTjh6RkE3MmRVSi02djFlVEhibXhkUHBXQV9oNTRXd0puNU5DZC1CbTF4em80YjFXc1dLNTFNaDdmQnlVcE45XzU2cGVha0thWFQyVnc9PQ==",
-            "prefix_code": "NBFREEBY",
-            "name": "FREE VOUCHER",
-            "discount_type": "28c0d4b1-b1d4-451a-afad-5589e2f633e7",
-            "discount_value": 10,
-            "min_purchase": 100000,
-            "max_purchase": 0,
-            "valid_from": "2023-10-04T00:57:32Z",
-            "valid_to": "2023-10-07T00:57:38Z",
-            "is_active": true,
-            "is_private": false,
-            "is_limited": false,
-            "created_at": "2023-10-04T00:57:50.108Z",
-            "updated_at": "2023-10-04T00:57:50.108Z"
-        }
+  {
+    "model": "coupons.coupon",
+    "pk": "a44ee903-5bff-46e2-b7c3-a026efa98bc2",
+    "fields": {
+      "code": "gAAAAABlI07-74iCH1QYHPbekJKhDhLCfwSkAYh2rC2B8D91i5FfcEehhck46xKE-2u_Yi17Dm3rWlicSONfkz7Pe0wiTtBGTg==",
+      "prefix_code": "TESTNANO",
+      "name": "TESTNANO",
+      "discount_type": "28c0d4b1-b1d4-451a-afad-5589e2f633e7",
+      "discount_value": 10,
+      "min_purchase": 0,
+      "max_purchase": 0,
+      "valid_from": "2023-10-09T00:49:06Z",
+      "valid_to": "2023-10-31T00:49:09Z",
+      "is_active": true,
+      "is_private": false,
+      "is_limited": false,
+      "created_at": "2023-10-09T00:49:13.344Z",
+      "updated_at": "2023-10-09T00:54:35.652Z"
     }
+  }
 ]
