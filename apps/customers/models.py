@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 import uuid
+from tools.filestorage_helper import GridFSStorage
 
 from apps.products.models import Product
 
@@ -57,7 +58,9 @@ class ComplaintImage(models.Model):
     complaint = models.ForeignKey(
         Complaint, on_delete=models.CASCADE, related_name="complaint_images"
     )
-    image = models.ImageField(upload_to="complaints/")
+    image = models.ImageField(
+        storage=GridFSStorage(collection="complaint_images"), default="default.jpg"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -69,7 +72,10 @@ class ProductRequest(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_requests"
     )
-    image = models.ImageField(upload_to="requests/")
+    image = models.ImageField(
+        storage=GridFSStorage(collection="product_request_images"),
+        default="default.jpg",
+    )
     title = models.CharField(max_length=255)
     detail = models.TextField()
     status = models.CharField(max_length=255, choices=REQUEST_STATUS, default="pending")
@@ -118,7 +124,9 @@ class BugReportImage(models.Model):
     bug_report = models.ForeignKey(
         BugReport, on_delete=models.CASCADE, related_name="bug_report_images"
     )
-    image = models.ImageField(upload_to="bug_reports/", blank=True, null=True)
+    image = models.ImageField(
+        storage=GridFSStorage(collection="bug_report_images"), default="default.jpg"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from tools.fileupload_helper import validate_uploaded_file
 
 from .models import (
     Favorite,
@@ -33,12 +34,22 @@ class ComplaintImageSerializer(serializers.ModelSerializer):
         model = ComplaintImage
         fields = "__all__"
 
+    def validate_image(self, value):
+        if value:
+            validate_uploaded_file(value, "image")
+            return value
+
 
 class ProductRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductRequest
         fields = "__all__"
         read_only_fields = ["user"]
+
+    def validate_image(self, value):
+        if value:
+            validate_uploaded_file(value, "image")
+            return value
 
 
 class FeatureRequestSerializer(serializers.ModelSerializer):
@@ -59,3 +70,8 @@ class BugReportImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = BugReportImage
         fields = "__all__"
+
+    def validate_image(self, value):
+        if value:
+            validate_uploaded_file(value, "image")
+            return value
