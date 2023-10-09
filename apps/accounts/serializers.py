@@ -7,6 +7,7 @@ from allauth.account.utils import user_pk_to_url_str
 from allauth.account.adapter import get_adapter
 from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
+from tools.fileupload_helper import validate_uploaded_file
 
 from .models import UserDetail
 
@@ -109,6 +110,11 @@ class UserSerializer(serializers.ModelSerializer):
         instance = super().update(instance, validated_data)
 
         return instance
+
+    def validate_avatar(self, value):
+        if value:
+            validate_uploaded_file(value, "image")
+            return value
 
 
 class BasicUserSerializer(serializers.ModelSerializer):
