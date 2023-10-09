@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
 import uuid
+from tools.filestorage_helper import GridFSStorage
 
 User = get_user_model()
 
@@ -11,7 +12,7 @@ class Category(models.Model):
     name = models.CharField(max_length=250)
     description = models.TextField()
     cover = models.ImageField(
-        upload_to="categories/", default="categories/no_picture.png"
+        storage=GridFSStorage(collection="categories"), default="default.jpg"
     )
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
 
@@ -28,7 +29,7 @@ class Subcategory(models.Model):
     name = models.CharField(max_length=250)
     description = models.TextField()
     cover = models.ImageField(
-        upload_to="subcategories/", default="subcategories/no_picture.png"
+        storage=GridFSStorage(collection="subcategories"), default="default.jpg"
     )
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
     category = models.ForeignKey(
@@ -48,7 +49,7 @@ class Subsubcategory(models.Model):
     name = models.CharField(max_length=250)
     description = models.TextField()
     cover = models.ImageField(
-        upload_to="subsubcategories/", default="subsubcategories/no_picture.png"
+        storage=GridFSStorage(collection="subsubcategories"), default="default.jpg"
     )
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
     subcategory = models.ForeignKey(
@@ -68,7 +69,9 @@ class Brand(models.Model):
     name = models.CharField(max_length=250)
     description = models.TextField()
     origin = models.CharField(max_length=250, null=True, blank=True)
-    cover = models.ImageField(upload_to="brands/", default="brands/no_picture.png")
+    cover = models.ImageField(
+        storage=GridFSStorage(collection="brands"), default="default.jpg"
+    )
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
 
     def save(self, *args, **kwargs):
@@ -99,7 +102,9 @@ class Product(models.Model):
         related_name="product_subsubcategories",
         on_delete=models.PROTECT,
     )
-    cover = models.ImageField(upload_to="products/", default="products/no_picture.png")
+    cover = models.ImageField(
+        storage=GridFSStorage(collection="products"), default="default.jpg"
+    )
     link = models.URLField(null=True, blank=True)
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -124,7 +129,14 @@ class Rating(models.Model):
     )
     star = models.IntegerField(default=0)
     review = models.TextField()
-    image = models.ImageField(upload_to="ratings/", default="ratings/no_picture.png")
+    image = models.ImageField(
+        storage=GridFSStorage(collection="rating_images"),
+        default="default.jpg",
+    )
+    video = models.FileField(
+        storage=GridFSStorage(collection="rating_videos"),
+        default="default.jpg",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -153,7 +165,9 @@ class Stock(models.Model):
         Product, related_name="product_stock", on_delete=models.CASCADE
     )
     price = models.IntegerField(default=0)
-    image = models.ImageField(upload_to="stock/", default="stock/no_picture.png")
+    image = models.ImageField(
+        storage=GridFSStorage(collection="stock_images"), default="default.jpg"
+    )
     size = models.CharField(max_length=100, null=True, blank=True)
     color = models.CharField(max_length=100, null=True, blank=True)
     other = models.CharField(max_length=100, null=True, blank=True)
@@ -175,7 +189,7 @@ class ExtraProductImage(models.Model):
         Product, related_name="product_extra_images", on_delete=models.CASCADE
     )
     image = models.ImageField(
-        upload_to="extra_images/", default="extra_images/no_picture.png"
+        storage=GridFSStorage(collection="extra_product_images"), default="default.jpg"
     )
 
     def __str__(self):

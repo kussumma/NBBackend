@@ -172,6 +172,26 @@ class RatingViewSet(viewsets.ModelViewSet):
     ordering_fields = ["star", "created_at"]
     ordering = ["-created_at"]
 
+    def get_queryset(self):
+        product = self.request.query_params.get("product")
+        return Rating.objects.filter(product=product)
+
+    def create(self, request, *args, **kwargs):
+        # get product
+        product_id = request.data.get("product")
+        product = Product.objects.get(id=product_id)
+
+        # check if product is already rated
+        if Rating.objects.filter(product=product, user=request.user).exists():
+            raise serializers.ValidationError("Product is already rated")
+
+        # create rating
+        serializer = RatingSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+
+        return Response(serializer.data)
+
 
 class WishlistViewSet(viewsets.ModelViewSet):
     queryset = Wishlist.objects.all()
