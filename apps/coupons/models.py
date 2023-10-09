@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from cryptography.fernet import Fernet
+from cryptography.fernet import InvalidToken
 from django.conf import settings
 import hashlib
 import base64
@@ -48,7 +49,8 @@ class Coupon(models.Model):
         return f"{self.name} - {self.prefix_code}{self.decode_coupon_code(self.code)}"
 
     def save(self, *args, **kwargs):
-        self.code = self.generate_code()
+        if not self.code:
+            self.code = self.generate_code()
         if self.prefix_code.upper() == "RANDOM" or len(self.prefix_code) < 8:
             self.prefix_code = self.generate_prefix_code()
         else:
@@ -64,17 +66,26 @@ class Coupon(models.Model):
         return prefix
 
     def is_verified(self, code):
-        code = code.encode()
-        decrypted_code = fernet.decrypt(self.code.encode())
-        return code == decrypted_code
+        try:
+            code = code.encode()
+            decrypted_code = fernet.decrypt(self.code.encode())
+            return code == decrypted_code
+        except InvalidToken:
+            return False
 
     def decode_coupon_code(self, code):
-        code = code.encode()
-        return fernet.decrypt(code).decode()
+        try:
+            code = code.encode()
+            return fernet.decrypt(code).decode()
+        except InvalidToken:
+            return "Invalid code"
 
     def is_valid(self):
-        now = timezone.now()
-        return self.is_active and self.valid_from <= now and self.valid_to >= now
+        try:
+            now = timezone.now()
+            return self.is_active and self.valid_from <= now and self.valid_to >= now
+        except Exception:
+            return False
 
 
 class CouponUser(models.Model):
