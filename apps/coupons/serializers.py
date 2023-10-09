@@ -1,5 +1,5 @@
 from rest_framework import serializers
-
+from tools.fileupload_helper import validate_uploaded_file
 from .models import DiscountType, Coupon, CouponUser, CouponBanner
 
 
@@ -38,3 +38,8 @@ class CouponBannerSerializer(serializers.ModelSerializer):
     class Meta:
         model = CouponBanner
         fields = "__all__"
+
+    def validate_image(self, value):
+        if value:
+            validate_uploaded_file(value, "image")
+            return value
