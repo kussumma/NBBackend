@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 import uuid
 import secrets
+from tools.filestorage_helper import GridFSStorage
 
 User = get_user_model()
 
@@ -138,7 +139,9 @@ class ReturnImage(models.Model):
     return_order = models.ForeignKey(
         ReturnOrder, on_delete=models.CASCADE, related_name="return_images"
     )
-    image = models.ImageField(upload_to="return_images/", null=True, blank=True)
+    image = models.ImageField(
+        storage=GridFSStorage(collection="return_images"), default="default.jpg"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -151,8 +154,8 @@ class RefundOrder(models.Model):
         ReturnOrder, on_delete=models.CASCADE, related_name="refund_order"
     )
     refund_amount = models.PositiveIntegerField(default=0)
-    refund_receipt = models.ImageField(
-        upload_to="refund_receipts/", null=True, blank=True
+    refund_receipt = models.FileField(
+        storage=GridFSStorage(collection="refund_receipts"), default="default.jpg"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
