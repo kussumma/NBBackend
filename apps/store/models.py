@@ -1,11 +1,14 @@
 from django.db import models
 import uuid
+from tools.filestorage_helper import GridFSStorage
 
 
 class Store(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
-    logo = models.ImageField(upload_to="stores/")
+    logo = models.ImageField(
+        storage=GridFSStorage(collection="store_logos"), default="default.jpg"
+    )
     description = models.TextField(null=True, blank=True)
     motto = models.CharField(max_length=255, null=True, blank=True)
 
@@ -50,7 +53,9 @@ class About(models.Model):
 class Partner(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
-    logo = models.ImageField(upload_to="partners/")
+    logo = models.ImageField(
+        storage=GridFSStorage(collection="partner_logos"), default="default.jpg"
+    )
     description = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
