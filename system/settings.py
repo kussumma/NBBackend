@@ -126,10 +126,21 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "mediafiles")
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+# Media files
+MONGODB_GRIDFS = {
+    "UNIX_SOCKET_PATH": config("MONGO_UNIX_SOCKET_PATH"),
+    "HOST": config("MONGO_HOST"),
+    "PORT": config("MONGO_PORT", cast=int),
+    "DB": config("MONGO_DB"),
+    "USERNAME": config("MONGO_USERNAME"),
+    "PASSWORD": config("MONGO_PASSWORD"),
+    "COLLECTION": config("MONGO_COLLECTION"),
+}
+
+DEFAULT_FILE_STORAGE = "tools.filestorage_helper.GridFSStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
