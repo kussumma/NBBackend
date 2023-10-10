@@ -1,78 +1,78 @@
 [
-    {
-        "model": "products.product",
-        "pk": "18462ef4-5c6a-4a65-9cee-86cd73bc2ca4",
-        "fields": {
-            "name": "B Product",
-            "discount": 0,
-            "description": "Dummy product",
-            "brand": "07456675-287a-461e-b892-da30d439abe6",
-            "category": "cb0c28f0-546a-408b-a199-3d1f62630a72",
-            "subcategory": "4df4e309-17be-46f3-9a8b-67045058b862",
-            "subsubcategory": "c5ff5c28-9e2f-40d5-838a-7d6f1eee0d63",
-            "cover": "products/no_picture.png",
-            "link": null,
-            "slug": "b-product",
-            "created_at": "2023-09-17T02:31:37.627Z",
-            "updated_at": "2023-09-17T02:31:37.628Z",
-            "is_active": true
-        }
-    },
-    {
-        "model": "products.product",
-        "pk": "4bc506f3-f676-4442-86ff-759b15017d8e",
-        "fields": {
-            "name": "C Product",
-            "discount": 0,
-            "description": "Dummy product",
-            "brand": "07456675-287a-461e-b892-da30d439abe6",
-            "category": "23603e3f-a2d6-413b-b688-afc6dc26c0c9",
-            "subcategory": "762790a9-a232-4851-8f32-db3decbe643a",
-            "subsubcategory": "dc27ceaf-9a0f-4741-8e78-8acd76ecd691",
-            "cover": "products/no_picture.png",
-            "link": null,
-            "slug": "c-product",
-            "created_at": "2023-09-17T02:32:08.215Z",
-            "updated_at": "2023-09-17T02:32:08.215Z",
-            "is_active": true
-        }
-    },
-    {
-        "model": "products.product",
-        "pk": "6dcc2109-6491-4933-b8a4-81c81031e83d",
-        "fields": {
-            "name": "D Product",
-            "discount": 0,
-            "description": "Dummy product",
-            "brand": "9c0ea1e4-fee0-4aa2-8b43-5040e513eeac",
-            "category": "23603e3f-a2d6-413b-b688-afc6dc26c0c9",
-            "subcategory": "3549345c-8ad3-4111-a564-e22264985531",
-            "subsubcategory": "4f0074a8-caea-48a5-ab84-431728b83410",
-            "cover": "products/no_picture.png",
-            "link": null,
-            "slug": "d-product",
-            "created_at": "2023-09-17T02:32:46.511Z",
-            "updated_at": "2023-09-17T02:32:46.511Z",
-            "is_active": true
-        }
-    },
-    {
-        "model": "products.product",
-        "pk": "9b89e4d2-0ae9-4693-b19d-10b1797a4bce",
-        "fields": {
-            "name": "A Product",
-            "discount": 0,
-            "description": "Dummy product",
-            "brand": "9c0ea1e4-fee0-4aa2-8b43-5040e513eeac",
-            "category": "cb0c28f0-546a-408b-a199-3d1f62630a72",
-            "subcategory": "e489737d-9527-4e22-9ee7-310bfa863344",
-            "subsubcategory": "a160e97b-8d0b-4762-bac8-61fded04abfe",
-            "cover": "products/no_picture.png",
-            "link": null,
-            "slug": "a-product",
-            "created_at": "2023-09-17T02:30:58.567Z",
-            "updated_at": "2023-09-17T02:30:58.567Z",
-            "is_active": true
-        }
-    }
+	{
+		"model": "products.product",
+		"pk": "18462ef4-5c6a-4a65-9cee-86cd73bc2ca4",
+		"fields": {
+			"name": "B Product",
+			"discount": 0,
+			"description": "Dummy product",
+			"brand": "07456675-287a-461e-b892-da30d439abe6",
+			"category": "cb0c28f0-546a-408b-a199-3d1f62630a72",
+			"subcategory": "4df4e309-17be-46f3-9a8b-67045058b862",
+			"subsubcategory": "c5ff5c28-9e2f-40d5-838a-7d6f1eee0d63",
+			"cover": "default.jpg",
+			"link": null,
+			"slug": "b-product",
+			"created_at": "2023-09-17T02:31:37.627Z",
+			"updated_at": "2023-09-17T02:31:37.628Z",
+			"is_active": true
+		}
+	},
+	{
+		"model": "products.product",
+		"pk": "4bc506f3-f676-4442-86ff-759b15017d8e",
+		"fields": {
+			"name": "C Product",
+			"discount": 0,
+			"description": "Dummy product",
+			"brand": "07456675-287a-461e-b892-da30d439abe6",
+			"category": "23603e3f-a2d6-413b-b688-afc6dc26c0c9",
+			"subcategory": "762790a9-a232-4851-8f32-db3decbe643a",
+			"subsubcategory": "dc27ceaf-9a0f-4741-8e78-8acd76ecd691",
+			"cover": "default.jpg",
+			"link": null,
+			"slug": "c-product",
+			"created_at": "2023-09-17T02:32:08.215Z",
+			"updated_at": "2023-09-17T02:32:08.215Z",
+			"is_active": true
+		}
+	},
+	{
+		"model": "products.product",
+		"pk": "6dcc2109-6491-4933-b8a4-81c81031e83d",
+		"fields": {
+			"name": "D Product",
+			"discount": 0,
+			"description": "Dummy product",
+			"brand": "9c0ea1e4-fee0-4aa2-8b43-5040e513eeac",
+			"category": "23603e3f-a2d6-413b-b688-afc6dc26c0c9",
+			"subcategory": "3549345c-8ad3-4111-a564-e22264985531",
+			"subsubcategory": "4f0074a8-caea-48a5-ab84-431728b83410",
+			"cover": "default.jpg",
+			"link": null,
+			"slug": "d-product",
+			"created_at": "2023-09-17T02:32:46.511Z",
+			"updated_at": "2023-09-17T02:32:46.511Z",
+			"is_active": true
+		}
+	},
+	{
+		"model": "products.product",
+		"pk": "9b89e4d2-0ae9-4693-b19d-10b1797a4bce",
+		"fields": {
+			"name": "A Product",
+			"discount": 0,
+			"description": "Dummy product",
+			"brand": "9c0ea1e4-fee0-4aa2-8b43-5040e513eeac",
+			"category": "cb0c28f0-546a-408b-a199-3d1f62630a72",
+			"subcategory": "e489737d-9527-4e22-9ee7-310bfa863344",
+			"subsubcategory": "a160e97b-8d0b-4762-bac8-61fded04abfe",
+			"cover": "default.jpg",
+			"link": null,
+			"slug": "a-product",
+			"created_at": "2023-09-17T02:30:58.567Z",
+			"updated_at": "2023-09-17T02:30:58.567Z",
+			"is_active": true
+		}
+	}
 ]

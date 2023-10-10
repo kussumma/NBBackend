@@ -1,22 +1,22 @@
 [
-    {
-        "model": "products.category",
-        "pk": "23603e3f-a2d6-413b-b688-afc6dc26c0c9",
-        "fields": {
-            "name": "BCategory",
-            "description": "Category B",
-            "cover": "categories/no_picture.png",
-            "slug": "bcategory"
-        }
-    },
-    {
-        "model": "products.category",
-        "pk": "cb0c28f0-546a-408b-a199-3d1f62630a72",
-        "fields": {
-            "name": "ACategory",
-            "description": "Category A",
-            "cover": "categories/no_picture.png",
-            "slug": "acategory"
-        }
+  {
+    "model": "products.category",
+    "pk": "23603e3f-a2d6-413b-b688-afc6dc26c0c9",
+    "fields": {
+      "name": "BCategory",
+      "description": "Category B",
+      "cover": "default.jpg",
+      "slug": "bcategory"
     }
+  },
+  {
+    "model": "products.category",
+    "pk": "cb0c28f0-546a-408b-a199-3d1f62630a72",
+    "fields": {
+      "name": "ACategory",
+      "description": "Category A",
+      "cover": "default.jpg",
+      "slug": "acategory"
+    }
+  }
 ]
