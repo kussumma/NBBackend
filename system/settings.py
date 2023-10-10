@@ -110,10 +110,15 @@ DATABASES = {
 }
 
 # Cache
+if config("REDIS_PATH"):
+    location_redis = config("REDIS_PATH")
+else:
+    location_redis = config("REDIS_URL")
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": config("REDIS_URL"),
+        "LOCATION": location_redis,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
