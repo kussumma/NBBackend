@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from apps.accounts.views import GoogleLogin
+from tools.file_server import FileAPIView
 
 urlpatterns = [
     # admin
@@ -35,8 +36,8 @@ urlpatterns = [
     path("api/", include("apps.shipping.urls")),
     # Payments
     path("api/", include("apps.payments.urls")),
+    # File Server
+    path("media/<str:collection>/<str:filename>", FileAPIView.as_view()),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

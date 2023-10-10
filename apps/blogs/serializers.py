@@ -1,5 +1,5 @@
 from rest_framework import serializers
-
+from tools.fileupload_helper import validate_uploaded_file
 from .models import BlogCategory, BlogTag, Blog, BlogImage, BlogVideo, BlogComment
 
 
@@ -8,6 +8,11 @@ class BlogCategorySerializer(serializers.ModelSerializer):
         model = BlogCategory
         fields = "__all__"
         read_only_fields = ("slug",)
+
+    def validate_cover(self, value):
+        if value:
+            validate_uploaded_file(value, "image")
+            return value
 
 
 class BlogTagSerializer(serializers.ModelSerializer):
@@ -21,6 +26,11 @@ class BlogImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlogImage
         fields = "__all__"
+
+    def validate_image(self, value):
+        if value:
+            validate_uploaded_file(value, "image")
+            return value
 
 
 class BlogVideoSerializer(serializers.ModelSerializer):
@@ -41,3 +51,8 @@ class BlogSerializer(serializers.ModelSerializer):
         model = Blog
         fields = "__all__"
         read_only_fields = ("slug", "created_at", "updated_at", "author")
+
+    def validate_cover(self, value):
+        if value:
+            validate_uploaded_file(value, "image")
+            return value

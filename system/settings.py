@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 from datetime import timedelta
+import sentry_sdk
 
 # use decouple
 from decouple import config, Csv
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     "django_filters",
     "import_export",
+    "cachalot",
     # Local apps
     "apps.accounts",
     "apps.store",
@@ -107,6 +109,25 @@ DATABASES = {
     }
 }
 
+# Cache
+if config("REDIS_PATH"):
+    location_redis = config("REDIS_PATH")
+else:
+    location_redis = config("REDIS_URL")
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": location_redis,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
+
+# Cachalot
+CACHALOT_ENABLED = True
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
@@ -126,10 +147,21 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "mediafiles")
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+# Media files
+MONGODB_GRIDFS = {
+    "UNIX_SOCKET_PATH": config("MONGO_UNIX_SOCKET_PATH"),
+    "HOST": config("MONGO_HOST"),
+    "PORT": config("MONGO_PORT", cast=int),
+    "DB": config("MONGO_DB"),
+    "USERNAME": config("MONGO_USERNAME"),
+    "PASSWORD": config("MONGO_PASSWORD"),
+    "COLLECTION": config("MONGO_COLLECTION"),
+}
+
+DEFAULT_FILE_STORAGE = "tools.filestorage_helper.GridFSStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -250,3 +282,15 @@ LANGUAGE_CODE = "en-us"
 TIME_ZONE = config("TIME_ZONE")
 USE_I18N = True
 USE_TZ = True
+
+# SENTRY
+sentry_sdk.init(
+    dsn=config("SENTRY_DSN"),
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    traces_sample_rate=1.0,
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate=1.0,
+)

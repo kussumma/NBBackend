@@ -8,6 +8,7 @@ from cryptography.fernet import InvalidToken
 from django.conf import settings
 import hashlib
 import base64
+from tools.filestorage_helper import GridFSStorage
 
 User = get_user_model()
 
@@ -106,7 +107,9 @@ class CouponBanner(models.Model):
     coupon = models.ForeignKey(
         Coupon, on_delete=models.CASCADE, related_name="coupon_banners"
     )
-    image = models.ImageField(upload_to="coupon_banners")
+    image = models.ImageField(
+        storage=GridFSStorage(collection="coupon_banners"), default="default.jpg"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

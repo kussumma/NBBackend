@@ -5,7 +5,7 @@
         "fields": {
             "name": "BBBSubsubcategory",
             "description": "test subsubcategory",
-            "cover": "subsubcategories/no_picture.png",
+            "cover": "default.jpg",
             "slug": "bbbsubsubcategory",
             "subcategory": "3549345c-8ad3-4111-a564-e22264985531"
         }
@@ -16,7 +16,7 @@
         "fields": {
             "name": "AAASubsubcategory",
             "description": "test subsubcategory",
-            "cover": "subsubcategories/no_picture.png",
+            "cover": "default.jpg",
             "slug": "aaasubsubcategory",
             "subcategory": "e489737d-9527-4e22-9ee7-310bfa863344"
         }
@@ -27,7 +27,7 @@
         "fields": {
             "name": "AABSubsubcategory",
             "description": "test subsubcategory",
-            "cover": "subsubcategories/no_picture.png",
+            "cover": "default.jpg",
             "slug": "aabsubsubcategory",
             "subcategory": "4df4e309-17be-46f3-9a8b-67045058b862"
         }
@@ -38,7 +38,7 @@
         "fields": {
             "name": "BBASubsubcategory",
             "description": "test subsubcategory",
-            "cover": "subsubcategories/no_picture.png",
+            "cover": "default.jpg",
             "slug": "bbasubsubcategory",
             "subcategory": "762790a9-a232-4851-8f32-db3decbe643a"
         }

@@ -2,6 +2,7 @@ from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 import uuid
+from tools.filestorage_helper import GridFSStorage
 
 
 class UserManager(BaseUserManager):
@@ -40,7 +41,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    avatar = models.ImageField(upload_to="avatars/", default="avatars/default.png")
+    avatar = models.ImageField(
+        storage=GridFSStorage(collection="avatars"), default="default.jpg"
+    )
     level = models.CharField(choices=LEVEL_CHOICES, max_length=20, default="bronze")
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

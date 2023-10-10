@@ -1,6 +1,6 @@
-from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView
+from rest_framework.generics import ListAPIView
 from django.contrib.auth import get_user_model
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAdminUser
 from rest_framework import filters
 from django.conf import settings
 
@@ -17,15 +17,6 @@ class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
     callback_url = settings.FRONTEND_URL + "/google/"
     client_class = OAuth2Client
-
-
-class UserDetailsView(RetrieveUpdateAPIView):
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self):
-        return self.request.user
 
 
 class UserListView(ListAPIView):

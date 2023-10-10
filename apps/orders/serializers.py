@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from tools.fileupload_helper import validate_uploaded_file
 
 from .models import (
     Order,
@@ -37,6 +38,11 @@ class ReturnImageSerializer(serializers.ModelSerializer):
         model = ReturnImage
         fields = "__all__"
 
+    def validate_image(self, value):
+        if value:
+            validate_uploaded_file(value, "image")
+            return value
+
 
 class ReturnOrderSerializer(serializers.ModelSerializer):
     return_images = ReturnImageSerializer(many=True, read_only=True)
@@ -51,3 +57,8 @@ class RefundOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = RefundOrder
         fields = "__all__"
+
+    def validate_refund_receipt(self, value):
+        if value:
+            validate_uploaded_file(value, "image")
+            return value

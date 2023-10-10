@@ -2,6 +2,7 @@ from django.db import models
 import uuid
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
+from tools.filestorage_helper import GridFSStorage
 
 User = get_user_model()
 
@@ -11,7 +12,7 @@ class BlogCategory(models.Model):
     name = models.CharField(max_length=50, unique=True)
     description = models.TextField()
     cover = models.ImageField(
-        upload_to="blog_categories/", default="blog_categories/no_picture.png"
+        storage=GridFSStorage(collection="blog_categories"), default="default.jpg"
     )
     icon = models.CharField(max_length=100, null=True, blank=True)
     slug = models.SlugField(max_length=50, unique=True)
@@ -41,7 +42,9 @@ class Blog(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=250)
     content = models.TextField()
-    cover = models.ImageField(upload_to="blogs/", default="blogs/no_picture.png")
+    cover = models.ImageField(
+        storage=GridFSStorage(collection="blog_covers"), default="default.jpg"
+    )
     slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
     category = models.ForeignKey(BlogCategory, on_delete=models.PROTECT)
     tags = models.ManyToManyField(BlogTag)
@@ -61,7 +64,9 @@ class Blog(models.Model):
 class BlogImage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="blog_images/")
+    image = models.ImageField(
+        storage=GridFSStorage(collection="blog_images"), default="default.jpg"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
