@@ -172,10 +172,6 @@ class RatingViewSet(viewsets.ModelViewSet):
     ordering_fields = ["star", "created_at"]
     ordering = ["-created_at"]
 
-    def get_queryset(self):
-        product = self.request.query_params.get("product")
-        return Rating.objects.filter(product=product)
-
     def create(self, request, *args, **kwargs):
         # get product
         product_id = request.data.get("product")
