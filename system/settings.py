@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 from datetime import timedelta
+import sentry_sdk
 
 # use decouple
 from decouple import config, Csv
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     "django_filters",
     "import_export",
+    "cachalot",
     # Local apps
     "apps.accounts",
     "apps.store",
@@ -106,6 +108,20 @@ DATABASES = {
         },
     }
 }
+
+# Cache
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": config("REDIS_URL"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
+
+# Cachalot
+CACHALOT_ENABLED = True
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -261,3 +277,15 @@ LANGUAGE_CODE = "en-us"
 TIME_ZONE = config("TIME_ZONE")
 USE_I18N = True
 USE_TZ = True
+
+# SENTRY
+sentry_sdk.init(
+    dsn=config("SENTRY_DSN"),
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    traces_sample_rate=1.0,
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate=1.0,
+)
