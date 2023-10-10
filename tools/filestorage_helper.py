@@ -6,15 +6,14 @@ from django.utils.deconstruct import deconstructible
 import os
 import uuid
 import urllib.parse
-from rest_framework.response import Response
-from rest_framework import status
 
 
 @deconstructible
 class GridFSStorage(Storage):
     """
     GridFSStorage is a Django storage backend that uses MongoDB's GridFS
-    for storing files.
+    for storing files. It is based on the Storage class from Django
+    https://docs.djangoproject.com/en/4.2/ref/files/storage/#django.core.files.storage.Storage
     """
 
     def __init__(self, location=None, base_url=None, collection=None):
