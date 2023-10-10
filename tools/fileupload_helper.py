@@ -38,7 +38,7 @@ def validate_uploaded_file(uploaded_file, type):
             # delete temp file
             os.unlink(video_path)
 
-        if video_duration > 30:
+        if video_duration > 35:
             raise ValidationError(
                 "Video duration exceeds the maximum allowed duration of 30 seconds"
             )
