@@ -20,9 +20,7 @@ class GridFSStorage(Storage):
         if settings.MONGODB_GRIDFS["UNIX_SOCKET_PATH"]:
             # encode the UNIX_SOCKET_PATH as URL encoding
             # https://docs.mongodb.com/manual/reference/connection-string/#unix-domain-sockets
-            mongo_uri = "mongodb://" + urllib.parse.quote(
-                settings.MONGODB_GRIDFS["UNIX_SOCKET_PATH"]
-            )
+            mongo_uri = "mongodb://" + settings.MONGODB_GRIDFS["UNIX_SOCKET_PATH"]
             self.client = MongoClient(mongo_uri)
         else:
             self.client = MongoClient(
