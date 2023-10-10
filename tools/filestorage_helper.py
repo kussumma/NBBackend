@@ -17,22 +17,8 @@ class GridFSStorage(Storage):
     """
 
     def __init__(self, location=None, base_url=None, collection=None):
-        if settings.MONGODB_GRIDFS["UNIX_SOCKET_PATH"]:
-            # encode the UNIX_SOCKET_PATH as URL encoding
-            # https://docs.mongodb.com/manual/reference/connection-string/#unix-domain-sockets
-            mongo_uri = "mongodb://" + settings.MONGODB_GRIDFS["UNIX_SOCKET_PATH"]
-            self.client = MongoClient(mongo_uri)
-        else:
-            self.client = MongoClient(
-                settings.MONGODB_GRIDFS["HOST"],
-                settings.MONGODB_GRIDFS["PORT"],
-            )
+        self.client = MongoClient(settings.MONGODB_GRIDFS["URL"])
         self.db = self.client[settings.MONGODB_GRIDFS["DB"]]
-        if settings.MONGODB_GRIDFS["USERNAME"] and settings.MONGODB_GRIDFS["PASSWORD"]:
-            self.db.authenticate(
-                settings.MONGO_DB_USERNAME,
-                settings.MONGO_DB_PASSWORD,
-            )
         self.collection = collection or settings.MONGODB_GRIDFS["COLLECTION"]
         self.fs = GridFS(self.db, self.collection)
         self.location = location or ""

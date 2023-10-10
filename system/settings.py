@@ -110,15 +110,10 @@ DATABASES = {
 }
 
 # Cache
-if config("REDIS_PATH"):
-    location_redis = config("REDIS_PATH")
-else:
-    location_redis = config("REDIS_URL")
-
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": location_redis,
+        "LOCATION": config("REDIS_URL"),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
@@ -152,12 +147,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Media files
 MONGODB_GRIDFS = {
-    "UNIX_SOCKET_PATH": config("MONGO_UNIX_SOCKET_PATH"),
-    "HOST": config("MONGO_HOST"),
-    "PORT": config("MONGO_PORT", cast=int),
+    "URL": config("MONGO_URL"),
     "DB": config("MONGO_DB"),
-    "USERNAME": config("MONGO_USERNAME"),
-    "PASSWORD": config("MONGO_PASSWORD"),
     "COLLECTION": config("MONGO_COLLECTION"),
 }
 
