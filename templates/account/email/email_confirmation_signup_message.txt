@@ -11,7 +11,7 @@ Thank you for choosing NanoBeepa.
 
 
 Copyright © {% now 'Y' %} NanoBeepa. All rights reserved.
-PT. Inayat Bunga perdana
+PT. Inayat Bunga Perdana
 
 Email support: cs@nanobeepa.com
 WhatsApp support: +6281238995951
