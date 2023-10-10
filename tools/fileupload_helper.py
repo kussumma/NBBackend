@@ -1,6 +1,7 @@
 import os
 import cv2
 from rest_framework.serializers import ValidationError
+import tempfile
 
 
 def validate_uploaded_file(uploaded_file, type):
@@ -15,25 +16,36 @@ def validate_uploaded_file(uploaded_file, type):
             raise ValidationError("File size exceeds the maximum allowed size of 5 MB")
 
     elif type == "video" and file_extension in [".mp4", ".avi", ".mov"]:
-        if uploaded_file.size > max_file_size * 3:
+        if uploaded_file.size > max_file_size * 6:
             raise ValidationError("File size exceeds the maximum allowed size of 15 MB")
 
         try:
-            video_capture = cv2.VideoCapture(uploaded_file.temporary_file_path())
+            # opencv requires a file path to analyze video files
+            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                temp_file.write(uploaded_file.read())
+                video_path = temp_file.name
+
+            # analyze video file
+            video_capture = cv2.VideoCapture(video_path)
             frame_count = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
             fps = int(video_capture.get(cv2.CAP_PROP_FPS))
             video_duration = frame_count / fps
 
-            if video_duration > 60:
-                raise ValidationError(
-                    "Video duration exceeds the maximum allowed duration of 60 seconds"
-                )
         except Exception as e:
-            raise ValidationError("Error analyzing video file")
+            raise ValidationError("Error analyzing video file: " + str(e))
+
+        finally:
+            # delete temp file
+            os.unlink(video_path)
+
+        if video_duration > 30:
+            raise ValidationError(
+                "Video duration exceeds the maximum allowed duration of 30 seconds"
+            )
 
     else:
         raise ValidationError(
-            "Unsupported file format. Allowed formats: jpg, jpeg, png, gif, mp4, avi, mov, pdf"
+            "Unsupported file format. Image file must be in .jpg, .jpeg, .png, .gif, or .pdf format. Video file must be in .mp4, .avi, or .mov format"
         )
 
     return uploaded_file
