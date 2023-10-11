@@ -83,7 +83,7 @@ class Shipping(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    is_default = models.BooleanField(default=False)
+    is_default = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.user} - {self.destination.route}"
@@ -91,4 +91,5 @@ class Shipping(models.Model):
     def save(self, *args, **kwargs):
         if self.is_default:
             Shipping.objects.filter(user=self.user).update(is_default=False)
+
         super(Shipping, self).save(*args, **kwargs)
