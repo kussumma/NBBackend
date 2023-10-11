@@ -7,6 +7,7 @@ from django.db.models import Min, Max
 from django.db.models.functions import Coalesce
 from rest_framework import serializers
 
+from apps.orders.models import Order
 from .models import (
     Category,
     Product,
@@ -48,6 +49,8 @@ class ProductViewSet(viewsets.ModelViewSet):
         "subcategory__slug": ["exact"],
         "subsubcategory__slug": ["exact"],
         "brand__slug": ["exact"],
+        "brand__name": ["istartswith"],
+        "name": ["istartswith"],
         "product_stock__price": ["exact", "gte", "lte"],
         "discount": ["exact", "gte", "lte"],
         "created_at": ["exact", "gte", "lte"],
@@ -78,11 +81,21 @@ class ProductViewSet(viewsets.ModelViewSet):
         stock = Stock.objects.filter(product=instance)
         stock_serializer = StockSerializer(stock, many=True)
 
-        # get 5 latest ratings with 5 stars
-        ratings = Rating.objects.filter(product=instance, star=5).order_by(
-            "-created_at"
-        )[:5]
+        # get 5 latest ratings
+        ratings = Rating.objects.filter(product=instance).order_by("-created_at")[:5]
         ratings_serializer = RatingSerializer(ratings, many=True)
+
+        # get 3 ratings with >= 4 stars
+        highest_ratings = Rating.objects.filter(product=instance, star__gte=4).order_by(
+            "-star", "-created_at"
+        )[:3]
+        highest_ratings_serializer = RatingSerializer(highest_ratings, many=True)
+
+        # get 3 ratings with <= 3 stars
+        lowest_ratings = Rating.objects.filter(product=instance, star__lte=3).order_by(
+            "-star", "-created_at"
+        )[:3]
+        lowest_ratings_serializer = RatingSerializer(lowest_ratings, many=True)
 
         # acumulate all ratings
         ratings = Rating.objects.filter(product=instance)
@@ -110,6 +123,8 @@ class ProductViewSet(viewsets.ModelViewSet):
                 "stock": stock_serializer.data,
                 "total_rating": average_rating,
                 "latest_rating": ratings_serializer.data,
+                "highest_rating": highest_ratings_serializer.data,
+                "lowest_rating": lowest_ratings_serializer.data,
                 "total_wishlist": total_wishlist,
                 "related_products": ProductSerializer(related_products, many=True).data,
             }
@@ -153,8 +168,15 @@ class BrandViewSet(viewsets.ModelViewSet):
     queryset = Brand.objects.all()
     serializer_class = BrandSerializer
     permission_classes = [IsAdminOrReadOnly]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [
+        filters.SearchFilter,
+        filters.OrderingFilter,
+        DjangoFilterBackend,
+    ]
     search_fields = ["name"]
+    filterset_fields = {
+        "name": ["exact", "istartswith"],
+    }
     ordering_fields = ["name"]
     ordering = ["name"]
     lookup_field = "slug"
@@ -175,10 +197,19 @@ class RatingViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         # get product
         product_id = request.data.get("product")
-        product = Product.objects.get(id=product_id)
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            raise serializers.ValidationError("Product does not exist")
+
+        # check the product is exist in previous order
+        if not Order.objects.filter(
+            payment_status="settlement", order_items__product_id=product.pk
+        ).exists():
+            raise serializers.ValidationError("Please buy this product first")
 
         # check if product is already rated
-        if Rating.objects.filter(product=product, user=request.user).exists():
+        if Rating.objects.filter(product=product.pk, user=request.user).exists():
             raise serializers.ValidationError("Product is already rated")
 
         # create rating
