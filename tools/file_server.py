@@ -16,12 +16,24 @@ class FileAPIView(views.APIView):
                 {"error": "filename is required"}, status=status.HTTP_400_BAD_REQUEST
             )
         try:
+            # open the file from GridFS
             client = MongoClient(settings.MONGODB_GRIDFS["URL"])
             db = client[settings.MONGODB_GRIDFS["DB"]]
             fs = GridFS(db, collection)
             file = fs.get_last_version(filename)
 
-            response = HttpResponse(file.read(), content_type="image/jpeg")
+            # get the file content type from the filename
+            ext = filename.split(".")[-1].lower()
+            content_type = "application/octet-stream"
+            if ext == "jpg" or ext == "jpeg":
+                content_type = "image/jpeg"
+            elif ext == "png":
+                content_type = "image/png"
+            elif ext == "mp4" or ext == "mov":
+                content_type = "video/mp4"
+
+            # return the file directly to the client
+            response = HttpResponse(file.read(), content_type=content_type)
             response["Content-Disposition"] = "inline; filename=" + file.filename
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

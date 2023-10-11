@@ -5,7 +5,6 @@ from gridfs import GridFS
 from django.utils.deconstruct import deconstructible
 import os
 import uuid
-import urllib.parse
 
 
 @deconstructible

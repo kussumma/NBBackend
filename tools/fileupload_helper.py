@@ -11,11 +11,11 @@ def validate_uploaded_file(uploaded_file, type):
     # Check file size
     max_file_size = 5 * 1024 * 1024  # 5 MB
 
-    if type == "image" and file_extension in [".jpg", ".jpeg", ".png", ".gif", ".pdf"]:
+    if type == "image" and file_extension in [".jpg", ".jpeg", ".png"]:
         if uploaded_file.size > max_file_size:
             raise ValidationError("File size exceeds the maximum allowed size of 5 MB")
 
-    elif type == "video" and file_extension in [".mp4", ".avi", ".mov"]:
+    elif type == "video" and file_extension in [".mp4", ".mov"]:
         if uploaded_file.size > max_file_size * 6:
             raise ValidationError("File size exceeds the maximum allowed size of 15 MB")
 
@@ -45,7 +45,7 @@ def validate_uploaded_file(uploaded_file, type):
 
     else:
         raise ValidationError(
-            "Unsupported file format. Image file must be in .jpg, .jpeg, .png, .gif, or .pdf format. Video file must be in .mp4, .avi, or .mov format"
+            "Unsupported file format. Image must be in .jpg, .jpeg, .png. Video must be in .mp4, or .mov format"
         )
 
     return uploaded_file
