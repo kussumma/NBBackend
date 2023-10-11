@@ -70,6 +70,7 @@ class OrderShipping(models.Model):
     order = models.OneToOneField(
         Order, on_delete=models.CASCADE, related_name="order_shipping"
     )
+    shipping_id = models.UUIDField()
     receiver_name = models.CharField(max_length=100)
     receiver_phone = models.CharField(max_length=100)
     receiver_address = models.CharField(max_length=250)
@@ -92,7 +93,9 @@ class OrderItem(models.Model):
     )
     quantity = models.IntegerField(default=1)
     product_name = models.CharField(max_length=250)
+    product_id = models.UUIDField()
     product_discount = models.IntegerField(default=0)
+    stock_id = models.UUIDField()
     stock_price = models.IntegerField(default=0)
     stock_image = models.CharField(max_length=250, null=True, blank=True)
     stock_size = models.CharField(max_length=100, null=True, blank=True)
