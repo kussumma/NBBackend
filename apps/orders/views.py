@@ -178,8 +178,10 @@ class OrderViewset(viewsets.ModelViewSet):
             OrderItem.objects.create(
                 order=order,
                 quantity=cart_item.quantity,
+                product_id=cart_item.product.id,
                 product_name=cart_item.product.name,
                 product_discount=cart_item.product.discount,
+                stock_id=cart_item.stock.id,
                 stock_price=cart_item.stock.price,
                 stock_image=cart_item.stock.image,
                 stock_size=cart_item.stock.size,
@@ -206,6 +208,7 @@ class OrderViewset(viewsets.ModelViewSet):
         # create shipping order
         OrderShipping.objects.create(
             order=order,
+            shipping_id=shipping.id,
             receiver_name=shipping.receiver_name,
             receiver_phone=shipping.receiver_phone,
             receiver_address=shipping.receiver_address,
