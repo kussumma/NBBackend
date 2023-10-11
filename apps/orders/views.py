@@ -107,8 +107,9 @@ class OrderViewset(viewsets.ModelViewSet):
             subtotal_amount -= (coupon.discount_value * subtotal_amount) / 100
 
         # get shipping details
-        shipping = Shipping.objects.get(user=user, is_default=True)
-        if not shipping:
+        try:
+            shipping = Shipping.objects.get(user=user, is_default=True)
+        except Shipping.DoesNotExist:
             return Response(
                 {"error": "Default shipping is not set"},
                 status=status.HTTP_400_BAD_REQUEST,
