@@ -49,11 +49,12 @@ class SearchView(views.APIView):
                 product_results |= Product.objects.filter(
                     models.Q(name__icontains=term)
                     | models.Q(description__icontains=term)
-                    | models.Q(category__name__icontains=term)
-                    | models.Q(subcategory__name__icontains=term)
-                    | models.Q(subsubcategory__name__icontains=term)
-                    | models.Q(brand__name__icontains=term)
-                    | models.Q(brand__origin__icontains=term)
+                    | models.Q(sku__icontains=term)
+                    | models.Q(discount__icontains=term)
+                    | models.Q(product_stock__price__icontains=term)
+                    | models.Q(product_stock__size__icontains=term)
+                    | models.Q(product_stock__color__icontains=term)
+                    | models.Q(product_stock__other__icontains=term)
                 )
 
                 category_results |= Category.objects.filter(name__icontains=term)
@@ -72,7 +73,9 @@ class SearchView(views.APIView):
                     models.Q(title__icontains=term) | models.Q(content__icontains=term)
                 )
                 coupon_results |= Coupon.objects.filter(
-                    models.Q(code__icontains=term) | models.Q(name__icontains=term)
+                    models.Q(prefix_code__icontains=term) 
+                    | models.Q(name__icontains=term)
+                    | models.Q(discount_value__icontains=term)
                 )
 
             # Serialize the search results
@@ -99,7 +102,7 @@ class SearchView(views.APIView):
             trending_searches = (
                 Search.objects.values("query")
                 .annotate(search_count=models.Count("query"))
-                .order_by("-search_count")[:10]
+                .order_by("-search_count")[:5]
             )
 
             serialized_trending_searches = []
@@ -136,7 +139,7 @@ class TrendingSearchView(views.APIView):
         trending_searches = (
             Search.objects.values("query")
             .annotate(search_count=models.Count("query"))
-            .order_by("-search_count")[:10]
+            .order_by("-search_count")[:5]
         )
 
         # Manually extract the 'search_count' from the annotated query result
