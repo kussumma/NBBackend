@@ -95,7 +95,9 @@ class SearchView(views.APIView):
             # Create a new search record
             from tools.profanity_helper import AdvancedProfanityFilter
 
-            profanity_filter = AdvancedProfanityFilter("words_blacklist.txt", "words_whitelist.txt")
+            profanity_filter = AdvancedProfanityFilter(
+                "words_blacklist.txt", "words_whitelist.txt"
+            )
             search_query = profanity_filter.censor(search_query)
 
             user = request.user if request.user.is_authenticated else None
@@ -157,3 +159,18 @@ class TrendingSearchView(views.APIView):
             )
 
         return Response({"trending_searches": trending_searches_with_count})
+
+
+class SearchHistoryView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        # get search history
+        search_history = Search.objects.filter(user=request.user).order_by(
+            "-created_at"
+        )
+
+        # Serialize the search history
+        search_history_serializer = SearchSerializer(search_history, many=True)
+
+        return Response(search_history_serializer.data)
