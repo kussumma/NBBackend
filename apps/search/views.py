@@ -73,7 +73,7 @@ class SearchView(views.APIView):
                     models.Q(title__icontains=term) | models.Q(content__icontains=term)
                 )
                 coupon_results |= Coupon.objects.filter(
-                    models.Q(prefix_code__icontains=term) 
+                    models.Q(prefix_code__icontains=term)
                     | models.Q(name__icontains=term)
                     | models.Q(discount_value__icontains=term)
                 )
@@ -93,6 +93,11 @@ class SearchView(views.APIView):
             coupon_serializer = CouponSerializer(coupon_results, many=True)
 
             # Create a new search record
+            from tools.profanity_helper import AdvancedProfanityFilter
+
+            profanity_filter = AdvancedProfanityFilter("words_blacklist.txt", "words_whitelist.txt")
+            search_query = profanity_filter.censor(search_query)
+
             user = request.user if request.user.is_authenticated else None
             search = Search.objects.create(query=search_query, user=user)
 

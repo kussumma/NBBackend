@@ -3,6 +3,7 @@ from django.utils.text import slugify
 from django.contrib.auth import get_user_model
 import uuid
 from tools.filestorage_helper import GridFSStorage
+from tools.profanity_helper import AdvancedProfanityFilter
 
 User = get_user_model()
 
@@ -142,6 +143,11 @@ class Rating(models.Model):
 
     def __str__(self):
         return f"{self.product.slug} - {self.user.pk} - {self.star}"
+    
+    def save(self, *args, **kwargs):
+        profanity_filter = AdvancedProfanityFilter("words_blacklist.txt", "words_whitelist.txt")
+        self.review = profanity_filter.censor(self.review)
+        super(Rating, self).save(*args, **kwargs)
 
 
 class Wishlist(models.Model):
