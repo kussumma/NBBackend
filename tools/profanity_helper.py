@@ -1,5 +1,6 @@
 from thefuzz import fuzz
 
+
 class AdvancedProfanityFilter:
     def __init__(self, blacklist_file, whitelist_file=None):
         self.blacklist = self.load_blacklist(blacklist_file)
@@ -17,13 +18,13 @@ class AdvancedProfanityFilter:
         }
 
     def load_blacklist(self, blacklist_file):
-        with open(blacklist_file, 'r') as file:
+        with open(blacklist_file, "r") as file:
             return [line.strip() for line in file]
-        
+
     def load_whitelist(self, whitelist_file):
-        with open(whitelist_file, 'r') as file:
+        with open(whitelist_file, "r") as file:
             return [line.strip() for line in file]
-        
+
     def replace_profanity(self, text):
         for char in self.CHARS_MAPPING:
             for sub in self.CHARS_MAPPING[char]:
@@ -36,7 +37,7 @@ class AdvancedProfanityFilter:
         else:
             similarity = fuzz.partial_ratio(word, profane_word)
             return similarity > 90
-        
+
     def is_whitelisted(self, word):
         for whitelisted_word in self.whitelist:
             if word == whitelisted_word:
@@ -57,8 +58,8 @@ class AdvancedProfanityFilter:
             if self.is_whitelisted(word):
                 censored_words.append(word)
             elif self.is_profanity(word):
-                censored_word = '*' * 5
+                censored_word = "*" * 5
                 censored_words.append(censored_word)
             else:
                 censored_words.append(word)
-        return ' '.join(censored_words)
+        return " ".join(censored_words)
