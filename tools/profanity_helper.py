@@ -2,33 +2,45 @@ from thefuzz import fuzz
 
 
 class AdvancedProfanityFilter:
-    def __init__(self, blacklist_file, whitelist_file=None):
+    def __init__(self):
+        blacklist_file = "words_blacklist.txt"
+        whitelist_file = "words_whitelist.txt"
         self.blacklist = self.load_blacklist(blacklist_file)
         self.whitelist = self.load_whitelist(whitelist_file) if whitelist_file else []
         self.CHARS_MAPPING = {
-            "a": ("a", "@", "*", "4"),
-            "i": ("i", "*", "l", "1"),
-            "o": ("o", "*", "0", "@"),
-            "u": ("u", "*", "v"),
-            "v": ("v", "*", "u"),
-            "l": ("l", "1"),
-            "e": ("e", "*", "3"),
-            "s": ("s", "$", "5"),
-            "t": ("t", "7"),
+            "a": ("@", "*", "4"),
+            "b": ("8"),
+            "g": ("9"),
+            "i": ("*", "1"),
+            "o": ("*", "0", "@"),
+            "u": ("*", "v"),
+            "v": ("*", "u"),
+            "l": ("1"),
+            "e": ("*", "3"),
+            "s": ("$", "5"),
+            "t": ("7"),
         }
 
     def load_blacklist(self, blacklist_file):
-        with open(blacklist_file, "r") as file:
-            return [line.strip() for line in file]
+        try:
+            with open(blacklist_file, "r") as file:
+                return [line.strip() for line in file]
+        except FileNotFoundError:
+            return []
 
     def load_whitelist(self, whitelist_file):
-        with open(whitelist_file, "r") as file:
-            return [line.strip() for line in file]
+        try:
+            with open(whitelist_file, "r") as file:
+                return [line.strip() for line in file]
+        except FileNotFoundError:
+            return []
 
     def replace_profanity(self, text):
-        for char in self.CHARS_MAPPING:
-            for sub in self.CHARS_MAPPING[char]:
-                text = text.lower().replace(sub, char)
+        text = text.lower()
+        for char in text:
+            for key, values in self.CHARS_MAPPING.items():
+                if char in values:
+                    text = text.replace(char, key)
         return text
 
     def is_similar(self, word, profane_word):
@@ -46,9 +58,10 @@ class AdvancedProfanityFilter:
 
     def is_profanity(self, word):
         for profane_word in self.blacklist:
-            new_word = self.replace_profanity(word)
-            if self.is_similar(new_word, profane_word):
-                return True
+            if len(word) >= 3:
+                new_word = self.replace_profanity(word)
+                if self.is_similar(new_word, profane_word):
+                    return True
         return False
 
     def censor(self, text):

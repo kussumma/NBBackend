@@ -3,6 +3,7 @@ import uuid
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
 from tools.filestorage_helper import GridFSStorage
+from tools.profanity_helper import AdvancedProfanityFilter
 
 User = get_user_model()
 
@@ -97,3 +98,7 @@ class BlogComment(models.Model):
 
     def __str__(self):
         return self.pk
+
+    def save(self, *args, **kwargs):
+        self.comment = AdvancedProfanityFilter().censor(self.comment)
+        super(BlogComment, self).save(*args, **kwargs)

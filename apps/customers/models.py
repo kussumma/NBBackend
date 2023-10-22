@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 import uuid
 from tools.filestorage_helper import GridFSStorage
+from tools.profanity_helper import AdvancedProfanityFilter
 
 from apps.products.models import Product
 
@@ -52,6 +53,11 @@ class Complaint(models.Model):
     def __str__(self):
         return f"{self.user.email} - {self.product.slug}"
 
+    def save(self, *args, **kwargs):
+        self.content = AdvancedProfanityFilter().censor(self.content)
+        self.sugestion = AdvancedProfanityFilter().censor(self.sugestion)
+        super(Complaint, self).save(*args, **kwargs)
+
 
 class ComplaintImage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -85,6 +91,10 @@ class ProductRequest(models.Model):
     def __str__(self):
         return f"{self.user.email} - {self.title}"
 
+    def save(self, *args, **kwargs):
+        self.detail = AdvancedProfanityFilter().censor(self.detail)
+        super(ProductRequest, self).save(*args, **kwargs)
+
 
 class FeatureRequest(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -99,6 +109,10 @@ class FeatureRequest(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.product.slug}"
+
+    def save(self, *args, **kwargs):
+        self.detail = AdvancedProfanityFilter().censor(self.detail)
+        super(FeatureRequest, self).save(*args, **kwargs)
 
 
 class BugReport(models.Model):
@@ -117,6 +131,13 @@ class BugReport(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.product.slug}"
+
+    def save(self, *args, **kwargs):
+        self.detail = AdvancedProfanityFilter().censor(self.detail)
+        self.how_to_reproduce = AdvancedProfanityFilter().censor(self.how_to_reproduce)
+        self.result_expected = AdvancedProfanityFilter().censor(self.result_expected)
+        self.suggestion = AdvancedProfanityFilter().censor(self.suggestion)
+        super(BugReport, self).save(*args, **kwargs)
 
 
 class BugReportImage(models.Model):

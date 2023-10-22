@@ -143,9 +143,9 @@ class Rating(models.Model):
 
     def __str__(self):
         return f"{self.product.slug} - {self.user.pk} - {self.star}"
-    
+
     def save(self, *args, **kwargs):
-        profanity_filter = AdvancedProfanityFilter("words_blacklist.txt", "words_whitelist.txt")
+        profanity_filter = AdvancedProfanityFilter()
         self.review = profanity_filter.censor(self.review)
         super(Rating, self).save(*args, **kwargs)
 

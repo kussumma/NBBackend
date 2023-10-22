@@ -19,6 +19,7 @@ from apps.products.serializers import (
 from apps.store.serializers import FAQSerializer
 from apps.blogs.serializers import BlogSerializer
 from apps.coupons.serializers import CouponSerializer
+from tools.profanity_helper import AdvancedProfanityFilter
 
 User = get_user_model()
 
@@ -93,11 +94,7 @@ class SearchView(views.APIView):
             coupon_serializer = CouponSerializer(coupon_results, many=True)
 
             # Create a new search record
-            from tools.profanity_helper import AdvancedProfanityFilter
-
-            profanity_filter = AdvancedProfanityFilter(
-                "words_blacklist.txt", "words_whitelist.txt"
-            )
+            profanity_filter = AdvancedProfanityFilter()
             search_query = profanity_filter.censor(search_query)
 
             user = request.user if request.user.is_authenticated else None
