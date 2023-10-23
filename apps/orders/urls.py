@@ -7,6 +7,7 @@ from .views import (
     RefundOrderViewset,
     ConfirmOrderAPIView,
     BookShipmentAPIView,
+    CouponCheckingAPIView,
 )
 
 router = DefaultRouter()
@@ -25,5 +26,10 @@ urlpatterns = [
         "v1/book-shipment/<uuid:pk>/",
         BookShipmentAPIView.as_view(),
         name="book_shipment",
+    ),
+    path(
+        "v1/coupon-checking/",
+        CouponCheckingAPIView.as_view(),
+        name="coupon_checking",
     ),
 ]

@@ -37,10 +37,29 @@ class OrderViewset(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        # calculate subtotal amount and total weight
+        subtotal_amount = 0
+        total_discount = 0
+        total_paid = 0
+        total_weight = 0
+
+        for cart_item in cart_items:
+            subtotal_amount += cart_item.total_price
+            total_weight += cart_item.stock.weight * cart_item.quantity
+
+        # set total paid
+        total_paid += subtotal_amount
+
+        # convert to kg
+        if total_weight > 0:
+            total_weight = math.ceil(total_weight / 1000)
+
         # get the coupon
         coupon_code_input = request.data.get("coupon")
+        coupon_code_input2 = request.data.get("coupon2")
+
+        # Get the first coupon
         if coupon_code_input:
-            # divide coupon code into prefix and code
             coupon_prefix = coupon_code_input[:8]
             coupon_code = coupon_code_input[8:]
 
@@ -48,25 +67,14 @@ class OrderViewset(viewsets.ModelViewSet):
                 coupon = Coupon.objects.get(prefix_code=coupon_prefix)
             except Coupon.DoesNotExist:
                 return Response(
-                    {"error": "Coupon is not valid"},
-                    status=status.HTTP_400_BAD_REQUEST,
+                    {"error": "Coupon is not valid"}, status=status.HTTP_400_BAD_REQUEST
                 )
 
-            # check if coupon is verified
-            if not coupon.is_verified(coupon_code):
+            if not coupon.is_verified(coupon_code) or not coupon.is_valid():
                 return Response(
-                    {"error": "Coupon is not valid"},
-                    status=status.HTTP_400_BAD_REQUEST,
+                    {"error": "Coupon is not valid"}, status=status.HTTP_400_BAD_REQUEST
                 )
 
-            # check if coupon is valid
-            if not coupon.is_valid():
-                return Response(
-                    {"error": "Coupon is not valid"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            # check if coupon is already used
             try:
                 coupon_user = CouponUser.objects.get(coupon=coupon, user=user)
             except CouponUser.DoesNotExist:
@@ -77,34 +85,88 @@ class OrderViewset(viewsets.ModelViewSet):
                     {"error": "Coupon is already used"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+
+            # Check if the coupon is valid for this order and calculate discount
+            if not coupon.is_private and coupon.min_purchase > subtotal_amount:
+                raise serializers.ValidationError(
+                    "Total purchase must be higher than minimum purchase allowed for the first coupon"
+                )
         else:
             coupon = None
 
-        # calculate subtotal amount and total weight
-        subtotal_amount = 0
-        total_weight = 0
-        for cart_item in cart_items:
-            subtotal_amount += cart_item.total_price
-            total_weight += cart_item.stock.weight * cart_item.quantity
+        # Get the second coupon
+        if coupon_code_input2:
+            coupon_prefix2 = coupon_code_input2[:8]
+            coupon_code2 = coupon_code_input2[8:]
 
-        # convert to kg
-        if total_weight > 0:
-            total_weight = math.ceil(total_weight / 1000)
+            try:
+                coupon2 = Coupon.objects.get(prefix_code=coupon_prefix2)
+            except Coupon.DoesNotExist:
+                return Response(
+                    {"error": "Coupon is not valid"}, status=status.HTTP_400_BAD_REQUEST
+                )
 
-        # check if coupon is valid for this order
+            if not coupon2.is_verified(coupon_code2) or not coupon2.is_valid():
+                return Response(
+                    {"error": "Coupon is not valid"}, status=status.HTTP_400_BAD_REQUEST
+                )
+
+            try:
+                coupon_user2 = CouponUser.objects.get(coupon=coupon2, user=user)
+            except CouponUser.DoesNotExist:
+                coupon_user2 = None
+
+            if coupon2.is_limited and coupon_user2:
+                return Response(
+                    {"error": "Coupon is already used"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Check if the second coupon is valid for this order and calculate discount
+            if not coupon2.is_private and coupon2.min_purchase > subtotal_amount:
+                raise serializers.ValidationError(
+                    "Total purchase must be higher than the minimum purchase allowed for the second coupon"
+                )
+        else:
+            coupon2 = None
+
+        # Check if both coupons are public, or prioritize the private coupon
+        if coupon and coupon2:
+            if not coupon.is_private and not coupon2.is_private:
+                return Response(
+                    {"error": "Only one free coupon is allowed"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            elif coupon.id == coupon2.id:
+                return Response(
+                    {"error": "Coupon can't be used twice"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            elif not coupon.is_private and coupon2.is_private:
+                coupon, coupon2 = (
+                    coupon2,
+                    coupon,
+                )  # Swap the coupons to prioritize the private one
+
         if coupon:
-            if coupon.min_purchase > subtotal_amount:
-                raise serializers.ValidationError(
-                    "Total purchase must be higher than minimum purchase allowed for this coupon"
-                )
+            if coupon.is_private:
+                total_discount += coupon.max_purchase
+                total_paid -= coupon.max_purchase
+            else:
+                total_discount += (coupon.discount_value * subtotal_amount) / 100
+                total_paid -= (coupon.discount_value * subtotal_amount) / 100
 
-            if coupon.is_private and coupon.max_purchase > subtotal_amount:
-                raise serializers.ValidationError(
-                    "Total purchase must be lower than maximum purchase allowed for this coupon"
-                )
+        if coupon2:
+            if coupon2.is_private:
+                total_discount += coupon2.max_purchase
+                total_paid -= coupon2.max_purchase
+            else:
+                total_discount += (coupon2.discount_value * subtotal_amount) / 100
+                total_paid -= (coupon2.discount_value * subtotal_amount) / 100
 
-            # calculate discount price
-            subtotal_amount -= (coupon.discount_value * subtotal_amount) / 100
+        if total_discount > subtotal_amount:
+            total_discount = subtotal_amount
+            total_paid = 0
 
         # get shipping details
         try:
@@ -157,7 +219,7 @@ class OrderViewset(viewsets.ModelViewSet):
         tax_amount = math.ceil(((subtotal_amount + shipping_cost) * 10) / 100)
 
         # calculate total price
-        total_amount = subtotal_amount + shipping_cost + tax_amount
+        total_amount = total_paid + shipping_cost + tax_amount
 
         # use transaction atomic when creating order
         with transaction.atomic():
@@ -167,11 +229,13 @@ class OrderViewset(viewsets.ModelViewSet):
             order = serializer.save(
                 user=user,
                 coupon=coupon_code_input,
+                coupon2=coupon_code_input2,
                 tax_amount=tax_amount,
                 shipping_amount=shipping_cost,
                 subtotal_amount=subtotal_amount,
                 total_amount=math.ceil(total_amount),
                 total_weight=math.ceil(total_weight),
+                discount_amount=math.ceil(total_discount),
             )
 
         # create order items
@@ -181,7 +245,7 @@ class OrderViewset(viewsets.ModelViewSet):
                 quantity=cart_item.quantity,
                 product_id=cart_item.product.id,
                 product_name=cart_item.product.name,
-                product_discount=cart_item.product.discount,
+                stock_discount=cart_item.stock.discount,
                 stock_id=cart_item.stock.id,
                 stock_price=cart_item.stock.price,
                 stock_image=cart_item.stock.image,
@@ -205,6 +269,9 @@ class OrderViewset(viewsets.ModelViewSet):
         # set coupon as used
         if coupon and coupon.is_limited:
             CouponUser.objects.create(coupon=coupon, user=user)
+
+        if coupon2 and coupon2.is_limited:
+            CouponUser.objects.create(coupon=coupon2, user=user)
 
         # create shipping order
         OrderShipping.objects.create(
@@ -344,3 +411,157 @@ class BookShipmentAPIView(views.APIView):
         order.save()
 
         return Response({"success": "Order is shipped"}, status=status.HTTP_200_OK)
+
+
+class CouponCheckingAPIView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        """
+        Check if the coupon is valid for the order and calculate the discount
+        This API requires one or two coupon codes and returns the total discount
+        """
+        # get cart items
+        user = self.request.user
+        cart = Cart.objects.get(user=user)
+
+        cart_items = CartItem.objects.filter(cart=cart, is_selected=True)
+        if not cart_items:
+            return Response(
+                {"error": "No item found in the cart"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # calculate subtotal amount
+        subtotal_amount = 0
+        total_discount = 0
+        total_paid = 0
+
+        for cart_item in cart_items:
+            subtotal_amount += cart_item.total_price
+
+        # set total paid
+        total_paid += subtotal_amount
+
+        # get the coupon
+        coupon_code_input = request.GET.get("coupon")
+        coupon_code_input2 = request.GET.get("coupon2")
+
+        # Get the first coupon
+        if coupon_code_input:
+            coupon_prefix = coupon_code_input[:8]
+            coupon_code = coupon_code_input[8:]
+
+            try:
+                coupon = Coupon.objects.get(prefix_code=coupon_prefix)
+            except Coupon.DoesNotExist:
+                return Response(
+                    {"error": "Coupon is not valid"}, status=status.HTTP_400_BAD_REQUEST
+                )
+
+            if not coupon.is_verified(coupon_code) or not coupon.is_valid():
+                return Response(
+                    {"error": "Coupon is not valid"}, status=status.HTTP_400_BAD_REQUEST
+                )
+
+            try:
+                coupon_user = CouponUser.objects.get(coupon=coupon, user=user)
+            except CouponUser.DoesNotExist:
+                coupon_user = None
+
+            if coupon.is_limited and coupon_user:
+                return Response(
+                    {"error": "Coupon is already used"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Check if the coupon is valid for this order and calculate discount
+            if not coupon.is_private and coupon.min_purchase > subtotal_amount:
+                raise serializers.ValidationError(
+                    "Total purchase must be higher than minimum purchase allowed for the first coupon"
+                )
+        else:
+            coupon = None
+
+        # Get the second coupon
+        if coupon_code_input2:
+            coupon_prefix2 = coupon_code_input2[:8]
+            coupon_code2 = coupon_code_input2[8:]
+
+            try:
+                coupon2 = Coupon.objects.get(prefix_code=coupon_prefix2)
+            except Coupon.DoesNotExist:
+                return Response(
+                    {"error": "Coupon is not valid"}, status=status.HTTP_400_BAD_REQUEST
+                )
+
+            if not coupon2.is_verified(coupon_code2) or not coupon2.is_valid():
+                return Response(
+                    {"error": "Coupon is not valid"}, status=status.HTTP_400_BAD_REQUEST
+                )
+
+            try:
+                coupon_user2 = CouponUser.objects.get(coupon=coupon2, user=user)
+            except CouponUser.DoesNotExist:
+                coupon_user2 = None
+
+            if coupon2.is_limited and coupon_user2:
+                return Response(
+                    {"error": "Coupon is already used"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Check if the second coupon is valid for this order and calculate discount
+            if not coupon2.is_private and coupon2.min_purchase > subtotal_amount:
+                raise serializers.ValidationError(
+                    "Total purchase must be higher than the minimum purchase allowed for the second coupon"
+                )
+        else:
+            coupon2 = None
+
+        # Check if both coupons are public, or prioritize the private coupon
+        if coupon and coupon2:
+            if not coupon.is_private and not coupon2.is_private:
+                return Response(
+                    {"error": "Only one free coupon is allowed"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            elif coupon.id == coupon2.id:
+                return Response(
+                    {"error": "Coupon can't be used twice"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            elif not coupon.is_private and coupon2.is_private:
+                coupon, coupon2 = (
+                    coupon2,
+                    coupon,
+                )  # Swap the coupons to prioritize the private one
+
+        if coupon:
+            if coupon.is_private:
+                total_discount += coupon.max_purchase
+                total_paid -= coupon.max_purchase
+            else:
+                total_discount += (coupon.discount_value * subtotal_amount) / 100
+                total_paid -= (coupon.discount_value * subtotal_amount) / 100
+
+        if coupon2:
+            if coupon2.is_private:
+                total_discount += coupon2.max_purchase
+                total_paid -= coupon2.max_purchase
+            else:
+                total_discount += (coupon2.discount_value * subtotal_amount) / 100
+                total_paid -= (coupon2.discount_value * subtotal_amount) / 100
+
+        if total_discount > subtotal_amount:
+            total_discount = subtotal_amount
+            total_paid = 0
+
+        return Response(
+            {
+                "subtotal_amount": subtotal_amount,
+                "total_discount": total_discount,
+                "total_paid": total_paid,
+            },
+            status=status.HTTP_200_OK,
+        )
