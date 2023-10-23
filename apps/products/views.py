@@ -43,7 +43,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         filters.OrderingFilter,
         DjangoFilterBackend,
     ]
-    search_fields = ["name", "sku", "description"]
+    search_fields = ["name", "product_stock__sku", "description"]
     filterset_fields = {
         "category__slug": ["exact"],
         "subcategory__slug": ["exact"],
@@ -52,14 +52,14 @@ class ProductViewSet(viewsets.ModelViewSet):
         "brand__name": ["istartswith"],
         "name": ["istartswith"],
         "product_stock__price": ["exact", "gte", "lte"],
-        "discount": ["exact", "gte", "lte"],
+        "product_stock__discount": ["exact", "gte", "lte"],
         "created_at": ["exact", "gte", "lte"],
         "product_ratings__star": ["exact", "gte", "lte"],
     }
     ordering_fields = [
         "name",
         "product_stock__price",
-        "discount",
+        "product_stock__discount",
         "created_at",
         "product_ratings__star",
     ]

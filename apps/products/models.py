@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth import get_user_model
 import uuid
+from colorfield.fields import ColorField
 from tools.filestorage_helper import GridFSStorage
 from tools.profanity_helper import AdvancedProfanityFilter
 
@@ -70,6 +71,9 @@ class Brand(models.Model):
     name = models.CharField(max_length=250)
     description = models.TextField()
     origin = models.CharField(max_length=250, null=True, blank=True)
+    logo = models.ImageField(
+        storage=GridFSStorage(collection="brand_logos"), default="default.jpg"
+    )
     cover = models.ImageField(
         storage=GridFSStorage(collection="brands"), default="default.jpg"
     )
@@ -85,9 +89,7 @@ class Brand(models.Model):
 
 class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    sku = models.CharField(max_length=250)
     name = models.CharField(max_length=250)
-    discount = models.IntegerField(default=0)
     description = models.TextField()
     brand = models.ForeignKey(
         Brand, related_name="product_brands", on_delete=models.PROTECT
@@ -170,12 +172,15 @@ class Stock(models.Model):
     product = models.ForeignKey(
         Product, related_name="product_stock", on_delete=models.CASCADE
     )
+    sku = models.CharField(max_length=250)
     price = models.IntegerField(default=0)
+    discount = models.IntegerField(default=0)
     image = models.ImageField(
         storage=GridFSStorage(collection="stock_images"), default="default.jpg"
     )
     size = models.CharField(max_length=100, null=True, blank=True)
     color = models.CharField(max_length=100, null=True, blank=True)
+    color_code = ColorField(null=True, blank=True)
     other = models.CharField(max_length=100, null=True, blank=True)
     quantity = models.IntegerField(default=0)
     weight = models.IntegerField(default=0)

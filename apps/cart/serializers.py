@@ -16,10 +16,11 @@ class CartItemSerializer(serializers.ModelSerializer):
         stock = obj.stock
         product_data = {
             "name": product.name,
+            "sku": stock.sku,
             "slug": product.slug,
             "image": stock.image.url,
             "price": stock.price,
-            "discount": product.discount,
+            "discount": stock.discount,
             "size": stock.size,
             "color": stock.color,
             "other": stock.other,

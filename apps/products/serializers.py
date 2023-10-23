@@ -81,6 +81,11 @@ class BrandSerializer(serializers.ModelSerializer):
             validate_uploaded_file(value, "image")
             return value
 
+    def validate_logo(self, value):
+        if value:
+            validate_uploaded_file(value, "image")
+            return value
+
 
 class StockSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source="product.name", read_only=True)

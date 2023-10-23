@@ -39,7 +39,7 @@ class CartItem(models.Model):
     def save(self, *args, **kwargs):
         self.product = self.stock.product
         self.total_price = (
-            self.stock.price * self.quantity * (1 - self.product.discount / 100)
+            self.stock.price * self.quantity * (1 - self.stock.discount / 100)
         )
         super().save(*args, **kwargs)
 
