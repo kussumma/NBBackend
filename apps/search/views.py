@@ -50,34 +50,36 @@ class SearchView(views.APIView):
                 product_results |= Product.objects.filter(
                     models.Q(name__icontains=term)
                     | models.Q(description__icontains=term)
-                    | models.Q(sku__icontains=term)
-                    | models.Q(discount__icontains=term)
+                    | models.Q(product_stock__sku__icontains=term)
+                    | models.Q(product_stock__discount__icontains=term)
                     | models.Q(product_stock__price__icontains=term)
                     | models.Q(product_stock__size__icontains=term)
                     | models.Q(product_stock__color__icontains=term)
                     | models.Q(product_stock__other__icontains=term)
-                )
+                )[:5]
 
-                category_results |= Category.objects.filter(name__icontains=term)
-                subcategory_results |= Subcategory.objects.filter(name__icontains=term)
+                category_results |= Category.objects.filter(name__icontains=term)[:5]
+                subcategory_results |= Subcategory.objects.filter(name__icontains=term)[
+                    :5
+                ]
                 subsubcategory_results |= Subsubcategory.objects.filter(
                     name__icontains=term
-                )
+                )[:5]
                 brand_results |= Brand.objects.filter(
                     models.Q(name__icontains=term) | models.Q(origin__icontains=term)
-                )
+                )[:5]
                 faq_results |= FAQ.objects.filter(
                     models.Q(question__icontains=term)
                     | models.Q(answer__icontains=term)
-                )
+                )[:5]
                 blog_results |= Blog.objects.filter(
                     models.Q(title__icontains=term) | models.Q(content__icontains=term)
-                )
+                )[:5]
                 coupon_results |= Coupon.objects.filter(
                     models.Q(prefix_code__icontains=term)
                     | models.Q(name__icontains=term)
                     | models.Q(discount_value__icontains=term)
-                )
+                )[:5]
 
             # Serialize the search results
             product_serializer = ProductSerializer(product_results, many=True)
