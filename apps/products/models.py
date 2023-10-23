@@ -13,6 +13,9 @@ class Category(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=250)
     description = models.TextField()
+    description_id = models.TextField(
+        null=True, blank=True
+    )  # ID translation for description
     cover = models.ImageField(
         storage=GridFSStorage(collection="categories"), default="default.jpg"
     )
@@ -30,6 +33,9 @@ class Subcategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=250)
     description = models.TextField()
+    description_id = models.TextField(
+        null=True, blank=True
+    )  # ID translation for description
     cover = models.ImageField(
         storage=GridFSStorage(collection="subcategories"), default="default.jpg"
     )
@@ -50,6 +56,9 @@ class Subsubcategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=250)
     description = models.TextField()
+    description_id = models.TextField(
+        null=True, blank=True
+    )  # ID translation for description
     cover = models.ImageField(
         storage=GridFSStorage(collection="subsubcategories"), default="default.jpg"
     )
@@ -70,6 +79,9 @@ class Brand(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=250)
     description = models.TextField()
+    description_id = models.TextField(
+        null=True, blank=True
+    )  # ID translation for description
     origin = models.CharField(max_length=250, null=True, blank=True)
     logo = models.ImageField(
         storage=GridFSStorage(collection="brand_logos"), default="default.jpg"
@@ -91,6 +103,9 @@ class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=250)
     description = models.TextField()
+    description_id = models.TextField(
+        null=True, blank=True
+    )  # ID translation for description
     brand = models.ForeignKey(
         Brand, related_name="product_brands", on_delete=models.PROTECT
     )

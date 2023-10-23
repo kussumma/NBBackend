@@ -30,6 +30,7 @@ class About(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     content = models.TextField()
+    content_id = models.TextField(null=True, blank=True)  # ID translation for content
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -44,6 +45,9 @@ class Partner(models.Model):
         storage=GridFSStorage(collection="partner_logos"), default="default.jpg"
     )
     description = models.TextField(null=True, blank=True)
+    description_id = models.TextField(
+        null=True, blank=True
+    )  # ID translation for description
     url = models.URLField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -60,6 +64,9 @@ class Investor(models.Model):
         storage=GridFSStorage(collection="investor_logos"), default="default.jpg"
     )
     description = models.TextField(null=True, blank=True)
+    description_id = models.TextField(
+        null=True, blank=True
+    )  # ID translation for description
     url = models.URLField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -73,6 +80,7 @@ class Policy(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     content = models.TextField()
+    content_id = models.TextField(null=True, blank=True)  # ID translation for content
     period_start = models.DateTimeField()
     period_end = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -86,7 +94,9 @@ class Policy(models.Model):
 class FAQ(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     question = models.CharField(max_length=255)
+    question_id = models.TextField(null=True, blank=True)  # ID translation for question
     answer = models.TextField()
+    question_id = models.TextField(null=True, blank=True)  # ID translation for answer
     url = models.URLField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -100,6 +110,7 @@ class CopyRight(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     content = models.TextField()
+    content_id = models.TextField(null=True, blank=True)  # ID translation for content
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -12,6 +12,9 @@ class BlogCategory(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50, unique=True)
     description = models.TextField()
+    description_id = models.TextField(
+        null=True, blank=True
+    )  # ID translation for description
     cover = models.ImageField(
         storage=GridFSStorage(collection="blog_categories"), default="default.jpg"
     )
@@ -42,6 +45,7 @@ class Blog(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=250)
     content = models.TextField()
+    content_id = models.TextField(null=True, blank=True)  # ID translation for content
     cover = models.ImageField(
         storage=GridFSStorage(collection="blog_covers"), default="default.jpg"
     )
