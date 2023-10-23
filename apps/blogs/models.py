@@ -44,6 +44,7 @@ class BlogTag(models.Model):
 class Blog(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=250)
+    title_id = models.CharField(max_length=250, null=True, blank=True)
     content = models.TextField()
     content_id = models.TextField(null=True, blank=True)  # ID translation for content
     cover = models.ImageField(
