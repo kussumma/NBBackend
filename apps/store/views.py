@@ -1,25 +1,15 @@
 from rest_framework import viewsets, permissions, filters
 
-from .models import Store, Contact, About, Partner, Policy, FAQ, CopyRight
+from .models import Contact, About, Partner, Investor, Policy, FAQ, CopyRight
 from .serializers import (
-    StoreSerializer,
     ContactSerializer,
     AboutSerializer,
     PartnerSerializer,
+    InvestorSerializer,
     PolicySerializer,
     FAQSerializer,
     CopyRightSerializer,
 )
-
-
-class StoreViewSet(viewsets.ModelViewSet):
-    queryset = Store.objects.all()
-    serializer_class = StoreSerializer
-    permission_classes = [permissions.AllowAny]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ["name"]
-    ordering_fields = ["name"]
-    ordering = ["name"]
 
 
 class ContactViewSet(viewsets.ModelViewSet):
@@ -45,6 +35,16 @@ class AboutViewSet(viewsets.ModelViewSet):
 class PartnerViewSet(viewsets.ModelViewSet):
     queryset = Partner.objects.all()
     serializer_class = PartnerSerializer
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["name"]
+    ordering_fields = ["name"]
+    ordering = ["name"]
+
+
+class InvestorViewSet(viewsets.ModelViewSet):
+    queryset = Investor.objects.all()
+    serializer_class = InvestorSerializer
     permission_classes = [permissions.AllowAny]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["name"]

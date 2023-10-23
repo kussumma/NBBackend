@@ -3,19 +3,6 @@ import uuid
 from tools.filestorage_helper import GridFSStorage
 
 
-class Store(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=255)
-    logo = models.ImageField(
-        storage=GridFSStorage(collection="store_logos"), default="default.jpg"
-    )
-    description = models.TextField(null=True, blank=True)
-    motto = models.CharField(max_length=255, null=True, blank=True)
-
-    def __str__(self):
-        return self.name
-
-
 class Contact(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
@@ -57,6 +44,23 @@ class Partner(models.Model):
         storage=GridFSStorage(collection="partner_logos"), default="default.jpg"
     )
     description = models.TextField(null=True, blank=True)
+    url = models.URLField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Investor(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
+    logo = models.ImageField(
+        storage=GridFSStorage(collection="investor_logos"), default="default.jpg"
+    )
+    description = models.TextField(null=True, blank=True)
+    url = models.URLField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
