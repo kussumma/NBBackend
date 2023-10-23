@@ -3,7 +3,15 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 
-from .models import BlogCategory, BlogTag, Blog, BlogImage, BlogVideo, BlogComment
+from .models import (
+    BlogCategory,
+    BlogTag,
+    Blog,
+    BlogImage,
+    BlogVideo,
+    BlogComment,
+    BlogUrl,
+)
 from .serializers import (
     BlogCategorySerializer,
     BlogTagSerializer,
@@ -11,6 +19,7 @@ from .serializers import (
     BlogImageSerializer,
     BlogVideoSerializer,
     BlogCommentSerializer,
+    BlogUrlSerializer,
 )
 
 from tools.custom_permissions import IsAdminOrReadOnly
@@ -110,3 +119,12 @@ class BlogCommentViewSet(viewsets.ModelViewSet):
         return Response(
             {"comment": serializer.data, "replies": replies_serializer.data}
         )
+
+
+class BlogUrlViewSet(viewsets.ModelViewSet):
+    queryset = BlogUrl.objects.all()
+    serializer_class = BlogUrlSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ["blog__title"]
+    ordering = ["-created_at"]

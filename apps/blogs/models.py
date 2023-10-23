@@ -15,7 +15,6 @@ class BlogCategory(models.Model):
     cover = models.ImageField(
         storage=GridFSStorage(collection="blog_categories"), default="default.jpg"
     )
-    icon = models.CharField(max_length=100, null=True, blank=True)
     slug = models.SlugField(max_length=50, unique=True)
 
     def __str__(self):
@@ -76,6 +75,15 @@ class BlogVideo(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     video = models.URLField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class BlogUrl(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+    name = models.CharField(max_length=250)
+    url = models.URLField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

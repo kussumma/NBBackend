@@ -1,6 +1,14 @@
 from rest_framework import serializers
 from tools.fileupload_helper import validate_uploaded_file
-from .models import BlogCategory, BlogTag, Blog, BlogImage, BlogVideo, BlogComment
+from .models import (
+    BlogCategory,
+    BlogTag,
+    Blog,
+    BlogImage,
+    BlogVideo,
+    BlogComment,
+    BlogUrl,
+)
 
 
 class BlogCategorySerializer(serializers.ModelSerializer):
@@ -56,3 +64,13 @@ class BlogSerializer(serializers.ModelSerializer):
         if value:
             validate_uploaded_file(value, "image")
             return value
+
+
+class BlogUrlSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BlogUrl
+        fields = "__all__"
+        read_only_fields = (
+            "created_at",
+            "updated_at",
+        )

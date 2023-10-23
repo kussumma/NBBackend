@@ -8,6 +8,7 @@ from .views import (
     BlogImageViewSet,
     BlogVideoViewSet,
     BlogCommentViewSet,
+    BlogUrlViewSet,
 )
 
 router = routers.DefaultRouter()
@@ -17,6 +18,7 @@ router.register("blogs", BlogViewSet)
 router.register("blog-images", BlogImageViewSet)
 router.register("blog-videos", BlogVideoViewSet)
 router.register("blog-comments", BlogCommentViewSet)
+router.register("blog-urls", BlogUrlViewSet)
 
 urlpatterns = [
     path("v1/", include(router.urls)),
