@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "django_filters",
     "import_export",
     "cachalot",
+    "colorfield",
     # Local apps
     "apps.accounts",
     "apps.store",
