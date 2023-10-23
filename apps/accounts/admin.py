@@ -15,6 +15,7 @@ class UserAdmin(admin.ModelAdmin):
         "last_login",
         "last_updated",
     ]
+    search_fields = ["email", "first_name", "last_name"]
 
 
 admin.site.register(UserDetail)

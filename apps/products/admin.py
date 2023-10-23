@@ -9,6 +9,7 @@ from .models import (
     Rating,
     Wishlist,
     Stock,
+    ExtraProductImage,
 )
 
 
@@ -17,10 +18,14 @@ class StockInline(admin.StackedInline):
     extra = 0
 
 
+class ExtraProductImageInline(admin.StackedInline):
+    model = ExtraProductImage
+    extra = 0
+
+
 class ProductAdmin(admin.ModelAdmin):
     list_display = (
         "name",
-        "sku",
         "category",
         "subcategory",
         "subsubcategory",
@@ -30,16 +35,50 @@ class ProductAdmin(admin.ModelAdmin):
         "is_active",
     )
     list_filter = ("category", "subcategory", "subsubcategory", "brand", "is_active")
-    inlines = [StockInline]
-    search_fields = ("name", "sku", "description")
+    inlines = [StockInline, ExtraProductImageInline]
+    search_fields = ("name", "description")
     ordering = ("-created_at",)
+    autocomplete_fields = ("category", "subcategory", "subsubcategory", "brand")
 
 
-admin.site.register(Category)
+class StockAdmin(admin.ModelAdmin):
+    list_display = (
+        "product",
+        "size",
+        "color",
+        "other",
+        "quantity",
+        "created_at",
+        "updated_at",
+    )
+    list_filter = ("product", "size", "color", "other")
+    search_fields = ("product", "size", "color", "other")
+    ordering = ("-created_at",)
+    autocomplete_fields = ("product",)
+
+
+class CategoryAdmin(admin.ModelAdmin):
+    search_fields = ("name",)
+
+
+class SubcategoryAdmin(admin.ModelAdmin):
+    search_fields = ("name",)
+
+
+class SubsubcategoryAdmin(admin.ModelAdmin):
+    search_fields = ("name",)
+
+
+class BrandAdmin(admin.ModelAdmin):
+    search_fields = ("name",)
+
+
+admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product, ProductAdmin)
-admin.site.register(Subcategory)
-admin.site.register(Subsubcategory)
-admin.site.register(Brand)
+admin.site.register(Subcategory, SubcategoryAdmin)
+admin.site.register(Subsubcategory, SubsubcategoryAdmin)
+admin.site.register(Brand, BrandAdmin)
 admin.site.register(Rating)
 admin.site.register(Wishlist)
-admin.site.register(Stock)
+admin.site.register(Stock, StockAdmin)
+admin.site.register(ExtraProductImage)

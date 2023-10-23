@@ -35,12 +35,14 @@ class ShippingGroupItemAdmin(admin.ModelAdmin):
     list_display = ("shipping_group", "shipping_route", "created_at", "updated_at")
     list_filter = ("shipping_group", "shipping_route")
     search_fields = ("shipping_group__name", "shipping_route__route")
+    autocomplete_fields = ("shipping_route",)
 
 
 class ShippingGroupTariffAdmin(admin.ModelAdmin):
     list_display = ("shipping_group", "created_at", "updated_at")
     list_filter = ("shipping_group",)
     search_fields = ("shipping_group__name",)
+    autocomplete_fields = ("shipping_group",)
 
 
 class ShippingAdmin(admin.ModelAdmin):
