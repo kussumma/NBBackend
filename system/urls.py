@@ -10,6 +10,7 @@ urlpatterns = [
     # admin
     path("admin/", admin.site.urls),
     path("", include("apps.orders.admin_urls")),
+    path("", include("apps.products.admin_urls")),
     # Basic Auth
     path("auth/", include("dj_rest_auth.urls")),
     path("auth/registration/", include("dj_rest_auth.registration.urls")),
