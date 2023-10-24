@@ -17,6 +17,7 @@ from .models import (
     Rating,
     Wishlist,
     Stock,
+    ExtraProductImage,
 )
 from .serializers import (
     CategorySerializer,
@@ -27,6 +28,7 @@ from .serializers import (
     RatingSerializer,
     WishlistSerializer,
     StockSerializer,
+    ExtraProductImageSerializer,
 )
 
 from tools.custom_permissions import IsAdminOrReadOnly, IsAuthenticatedOrReadOnly
@@ -77,6 +79,10 @@ class ProductViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
 
+        # get product images
+        images = ExtraProductImage.objects.filter(product=instance)
+        images_serializer = ExtraProductImageSerializer(images, many=True)
+
         # get product stock
         stock = Stock.objects.filter(product=instance)
         stock_serializer = StockSerializer(stock, many=True)
@@ -120,6 +126,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         return Response(
             {
                 "product": serializer.data,
+                "images": images_serializer.data,
                 "stock": stock_serializer.data,
                 "total_rating": average_rating,
                 "latest_rating": ratings_serializer.data,
