@@ -27,8 +27,15 @@ class BlogUrlInline(admin.TabularInline):
 
 
 class BlogAdmin(admin.ModelAdmin):
-    list_display = ("title", "category", "author", "created_at", "updated_at", "status")
-    list_filter = ("category", "author", "status")
+    list_display = (
+        "title",
+        "category",
+        "author",
+        "created_at",
+        "updated_at",
+        "is_published",
+    )
+    list_filter = ("category", "author", "is_published")
     inlines = [BlogImageInline, BlogVideoInline, BlogUrlInline]
     search_fields = ["title", "content", "category__name", "author__email"]
     ordering = ("-created_at",)

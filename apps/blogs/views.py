@@ -59,6 +59,10 @@ class BlogViewSet(viewsets.ModelViewSet):
     ordering = ["-created_at"]
     lookup_field = "slug"
 
+    def get_queryset(self):
+        queryset = Blog.objects.filter(is_published=True)
+        return queryset
+
     def retrieve(self, request, slug=None):
         queryset = Blog.objects.all()
         blog = get_object_or_404(queryset, slug=slug)
