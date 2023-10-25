@@ -35,51 +35,73 @@ class SearchView(views.APIView):
             # split search query into individual search terms
             search_terms = search_query.split()
 
-            # initialize empty querysets
-            product_results = Product.objects.none()
-            category_results = Category.objects.none()
-            subcategory_results = Subcategory.objects.none()
-            subsubcategory_results = Subsubcategory.objects.none()
-            brand_results = Brand.objects.none()
-            faq_results = FAQ.objects.none()
-            blog_results = Blog.objects.none()
-            coupon_results = Coupon.objects.none()
+            # Initialize empty lists to collect results
+            product_results = set()
+            category_results = set()
+            subcategory_results = set()
+            subsubcategory_results = set()
+            brand_results = set()
+            faq_results = set()
+            blog_results = set()
+            coupon_results = set()
 
             # perform search
             for term in search_terms:
-                product_results |= Product.objects.filter(
-                    models.Q(name__icontains=term)
-                    | models.Q(description__icontains=term)
-                    | models.Q(product_stock__sku__icontains=term)
-                    | models.Q(product_stock__discount__icontains=term)
-                    | models.Q(product_stock__price__icontains=term)
-                    | models.Q(product_stock__size__icontains=term)
-                    | models.Q(product_stock__color__icontains=term)
-                    | models.Q(product_stock__other__icontains=term)
-                )[:5]
+                product_results.update(
+                    Product.objects.filter(
+                        models.Q(name__icontains=term)
+                        | models.Q(description__icontains=term)
+                        | models.Q(product_stock__sku__icontains=term)
+                        | models.Q(product_stock__discount__icontains=term)
+                        | models.Q(product_stock__price__icontains=term)
+                        | models.Q(product_stock__size__icontains=term)
+                        | models.Q(product_stock__color__icontains=term)
+                        | models.Q(product_stock__other__icontains=term)
+                    ).order_by("name")
+                )
 
-                category_results |= Category.objects.filter(name__icontains=term)[:5]
-                subcategory_results |= Subcategory.objects.filter(name__icontains=term)[
-                    :5
-                ]
-                subsubcategory_results |= Subsubcategory.objects.filter(
-                    name__icontains=term
-                )[:5]
-                brand_results |= Brand.objects.filter(
-                    models.Q(name__icontains=term) | models.Q(origin__icontains=term)
-                )[:5]
-                faq_results |= FAQ.objects.filter(
-                    models.Q(question__icontains=term)
-                    | models.Q(answer__icontains=term)
-                )[:5]
-                blog_results |= Blog.objects.filter(
-                    models.Q(title__icontains=term) | models.Q(content__icontains=term)
-                )[:5]
-                coupon_results |= Coupon.objects.filter(
-                    models.Q(prefix_code__icontains=term)
-                    | models.Q(name__icontains=term)
-                    | models.Q(discount_value__icontains=term)
-                )[:5]
+                category_results.update(Category.objects.filter(name__icontains=term))
+                subcategory_results.update(
+                    Subcategory.objects.filter(name__icontains=term)
+                )
+                subsubcategory_results.update(
+                    Subsubcategory.objects.filter(name__icontains=term)
+                )
+                brand_results.update(
+                    Brand.objects.filter(
+                        models.Q(name__icontains=term)
+                        | models.Q(origin__icontains=term)
+                    )
+                )
+                faq_results.update(
+                    FAQ.objects.filter(
+                        models.Q(question__icontains=term)
+                        | models.Q(answer__icontains=term)
+                    )
+                )
+                blog_results.update(
+                    Blog.objects.filter(
+                        models.Q(title__icontains=term)
+                        | models.Q(content__icontains=term)
+                    )
+                )
+                coupon_results.update(
+                    Coupon.objects.filter(
+                        models.Q(prefix_code__icontains=term)
+                        | models.Q(name__icontains=term)
+                        | models.Q(discount_value__icontains=term)
+                    )
+                )
+
+            # Limit the results to the top 5 for each category
+            product_results = list(product_results)[:5]
+            category_results = list(category_results)[:5]
+            subcategory_results = list(subcategory_results)[:5]
+            subsubcategory_results = list(subsubcategory_results)[:5]
+            brand_results = list(brand_results)[:5]
+            faq_results = list(faq_results)[:5]
+            blog_results = list(blog_results)[:5]
+            coupon_results = list(coupon_results)[:5]
 
             # Serialize the search results
             product_serializer = ProductSerializer(product_results, many=True)
@@ -104,24 +126,8 @@ class SearchView(views.APIView):
 
             search_serializer = SearchSerializer(search)
 
-            # get trending searches
-            trending_searches = (
-                Search.objects.values("query")
-                .annotate(search_count=models.Count("query"))
-                .order_by("-search_count")[:5]
-            )
-
-            serialized_trending_searches = []
-            for entry in trending_searches:
-                search_query = entry["query"]
-                search_count = entry["search_count"]
-                serialized_trending_searches.append(
-                    {"query": search_query, "search_count": search_count}
-                )
-
             return Response(
                 {
-                    "trending_searches": serialized_trending_searches,
                     "products": product_serializer.data,
                     "categories": category_serializer.data,
                     "subcategories": subcategory_serializer.data,
