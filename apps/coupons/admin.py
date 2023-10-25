@@ -1,11 +1,6 @@
 from django.contrib import admin
 
-from .models import DiscountType, Coupon, CouponUser, CouponBanner
-
-
-class CouponBannerInline(admin.TabularInline):
-    model = CouponBanner
-    extra = 0
+from .models import DiscountType, Coupon, CouponUser
 
 
 class CouponUserInline(admin.TabularInline):
@@ -16,7 +11,7 @@ class CouponUserInline(admin.TabularInline):
 class CouponAdmin(admin.ModelAdmin):
     list_filter = ("is_private", "is_limited", "valid_from", "valid_to")
     search_fields = ("prefix_code", "name", "discount_type__name", "discount_value")
-    inlines = [CouponBannerInline, CouponUserInline]
+    inlines = [CouponUserInline]
 
     def get_list_display(self, request):
         if request.user.is_superuser:
@@ -42,4 +37,3 @@ class CouponAdmin(admin.ModelAdmin):
 admin.site.register(Coupon, CouponAdmin)
 admin.site.register(DiscountType)
 admin.site.register(CouponUser)
-admin.site.register(CouponBanner)

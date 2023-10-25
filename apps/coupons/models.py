@@ -34,6 +34,9 @@ class Coupon(models.Model):
     code = models.CharField(max_length=250, unique=True, editable=False)
     prefix_code = models.CharField(max_length=100, unique=True)
     name = models.CharField(max_length=250, unique=True)
+    cover = models.ImageField(
+        storage=GridFSStorage(collection="coupon_covers"), default="default.jpg"
+    )
     discount_type = models.ForeignKey(DiscountType, on_delete=models.CASCADE)
     discount_value = models.PositiveBigIntegerField(default=0)
     min_purchase = models.PositiveBigIntegerField(default=0)
@@ -100,18 +103,3 @@ class CouponUser(models.Model):
 
     def __str__(self):
         return f"{self.coupon.name} - {self.user}"
-
-
-class CouponBanner(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    coupon = models.ForeignKey(
-        Coupon, on_delete=models.CASCADE, related_name="coupon_banners"
-    )
-    image = models.ImageField(
-        storage=GridFSStorage(collection="coupon_banners"), default="default.jpg"
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"{self.coupon.name} - {self.image.url}"

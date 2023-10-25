@@ -1,17 +1,15 @@
 from rest_framework import viewsets
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.response import Response
 
 from tools.custom_permissions import IsAdminOrReadOnly
 
-from .models import DiscountType, Coupon, CouponUser, CouponBanner
+from .models import DiscountType, Coupon, CouponUser
 
 from .serializers import (
     DiscountTypeSerializer,
     CouponSerializer,
     CouponUserSerializer,
-    CouponBannerSerializer,
 )
 
 
@@ -56,13 +54,3 @@ class CouponUserViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["coupon__code", "user__email"]
     ordering_fields = ["coupon__code", "user__email"]
-
-
-class CouponBannerViewSet(viewsets.ModelViewSet):
-    queryset = CouponBanner.objects.all()
-    serializer_class = CouponBannerSerializer
-    permission_classes = [IsAdminOrReadOnly]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ["coupon__name", "id"]
-    ordering_fields = ["coupon__name", "id"]
-    ordering = ["coupon__name", "id"]
