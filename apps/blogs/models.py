@@ -9,16 +9,16 @@ User = get_user_model()
 
 
 class BlogCategory(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     name = models.CharField(max_length=50, unique=True)
     description = models.TextField()
-    description_id = models.TextField(
-        null=True, blank=True
-    )  # ID translation for description
+    description_id = models.TextField(null=True, blank=True)
     cover = models.ImageField(
         storage=GridFSStorage(collection="blog_categories"), default="default.jpg"
     )
-    slug = models.SlugField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=50, unique=True, db_index=True)
 
     def __str__(self):
         return self.name
@@ -29,7 +29,9 @@ class BlogCategory(models.Model):
 
 
 class BlogTag(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     name = models.CharField(max_length=50, unique=True)
     slug = models.SlugField(max_length=50, unique=True)
 
@@ -42,21 +44,25 @@ class BlogTag(models.Model):
 
 
 class Blog(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    title = models.CharField(max_length=250)
-    title_id = models.CharField(max_length=250, null=True, blank=True)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
+    title = models.CharField(max_length=250, db_index=True)
+    title_id = models.CharField(max_length=250, null=True, blank=True, db_index=True)
     content = models.TextField()
-    content_id = models.TextField(null=True, blank=True)  # ID translation for content
+    content_id = models.TextField(null=True, blank=True)
     cover = models.ImageField(
         storage=GridFSStorage(collection="blog_covers"), default="default.jpg"
     )
-    slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
+    slug = models.SlugField(
+        max_length=250, unique=True, null=True, blank=True, db_index=True
+    )
     category = models.ForeignKey(BlogCategory, on_delete=models.PROTECT)
     tags = models.ManyToManyField(BlogTag)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     author = models.ForeignKey(User, on_delete=models.PROTECT)
-    is_published = models.BooleanField(default=True)
+    is_published = models.BooleanField(default=True, db_index=True)
 
     def __str__(self):
         return self.title
@@ -67,7 +73,9 @@ class Blog(models.Model):
 
 
 class BlogImage(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     image = models.ImageField(
         storage=GridFSStorage(collection="blog_images"), default="default.jpg"
@@ -77,7 +85,9 @@ class BlogImage(models.Model):
 
 
 class BlogVideo(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     video = models.URLField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -85,7 +95,9 @@ class BlogVideo(models.Model):
 
 
 class BlogUrl(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     name = models.CharField(max_length=250)
     url = models.URLField()
@@ -94,7 +106,9 @@ class BlogUrl(models.Model):
 
 
 class BlogComment(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     parent_comment = models.ForeignKey(

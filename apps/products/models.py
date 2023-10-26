@@ -10,8 +10,10 @@ User = get_user_model()
 
 
 class Category(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=250)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
+    name = models.CharField(max_length=250, db_index=True)
     description = models.TextField()
     description_id = models.TextField(
         null=True, blank=True
@@ -19,7 +21,9 @@ class Category(models.Model):
     cover = models.ImageField(
         storage=GridFSStorage(collection="categories"), default="default.jpg"
     )
-    slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
+    slug = models.SlugField(
+        max_length=250, unique=True, null=True, blank=True, db_index=True
+    )
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
@@ -30,8 +34,10 @@ class Category(models.Model):
 
 
 class Subcategory(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=250)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
+    name = models.CharField(max_length=250, db_index=True)
     description = models.TextField()
     description_id = models.TextField(
         null=True, blank=True
@@ -39,7 +45,9 @@ class Subcategory(models.Model):
     cover = models.ImageField(
         storage=GridFSStorage(collection="subcategories"), default="default.jpg"
     )
-    slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
+    slug = models.SlugField(
+        max_length=250, unique=True, null=True, blank=True, db_index=True
+    )
     category = models.ForeignKey(
         Category, related_name="subcategories", on_delete=models.CASCADE
     )
@@ -53,8 +61,10 @@ class Subcategory(models.Model):
 
 
 class Subsubcategory(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=250)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
+    name = models.CharField(max_length=250, db_index=True)
     description = models.TextField()
     description_id = models.TextField(
         null=True, blank=True
@@ -62,7 +72,9 @@ class Subsubcategory(models.Model):
     cover = models.ImageField(
         storage=GridFSStorage(collection="subsubcategories"), default="default.jpg"
     )
-    slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
+    slug = models.SlugField(
+        max_length=250, unique=True, null=True, blank=True, db_index=True
+    )
     subcategory = models.ForeignKey(
         Subcategory, related_name="subsubcategories", on_delete=models.CASCADE
     )
@@ -76,8 +88,10 @@ class Subsubcategory(models.Model):
 
 
 class Brand(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=250)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
+    name = models.CharField(max_length=250, db_index=True)
     description = models.TextField()
     description_id = models.TextField(
         null=True, blank=True
@@ -89,7 +103,9 @@ class Brand(models.Model):
     cover = models.ImageField(
         storage=GridFSStorage(collection="brands"), default="default.jpg"
     )
-    slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
+    slug = models.SlugField(
+        max_length=250, unique=True, null=True, blank=True, db_index=True
+    )
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
@@ -100,12 +116,12 @@ class Brand(models.Model):
 
 
 class Product(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=250)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
+    name = models.CharField(max_length=250, db_index=True)
     description = models.TextField()
-    description_id = models.TextField(
-        null=True, blank=True
-    )  # ID translation for description
+    description_id = models.TextField(null=True, blank=True)
     brand = models.ForeignKey(
         Brand, related_name="product_brands", on_delete=models.PROTECT
     )
@@ -124,7 +140,9 @@ class Product(models.Model):
         storage=GridFSStorage(collection="products"), default="default.jpg"
     )
     link = models.URLField(null=True, blank=True)
-    slug = models.SlugField(max_length=250, unique=True, null=True, blank=True)
+    slug = models.SlugField(
+        max_length=250, unique=True, null=True, blank=True, db_index=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=False)
@@ -138,7 +156,9 @@ class Product(models.Model):
 
 
 class Rating(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     user = models.ForeignKey(
         User, related_name="user_ratings", on_delete=models.CASCADE
     )
@@ -168,7 +188,9 @@ class Rating(models.Model):
 
 
 class Wishlist(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     user = models.ForeignKey(
         User, related_name="user_wishlist", on_delete=models.CASCADE
     )
@@ -183,20 +205,22 @@ class Wishlist(models.Model):
 
 
 class Stock(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     product = models.ForeignKey(
         Product, related_name="product_stock", on_delete=models.CASCADE
     )
-    sku = models.CharField(max_length=250)
+    sku = models.CharField(max_length=250, db_index=True)
     price = models.IntegerField(default=0)
     discount = models.IntegerField(default=0)
     image = models.ImageField(
         storage=GridFSStorage(collection="stock_images"), default="default.jpg"
     )
-    size = models.CharField(max_length=100, null=True, blank=True)
-    color = models.CharField(max_length=100, null=True, blank=True)
-    color_code = ColorField(null=True, blank=True)
-    other = models.CharField(max_length=100, null=True, blank=True)
+    size = models.CharField(max_length=100, null=True, blank=True, db_index=True)
+    color = models.CharField(max_length=100, null=True, blank=True, db_index=True)
+    color_code = ColorField(null=True, blank=True, db_index=True)
+    other = models.CharField(max_length=100, null=True, blank=True, db_index=True)
     quantity = models.IntegerField(default=0)
     weight = models.IntegerField(default=0)
     length = models.IntegerField(default=0)
@@ -210,7 +234,9 @@ class Stock(models.Model):
 
 
 class ExtraProductImage(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     product = models.ForeignKey(
         Product, related_name="product_extra_images", on_delete=models.CASCADE
     )

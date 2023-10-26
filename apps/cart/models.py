@@ -8,7 +8,9 @@ User = get_user_model()
 
 
 class Cart(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="user_cart"
     )
@@ -20,7 +22,9 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="cart_items")
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name="cart_products"

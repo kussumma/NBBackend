@@ -7,8 +7,10 @@ User = get_user_model()
 
 
 class Search(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    query = models.CharField(max_length=250)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
+    query = models.CharField(max_length=250, db_index=True)
     user = models.ForeignKey(
         User, related_name="searches", on_delete=models.PROTECT, null=True, blank=True
     )

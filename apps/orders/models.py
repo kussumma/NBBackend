@@ -31,8 +31,10 @@ RETURN_REFUND_STATUS_CHOICES = (
 
 
 class Order(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    ref_code = models.CharField(max_length=100, unique=True)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
+    ref_code = models.CharField(max_length=100, unique=True, db_index=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_orders")
     coupon = models.CharField(max_length=100, null=True, blank=True)
     coupon2 = models.CharField(max_length=100, null=True, blank=True)
@@ -68,7 +70,9 @@ class Order(models.Model):
 
 
 class OrderShipping(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     order = models.OneToOneField(
         Order, on_delete=models.CASCADE, related_name="order_shipping"
     )
@@ -89,7 +93,9 @@ class OrderShipping(models.Model):
 
 
 class OrderItem(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     order = models.ForeignKey(
         Order, on_delete=models.CASCADE, related_name="order_items"
     )
@@ -122,7 +128,9 @@ class OrderItem(models.Model):
 
 
 class ReturnOrder(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_return_orders"
     )
@@ -142,7 +150,9 @@ class ReturnOrder(models.Model):
 
 
 class ReturnImage(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     return_order = models.ForeignKey(
         ReturnOrder, on_delete=models.CASCADE, related_name="return_images"
     )
@@ -156,7 +166,9 @@ class ReturnImage(models.Model):
 
 
 class RefundOrder(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     return_order = models.OneToOneField(
         ReturnOrder, on_delete=models.CASCADE, related_name="refund_order"
     )
