@@ -67,7 +67,7 @@ class SearchView(views.APIView):
                         | models.Q(product_stock__other__icontains=term)
                     ),
                     is_active=True,
-                ).order_by("name")[:5]
+                ).order_by("name")[:10]
             )
             brand_results.update(
                 Brand.objects.filter(
@@ -102,7 +102,7 @@ class SearchView(views.APIView):
             )
 
         # Limit the results to the top 5 for each category
-        product_results = sorted(product_results, key=lambda x: x.name)[:5]
+        product_results = sorted(product_results, key=lambda x: x.name)[:10]
         brand_results = sorted(brand_results, key=lambda x: x.name)[:5]
         faq_results = sorted(faq_results, key=lambda x: x.question)[:5]
         blog_results = sorted(blog_results, key=lambda x: x.title)[:5]
