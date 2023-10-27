@@ -23,9 +23,7 @@ fernet = Fernet(key)
 
 
 class DiscountType(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -33,12 +31,10 @@ class DiscountType(models.Model):
 
 
 class Coupon(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
-    )
-    code = models.CharField(max_length=250, unique=True, editable=False, db_index=True)
-    prefix_code = models.CharField(max_length=100, unique=True, db_index=True)
-    name = models.CharField(max_length=250, unique=True, db_index=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    code = models.CharField(max_length=250, unique=True, editable=False)
+    prefix_code = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=250, unique=True)
     cover = models.ImageField(
         storage=GridFSStorage(collection="coupon_covers"), default="default.jpg"
     )
@@ -48,9 +44,9 @@ class Coupon(models.Model):
     max_purchase = models.PositiveBigIntegerField(default=0)
     valid_from = models.DateTimeField()
     valid_to = models.DateTimeField()
-    is_active = models.BooleanField(default=True, db_index=True)
-    is_private = models.BooleanField(default=False, db_index=True)
-    is_limited = models.BooleanField(default=False, db_index=True)
+    is_active = models.BooleanField(default=True)
+    is_private = models.BooleanField(default=False)
+    is_limited = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -98,9 +94,7 @@ class Coupon(models.Model):
 
 
 class CouponUser(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_coupons"

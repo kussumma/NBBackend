@@ -4,9 +4,7 @@ from tools.filestorage_helper import GridFSStorage
 
 
 class Contact(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     phone = models.CharField(max_length=20)
     email = models.EmailField()
@@ -29,9 +27,7 @@ class Contact(models.Model):
 
 
 class About(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     content = models.TextField()
     content_id = models.TextField(null=True, blank=True)  # ID translation for content
@@ -43,9 +39,7 @@ class About(models.Model):
 
 
 class Partner(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     logo = models.ImageField(
         storage=GridFSStorage(collection="partner_logos"), default="default.jpg"
@@ -64,9 +58,7 @@ class Partner(models.Model):
 
 
 class Investor(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     logo = models.ImageField(
         storage=GridFSStorage(collection="investor_logos"), default="default.jpg"
@@ -85,9 +77,7 @@ class Investor(models.Model):
 
 
 class Policy(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     content = models.TextField()
     content_id = models.TextField(null=True, blank=True)  # ID translation for content
@@ -102,9 +92,7 @@ class Policy(models.Model):
 
 
 class FAQ(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     question = models.CharField(max_length=255)
     question_id = models.TextField(null=True, blank=True)  # ID translation for question
     answer = models.TextField()
@@ -119,9 +107,7 @@ class FAQ(models.Model):
 
 
 class CopyRight(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
     content = models.TextField()
     content_id = models.TextField(null=True, blank=True)  # ID translation for content

@@ -27,9 +27,7 @@ BUG_STATUS = (
 
 
 class Favorite(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_favorites"
     )
@@ -43,9 +41,7 @@ class Favorite(models.Model):
 
 
 class Complaint(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_complaints"
     )
@@ -64,9 +60,7 @@ class Complaint(models.Model):
 
 
 class ComplaintImage(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     complaint = models.ForeignKey(
         Complaint, on_delete=models.CASCADE, related_name="complaint_images"
     )
@@ -80,9 +74,7 @@ class ComplaintImage(models.Model):
 
 
 class ProductRequest(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_requests"
     )
@@ -105,9 +97,7 @@ class ProductRequest(models.Model):
 
 
 class FeatureRequest(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_features"
     )
@@ -126,9 +116,7 @@ class FeatureRequest(models.Model):
 
 
 class BugReport(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_reports"
     )
@@ -153,9 +141,7 @@ class BugReport(models.Model):
 
 
 class BugReportImage(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     bug_report = models.ForeignKey(
         BugReport, on_delete=models.CASCADE, related_name="bug_report_images"
     )

@@ -37,12 +37,10 @@ LEVEL_CHOICES = [
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
-    )
-    email = models.EmailField(max_length=255, unique=True, db_index=True)
-    first_name = models.CharField(max_length=255, db_index=True)
-    last_name = models.CharField(max_length=255, db_index=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    email = models.EmailField(max_length=255, unique=True)
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
     avatar = models.ImageField(
         storage=GridFSStorage(collection="avatars"), default="default.jpg"
     )
@@ -72,19 +70,17 @@ GENDER_CHOICES = [("male", "Male"), ("female", "Female")]
 
 
 class UserDetail(models.Model):
-    id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.OneToOneField(
         User, related_name="user_details", on_delete=models.CASCADE
     )
-    phone_number = models.CharField(max_length=20, null=True, blank=True, db_index=True)
+    phone_number = models.CharField(max_length=20, null=True, blank=True)
     gender = models.CharField(choices=GENDER_CHOICES, max_length=20, default="female")
-    date_of_birth = models.DateField(null=True, blank=True, db_index=True)
+    date_of_birth = models.DateField(null=True, blank=True)
     newsletter = models.BooleanField(default=False)
     city = models.CharField(max_length=255, null=True, blank=True)
     country = models.CharField(max_length=255, null=True, blank=True)
-    language = models.CharField(max_length=255, default="EN", db_index=True)
+    language = models.CharField(max_length=255, default="EN")
     theme = models.CharField(max_length=255, default="light")
     currency = models.CharField(max_length=255, default="IDR")
 
