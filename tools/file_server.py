@@ -1,7 +1,6 @@
 from django.http import HttpResponse
 from rest_framework import status, views
 from rest_framework.response import Response
-from pymongo import MongoClient
 from gridfs import GridFS
 from django.conf import settings
 from rest_framework.permissions import AllowAny
@@ -17,8 +16,7 @@ class FileAPIView(views.APIView):
             )
         try:
             # open the file from GridFS
-            client = MongoClient(settings.MONGODB_GRIDFS["URL"])
-            db = client[settings.MONGODB_GRIDFS["DB"]]
+            db = settings.MONGODB_DATABASE
             fs = GridFS(db, collection)
             file = fs.get_last_version(filename)
 

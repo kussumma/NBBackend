@@ -1,6 +1,5 @@
 from django.core.files.storage import Storage
 from django.conf import settings
-from pymongo import MongoClient
 from gridfs import GridFS
 from django.utils.deconstruct import deconstructible
 import os
@@ -16,8 +15,7 @@ class GridFSStorage(Storage):
     """
 
     def __init__(self, location=None, base_url=None, collection=None):
-        self.client = MongoClient(settings.MONGODB_GRIDFS["URL"])
-        self.db = self.client[settings.MONGODB_GRIDFS["DB"]]
+        self.db = settings.MONGODB_DATABASE
         self.collection = collection or settings.MONGODB_GRIDFS["COLLECTION"]
         self.fs = GridFS(self.db, self.collection)
         self.location = location or ""

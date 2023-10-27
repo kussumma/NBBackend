@@ -1,8 +1,8 @@
 from pathlib import Path
 import os
 from datetime import timedelta
-
-# import sentry_sdk
+from pymongo import MongoClient
+import sentry_sdk
 
 # use decouple
 from decouple import config, Csv
@@ -154,6 +154,11 @@ MONGODB_GRIDFS = {
     "COLLECTION": config("MONGO_COLLECTION"),
 }
 
+# MongoDB GridFS
+MONGODB_CLIENT = MongoClient(MONGODB_GRIDFS["URL"])
+MONGODB_DATABASE = MONGODB_CLIENT[MONGODB_GRIDFS["DB"]]
+
+# GridFSStorage
 DEFAULT_FILE_STORAGE = "tools.filestorage_helper.GridFSStorage"
 
 # Default primary key field type
@@ -288,13 +293,13 @@ USE_TZ = True
 RECAPTCHA_SECRET_KEY = config("RECAPTCHA_SECRET_KEY")
 
 # SENTRY
-# sentry_sdk.init(
-#     dsn=config("SENTRY_DSN"),
-#     # Set traces_sample_rate to 1.0 to capture 100%
-#     # of transactions for performance monitoring.
-#     traces_sample_rate=1.0,
-#     # Set profiles_sample_rate to 1.0 to profile 100%
-#     # of sampled transactions.
-#     # We recommend adjusting this value in production.
-#     profiles_sample_rate=1.0,
-# )
+sentry_sdk.init(
+    dsn=config("SENTRY_DSN"),
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    traces_sample_rate=1.0,
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate=1.0,
+)
