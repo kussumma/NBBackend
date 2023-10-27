@@ -283,6 +283,9 @@ TIME_ZONE = config("TIME_ZONE")
 USE_I18N = True
 USE_TZ = True
 
+# RECAPTCHA
+RECAPTCHA_SECRET_KEY = config("RECAPTCHA_SECRET_KEY")
+
 # SENTRY
 sentry_sdk.init(
     dsn=config("SENTRY_DSN"),
