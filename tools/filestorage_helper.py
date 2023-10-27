@@ -16,7 +16,7 @@ class GridFSStorage(Storage):
     """
 
     def __init__(self, location=None, base_url=None, collection=None):
-        self.client = MongoClient(settings.MONGODB_GRIDFS["URL"])
+        self.client = MongoClient(settings.MONGODB_GRIDFS["URL"], maxPoolSize=None)
         self.db = self.client[settings.MONGODB_GRIDFS["DB"]]
         self.collection = collection or settings.MONGODB_GRIDFS["COLLECTION"]
         self.fs = GridFS(self.db, self.collection)
