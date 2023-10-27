@@ -6,10 +6,12 @@ User = get_user_model()
 
 
 class ShippingRoute(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     code = models.CharField(max_length=5, blank=True, null=True)
     city = models.CharField(max_length=100, blank=True, null=True)
-    route = models.CharField(max_length=100, blank=True, null=True)
+    route = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     is_city = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -19,8 +21,10 @@ class ShippingRoute(models.Model):
 
 
 class ShippingGroup(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100, unique=True)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
+    name = models.CharField(max_length=100, unique=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -29,9 +33,11 @@ class ShippingGroup(models.Model):
 
 
 class ShippingType(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     name = models.CharField(max_length=100, unique=True)
-    code = models.CharField(max_length=100, unique=True)
+    code = models.CharField(max_length=100, unique=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -40,7 +46,9 @@ class ShippingType(models.Model):
 
 
 class ShippingGroupItem(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     shipping_group = models.ForeignKey(
         ShippingGroup, on_delete=models.CASCADE, related_name="shipping_group_items"
     )
@@ -55,14 +63,16 @@ class ShippingGroupItem(models.Model):
 
 
 class ShippingGroupTariff(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     shipping_group = models.ForeignKey(
         ShippingGroup, on_delete=models.CASCADE, related_name="shipping_group_tariffs"
     )
     shipping_type = models.ForeignKey(
         ShippingType, on_delete=models.CASCADE, related_name="shipping_type_tariffs"
     )
-    tariff = models.PositiveBigIntegerField(default=0)
+    tariff = models.PositiveBigIntegerField(default=0, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -71,7 +81,9 @@ class ShippingGroupTariff(models.Model):
 
 
 class Shipping(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_shippings"
     )

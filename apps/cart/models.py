@@ -8,7 +8,9 @@ User = get_user_model()
 
 
 class Cart(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="user_cart"
     )
@@ -20,7 +22,9 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="cart_items")
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name="cart_products"
@@ -28,10 +32,10 @@ class CartItem(models.Model):
     stock = models.ForeignKey(
         Stock, on_delete=models.CASCADE, related_name="cart_stocks"
     )
-    quantity = models.PositiveIntegerField(default=1)
-    total_price = models.PositiveIntegerField(default=0)
+    quantity = models.PositiveIntegerField(default=1, db_index=True)
+    total_price = models.PositiveIntegerField(default=0, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    is_selected = models.BooleanField(default=False)
+    is_selected = models.BooleanField(default=False, db_index=True)
 
     def __str__(self):
         return f"{self.cart.user.email} - {self.product.slug} - {self.quantity}"

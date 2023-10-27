@@ -37,16 +37,20 @@ LEVEL_CHOICES = [
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    email = models.EmailField(max_length=255, unique=True)
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
+    email = models.EmailField(max_length=255, unique=True, db_index=True)
+    first_name = models.CharField(max_length=255, db_index=True)
+    last_name = models.CharField(max_length=255, db_index=True)
     avatar = models.ImageField(
-        storage=GridFSStorage(collection="avatars"), default="default.jpg"
+        storage=GridFSStorage(collection="avatars"),
+        default="default.jpg",
+        db_index=True,
     )
     level = models.CharField(choices=LEVEL_CHOICES, max_length=20, default="bronze")
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True, db_index=True)
+    is_staff = models.BooleanField(default=False, db_index=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
     last_updated = models.DateTimeField(auto_now=True)
@@ -70,17 +74,19 @@ GENDER_CHOICES = [("male", "Male"), ("female", "Female")]
 
 
 class UserDetail(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
     user = models.OneToOneField(
         User, related_name="user_details", on_delete=models.CASCADE
     )
-    phone_number = models.CharField(max_length=20, null=True, blank=True)
+    phone_number = models.CharField(max_length=20, null=True, blank=True, db_index=True)
     gender = models.CharField(choices=GENDER_CHOICES, max_length=20, default="female")
-    date_of_birth = models.DateField(null=True, blank=True)
-    newsletter = models.BooleanField(default=False)
+    date_of_birth = models.DateField(null=True, blank=True, db_index=True)
+    newsletter = models.BooleanField(default=False, db_index=True)
     city = models.CharField(max_length=255, null=True, blank=True)
     country = models.CharField(max_length=255, null=True, blank=True)
-    language = models.CharField(max_length=255, default="EN")
+    language = models.CharField(max_length=255, default="EN", db_index=True)
     theme = models.CharField(max_length=255, default="light")
     currency = models.CharField(max_length=255, default="IDR")
 
