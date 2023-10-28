@@ -1,6 +1,6 @@
 import os
 import cv2
-from rest_framework.serializers import ValidationError
+from django.core.exceptions import ValidationError
 import tempfile
 
 
@@ -30,6 +30,9 @@ def validate_uploaded_file(uploaded_file, type):
             frame_count = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
             fps = int(video_capture.get(cv2.CAP_PROP_FPS))
             video_duration = frame_count / fps
+
+            # release video capture
+            video_capture.release()
 
         except Exception as e:
             raise ValidationError("Error analyzing video file: " + str(e))
