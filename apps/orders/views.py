@@ -1,3 +1,4 @@
+from dis import disco
 from rest_framework import filters, serializers, viewsets, status, views
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -216,7 +217,8 @@ class OrderViewset(viewsets.ModelViewSet):
                 shipping_estimation = item.get("estimasi_sla")
 
         # calculate tax amount
-        tax_amount = math.ceil(((subtotal_amount + shipping_cost) * 10) / 100)
+        # tax_amount = math.ceil(((subtotal_amount + shipping_cost) * 10) / 100)
+        tax_amount = 0
 
         # calculate total price
         total_amount = total_paid + shipping_cost + tax_amount
@@ -559,10 +561,15 @@ class CouponCheckingAPIView(views.APIView):
             total_discount = subtotal_amount
             total_paid = 0
 
+        discount_percentage = 0
+        if subtotal_amount > 0:
+            discount_percentage = (total_discount / subtotal_amount) * 100
+
         return Response(
             {
                 "subtotal_amount": subtotal_amount,
                 "total_discount": total_discount,
+                "dicount_percentage": discount_percentage,
                 "total_paid": total_paid,
             },
             status=status.HTTP_200_OK,
