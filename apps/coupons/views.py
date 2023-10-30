@@ -32,9 +32,11 @@ class CouponViewSet(viewsets.ModelViewSet):
         filters.OrderingFilter,
         DjangoFilterBackend,
     ]
-    search_fields = ["name", "created_at", "updated_at"]
+    search_fields = ["name", "prefix_code", "created_at", "updated_at"]
     ordering_fields = ["name", "created_at", "updated_at"]
     filterset_fields = {
+        "name": ["exact", "icontains"],
+        "prefix_code": ["exact"],
         "discount_type": ["exact"],
         "is_active": ["exact"],
         "valid_from": ["exact", "gte", "lte"],
@@ -52,5 +54,5 @@ class CouponUserViewSet(viewsets.ModelViewSet):
     serializer_class = CouponUserSerializer
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ["coupon__code", "user__email"]
-    ordering_fields = ["coupon__code", "user__email"]
+    search_fields = ["coupon__prefix_code", "user__email"]
+    ordering_fields = ["coupon__prefix_code", "user__email"]
