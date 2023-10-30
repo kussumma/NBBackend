@@ -563,7 +563,7 @@ class CouponCheckingAPIView(views.APIView):
 
         discount_percentage = 0
         if subtotal_amount > 0:
-            discount_percentage = (total_discount / subtotal_amount) * 100
+            discount_percentage = math.ceil((total_discount / subtotal_amount) * 100)
 
         return Response(
             {
