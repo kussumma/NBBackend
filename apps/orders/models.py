@@ -4,6 +4,8 @@ import uuid
 import secrets
 from tools.filestorage_helper import GridFSStorage
 
+from apps.products.models import Product, Stock
+
 User = get_user_model()
 
 STATUS_CHOICES = (
@@ -101,9 +103,13 @@ class OrderItem(models.Model):
     )
     quantity = models.IntegerField(default=1)
     product_name = models.CharField(max_length=250)
-    product_id = models.UUIDField()
+    product = models.ForeignKey(
+        Product, on_delete=models.PROTECT, related_name="product_order_items"
+    )
+    stock = models.ForeignKey(
+        Stock, on_delete=models.PROTECT, related_name="stock_order_items"
+    )
     stock_discount = models.IntegerField(default=0)
-    stock_id = models.UUIDField()
     stock_sku = models.CharField(max_length=100, null=True, blank=True)
     stock_price = models.IntegerField(default=0)
     stock_image = models.CharField(max_length=250, null=True, blank=True)

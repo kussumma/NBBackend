@@ -245,10 +245,10 @@ class OrderViewset(viewsets.ModelViewSet):
             OrderItem.objects.create(
                 order=order,
                 quantity=cart_item.quantity,
-                product_id=cart_item.product.id,
+                product=cart_item.product,
                 product_name=cart_item.product.name,
+                stock=cart_item.stock,
                 stock_discount=cart_item.stock.discount,
-                stock_id=cart_item.stock.id,
                 stock_sku=cart_item.stock.sku,
                 stock_price=cart_item.stock.price,
                 stock_image=cart_item.stock.image,
