@@ -311,3 +311,33 @@ class TopBrandsAPIView(views.APIView):
         )
 
         return Response(top_brands_list)
+
+
+class TopCategoryAPIView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        # get top 5 brands based on total sales and payment status
+        top_category = (
+            OrderItem.objects.filter(order__payment_status="settlement")
+            .annotate(
+                category_id=F("product__category"),
+                category_name=F("product__category__name"),
+                category_cover=F("product__category__cover"),
+            )
+            .values("category_id", "category_name", "category_cover")
+            .annotate(total_sales=Sum("quantity"))
+            .order_by("-total_sales")[:5]
+        )
+
+        # Convert QuerySet to list of dictionaries
+        top_category_list = list(
+            top_category.values(
+                "category_id",
+                "category_name",
+                "total_sales",
+                "category_cover",
+            )
+        )
+
+        return Response(top_category_list)
