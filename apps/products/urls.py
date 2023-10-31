@@ -10,6 +10,7 @@ from .views import (
     RatingViewSet,
     WishlistViewSet,
     StockViewSet,
+    TopBrandsAPIView,
 )
 
 router = DefaultRouter()
@@ -24,4 +25,5 @@ router.register("stock", StockViewSet, basename="stock")
 
 urlpatterns = [
     path("v1/", include(router.urls)),
+    path("v1/top-brands/", TopBrandsAPIView.as_view(), name="top-brands"),
 ]

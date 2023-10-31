@@ -1,13 +1,13 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, views, permissions
 from django.contrib.auth import get_user_model
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
-from django.db.models import Min, Max
+from django.db.models import Min, Max, Sum, F
 from django.db.models.functions import Coalesce
 from rest_framework import serializers
 
-from apps.orders.models import Order
+from apps.orders.models import Order, OrderItem
 from .models import (
     Category,
     Product,
@@ -275,3 +275,39 @@ class StockViewSet(viewsets.ModelViewSet):
     }
     ordering_fields = ["product__name", "created_at"]
     ordering = ["-created_at"]
+
+
+class TopBrandsAPIView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        # get top 5 brands based on total sales and payment status
+        top_brands = (
+            OrderItem.objects.filter(order__payment_status="settlement")
+            .annotate(
+                brand_id=F("product__brand"),
+                brand_name=F("product__brand__name"),
+                brand_logo=F("product__brand__logo"),
+                brand_cover=F("product__brand__cover"),
+                brand_origin=F("product__brand__origin"),
+            )
+            .values(
+                "brand_id", "brand_name", "brand_cover", "brand_logo", "brand_origin"
+            )
+            .annotate(total_sales=Sum("quantity"))
+            .order_by("-total_sales")[:5]
+        )
+
+        # Convert QuerySet to list of dictionaries
+        top_brands_list = list(
+            top_brands.values(
+                "brand_id",
+                "brand_name",
+                "total_sales",
+                "brand_cover",
+                "brand_logo",
+                "brand_origin",
+            )
+        )
+
+        return Response(top_brands_list)
