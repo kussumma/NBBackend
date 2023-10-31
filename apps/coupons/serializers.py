@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from tools.fileupload_helper import validate_uploaded_file
-from .models import DiscountType, Coupon, CouponUser
+from .models import DiscountType, Coupon, CouponUser, Promotion
 
 
 class DiscountTypeSerializer(serializers.ModelSerializer):
@@ -37,3 +37,15 @@ class CouponUserSerializer(serializers.ModelSerializer):
         model = CouponUser
         fields = "__all__"
         read_only_fields = ["user"]
+
+
+class PromotionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Promotion
+        fields = "__all__"
+        read_only_fields = ["created_at", "updated_at"]
+
+    def validate_cover(self, value):
+        if value:
+            validate_uploaded_file(value, "image")
+            return value

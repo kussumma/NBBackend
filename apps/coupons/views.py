@@ -4,12 +4,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from tools.custom_permissions import IsAdminOrReadOnly
 
-from .models import DiscountType, Coupon, CouponUser
+from .models import DiscountType, Coupon, CouponUser, Promotion
 
 from .serializers import (
     DiscountTypeSerializer,
     CouponSerializer,
     CouponUserSerializer,
+    PromotionSerializer,
 )
 
 
@@ -56,3 +57,13 @@ class CouponUserViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["coupon__prefix_code", "user__email"]
     ordering_fields = ["coupon__prefix_code", "user__email"]
+
+
+class PromotionViewSet(viewsets.ModelViewSet):
+    queryset = Promotion.objects.all()
+    serializer_class = PromotionSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["name", "created_at", "updated_at"]
+    ordering_fields = ["name", "created_at", "updated_at"]
+    ordering = ["name", "created_at", "updated_at"]

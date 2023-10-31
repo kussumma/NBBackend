@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import DiscountType, Coupon, CouponUser
+from .models import DiscountType, Coupon, CouponUser, Promotion
 
 
 class CouponUserInline(admin.TabularInline):
@@ -19,6 +19,7 @@ class CouponAdmin(admin.ModelAdmin):
                 "name",
                 "prefix_code",
                 "private_decoded",
+                "full_code",
                 "discount_type",
                 "discount_value",
             )
@@ -33,7 +34,11 @@ class CouponAdmin(admin.ModelAdmin):
     def private_decoded(self, obj):
         return obj.decode_coupon_code(obj.code)
 
+    def full_code(self, obj):
+        return obj.prefix_code + obj.decode_coupon_code(obj.code)
+
 
 admin.site.register(Coupon, CouponAdmin)
 admin.site.register(DiscountType)
 admin.site.register(CouponUser)
+admin.site.register(Promotion)

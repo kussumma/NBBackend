@@ -112,3 +112,37 @@ class CouponUser(models.Model):
 
     def __str__(self):
         return f"{self.coupon.name} - {self.user}"
+
+
+class Promotion(models.Model):
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
+    name = models.CharField(max_length=250, unique=True)
+    cover = models.ImageField(
+        storage=GridFSStorage(collection="promotion_covers"),
+        default="default.jpg",
+        db_index=True,
+    )
+    description = models.TextField()
+    slug = models.SlugField(max_length=250, unique=True)
+    valid_from = models.DateTimeField()
+    valid_to = models.DateTimeField()
+    is_active = models.BooleanField(default=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.slug
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = self.generate_slug()
+        super().save(*args, **kwargs)
+
+    def is_valid(self):
+        try:
+            now = timezone.now()
+            return self.is_active and self.valid_from <= now and self.valid_to >= now
+        except Exception:
+            return False
