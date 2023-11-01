@@ -86,7 +86,7 @@ class UserDetail(models.Model):
     newsletter = models.BooleanField(default=False, db_index=True)
     city = models.CharField(max_length=255, null=True, blank=True)
     country = models.CharField(max_length=255, null=True, blank=True)
-    language = models.CharField(max_length=255, default="EN", db_index=True)
+    language = models.CharField(max_length=255, default="GB", db_index=True)
     theme = models.CharField(max_length=255, default="light")
     currency = models.CharField(max_length=255, default="IDR")
 
