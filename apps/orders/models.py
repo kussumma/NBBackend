@@ -5,6 +5,7 @@ import secrets
 from tools.filestorage_helper import GridFSStorage
 
 from apps.products.models import Product, Stock
+from apps.shipping.models import Shipping
 
 User = get_user_model()
 
@@ -43,6 +44,7 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.TextField(choices=STATUS_CHOICES, default="pending")
+    payment_token = models.TextField(null=True, blank=True)
     payment_status = models.TextField(choices=PAYMENT_STATUS_CHOICES, default="pending")
     payment_ref_code = models.UUIDField(null=True, blank=True)
     tax_amount = models.PositiveIntegerField(default=0)
@@ -78,7 +80,9 @@ class OrderShipping(models.Model):
     order = models.OneToOneField(
         Order, on_delete=models.CASCADE, related_name="order_shipping"
     )
-    shipping_id = models.UUIDField()
+    shipping = models.ForeignKey(
+        Shipping, on_delete=models.PROTECT, related_name="order_shippings"
+    )
     receiver_name = models.CharField(max_length=100)
     receiver_phone = models.CharField(max_length=100)
     receiver_address = models.CharField(max_length=250)

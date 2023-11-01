@@ -61,6 +61,9 @@ class PaymentAPIViews(APIView):
         # create transaction token
         try:
             transaction_token = snap.create_transaction(param)
+
+            order.payment_token = transaction_token
+            order.save()
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 

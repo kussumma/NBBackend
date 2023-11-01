@@ -280,7 +280,7 @@ class OrderViewset(viewsets.ModelViewSet):
         # create shipping order
         OrderShipping.objects.create(
             order=order,
-            shipping_id=shipping.id,
+            shipping=shipping,
             receiver_name=shipping.receiver_name,
             receiver_phone=shipping.receiver_phone,
             receiver_address=shipping.receiver_address,
