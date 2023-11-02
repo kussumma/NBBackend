@@ -55,8 +55,9 @@ class ComplaintViewset(viewsets.ModelViewSet):
         user = self.request.user
         return Complaint.objects.filter(user=user)
 
-    def create(self, request, *args, **kwargs):
-        recaptcha = request.data.get("recaptcha", "")
+    def perform_create(self, serializer):
+        user = self.request.user
+        recaptcha = self.request.data.get("recaptcha", "")
 
         if not recaptcha:
             return Response(
@@ -77,7 +78,8 @@ class ComplaintViewset(viewsets.ModelViewSet):
                 {"error": "recaptcha validation failed"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        return super().create(request, *args, **kwargs)
+
+        serializer.save(user=user)
 
 
 class ProductRequestViewset(viewsets.ModelViewSet):
@@ -93,8 +95,9 @@ class ProductRequestViewset(viewsets.ModelViewSet):
         user = self.request.user
         return ProductRequest.objects.filter(user=user)
 
-    def create(self, request, *args, **kwargs):
-        recaptcha = request.data.get("recaptcha", "")
+    def perform_create(self, serializer):
+        user = self.request.user
+        recaptcha = self.request.data.get("recaptcha", "")
 
         if not recaptcha:
             return Response(
@@ -115,7 +118,8 @@ class ProductRequestViewset(viewsets.ModelViewSet):
                 {"error": "recaptcha validation failed"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        return super().create(request, *args, **kwargs)
+
+        serializer.save(user=user)
 
 
 class FeatureRequestViewset(viewsets.ModelViewSet):
@@ -131,8 +135,9 @@ class FeatureRequestViewset(viewsets.ModelViewSet):
         user = self.request.user
         return FeatureRequest.objects.filter(user=user)
 
-    def create(self, request, *args, **kwargs):
-        recaptcha = request.data.get("recaptcha", "")
+    def perform_create(self, serializer):
+        user = self.request.user
+        recaptcha = self.request.data.get("recaptcha", "")
 
         if not recaptcha:
             return Response(
@@ -153,7 +158,8 @@ class FeatureRequestViewset(viewsets.ModelViewSet):
                 {"error": "recaptcha validation failed"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        return super().create(request, *args, **kwargs)
+
+        serializer.save(user=user)
 
 
 class BugReportViewset(viewsets.ModelViewSet):
@@ -169,8 +175,9 @@ class BugReportViewset(viewsets.ModelViewSet):
         user = self.request.user
         return BugReport.objects.filter(user=user)
 
-    def create(self, request, *args, **kwargs):
-        recaptcha = request.data.get("recaptcha", "")
+    def perform_create(self, serializer):
+        user = self.request.user
+        recaptcha = self.request.data.get("recaptcha", "")
 
         if not recaptcha:
             return Response(
@@ -191,4 +198,5 @@ class BugReportViewset(viewsets.ModelViewSet):
                 {"error": "recaptcha validation failed"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        return super().create(request, *args, **kwargs)
+
+        serializer.save(user=user)
