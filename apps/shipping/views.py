@@ -1,9 +1,11 @@
+from numpy import rec
 from rest_framework import viewsets, permissions, filters, views, status
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from tools.custom_permissions import IsAdminOrReadOnly
 import math
 
+from apps.orders.models import Order
 from .models import (
     Shipping,
     ShippingRoute,
@@ -24,6 +26,7 @@ from .serializers import (
 from apps.cart.models import Cart, CartItem
 from apps.orders.models import OrderShipping
 
+from tools.recaptcha_helper import RecaptchaHelper
 from .helpers import lionparcel_original_tariff
 from .helpers import lionparcel_tariff_mapping
 from .helpers import lionparcel_track_status
@@ -67,6 +70,29 @@ class ShippingViewSet(viewsets.ModelViewSet):
         return ShippingSerializer
 
     def perform_create(self, serializer):
+        recaptcha = self.request.data.get("recaptcha", "")
+
+        if not recaptcha:
+            return Response(
+                {"error": "recaptcha validation failed"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        recaptcha_helper = RecaptchaHelper(recaptcha)
+        recaptcha_response = recaptcha_helper.validate()
+
+        if recaptcha_response.data["success"] == False:
+            return Response(
+                {"error": "recaptcha validation failed"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if recaptcha_response.data["score"] < 0.8:
+            return Response(
+                {"error": "recaptcha validation failed"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         # check if the shipping reach the maximum limit
         user = self.request.user
         shipping_count = Shipping.objects.filter(user=user).count()
@@ -156,6 +182,23 @@ class ShippingStatusAPIView(views.APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(response, status=status.HTTP_200_OK)
+
+
+class ShippingNotificationAPIView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        stt_no = request.data.get("stt_no")
+        status_code = request.data.get("status_code")
+
+        if status_code == "POD":
+            try:
+                order = Order.objects.get(order_shipping__shipping_ref_code=stt_no)
+                order.status = "complete"
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"message": "success"}, status=status.HTTP_200_OK)
 
 
 class ShippingGroupViewSet(viewsets.ModelViewSet):
