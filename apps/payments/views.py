@@ -3,7 +3,7 @@ from midtransclient import Snap
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from decouple import config
 
 from apps.orders.models import Order
@@ -108,3 +108,80 @@ class PaymentStatusAPIViews(APIView):
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(transaction_status, status=status.HTTP_200_OK)
+
+
+class PaymentNotificationAPIView(APIView):
+    """
+    Midtrans Webhook API View to handle payment status
+    https://docs.midtrans.com/docs/https-notification-webhooks
+    payment status:
+    - settlement : payment is successful
+    - capture : payment is successful, but waiting for settlement
+    - pending : payment is pending
+    - deny : payment is denied
+    - cancel : payment is canceled
+    - expire : payment is expired
+    - failure : payment is failed
+    - refund : payment is refunded
+    - partial_refund : payment is partially refunded
+    fraud status:
+    - accept : payment is not detected as fraud
+    - deny : payment is detected as fraud
+    """
+
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        # get transaction status
+        snap = Snap(
+            is_production=not settings.DEBUG, server_key=settings.MIDTRANS["SERVER_KEY"]
+        )
+
+        try:
+            transaction = snap.transactions.notification(request.data)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        # get transaction data
+        order_id = transaction["order_id"]
+        transaction_id = transaction["transaction_id"]
+        transaction_status = transaction["transaction_status"]
+        fraud_status = transaction["fraud_status"]
+
+        # check the transaction status
+        status = "pending"
+        if transaction_status == "capture":
+            if fraud_status == "accept":
+                status = "capture"
+            else:
+                status = "pending"
+        elif transaction_status == "settlement":
+            status = "settlement"
+        elif transaction_status == "cancel":
+            status = "cancel"
+        elif transaction_status == "deny":
+            status = "deny"
+        elif transaction_status == "expire":
+            status = "expire"
+        elif transaction_status == "failure":
+            status = "failure"
+        elif transaction_status == "refund":
+            status = "refund"
+        elif transaction_status == "partial_refund":
+            status = "partial_refund"
+
+        # get order from database
+        try:
+            order = Order.objects.get(id=order_id)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        # update order status
+        try:
+            order.payment_status = status
+            order.payment_ref_code = transaction_id
+            order.save()
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"message": "success"}, status=status.HTTP_200_OK)
