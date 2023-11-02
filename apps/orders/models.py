@@ -24,6 +24,10 @@ PAYMENT_STATUS_CHOICES = (
     ("settlement", "Settlement"),
     ("cancel", "Cancel"),
     ("expired", "Expired"),
+    ("deny", "Deny"),
+    ("failure", "Failure"),
+    ("refund", "Refund"),
+    ("partial_refund", "Partial Refund"),
 )
 
 RETURN_REFUND_STATUS_CHOICES = (
