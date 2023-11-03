@@ -27,6 +27,8 @@ class FileAPIView(views.APIView):
                 content_type = "image/jpeg"
             elif ext == "png":
                 content_type = "image/png"
+            elif ext == "webp":
+                content_type = "image/webp"
             elif ext == "mp4" or ext == "mov":
                 content_type = "video/mp4"
 

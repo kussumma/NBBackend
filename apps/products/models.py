@@ -174,8 +174,7 @@ class Rating(models.Model):
         default="default.jpg",
     )
     video = models.FileField(
-        storage=GridFSStorage(collection="rating_videos"),
-        default="default.jpg",
+        storage=GridFSStorage(collection="rating_videos"), null=True, blank=True
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

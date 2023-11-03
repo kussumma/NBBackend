@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from tools.fileupload_helper import validate_uploaded_file
+from tools.fileupload_helper import FileUploadHelper
 
 from .models import (
     Favorite,
@@ -36,7 +36,7 @@ class ComplaintImageSerializer(serializers.ModelSerializer):
 
     def validate_image(self, value):
         if value:
-            validate_uploaded_file(value, "image")
+            value = FileUploadHelper(value, webp=True).validate()
             return value
 
 
@@ -48,7 +48,7 @@ class ProductRequestSerializer(serializers.ModelSerializer):
 
     def validate_image(self, value):
         if value:
-            validate_uploaded_file(value, "image")
+            value = FileUploadHelper(value, webp=True).validate()
             return value
 
 
@@ -73,5 +73,5 @@ class BugReportImageSerializer(serializers.ModelSerializer):
 
     def validate_image(self, value):
         if value:
-            validate_uploaded_file(value, "image")
+            value = FileUploadHelper(value, webp=True).validate()
             return value

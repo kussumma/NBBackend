@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from tools.fileupload_helper import validate_uploaded_file
+from tools.fileupload_helper import FileUploadHelper
 from .models import DiscountType, Coupon, CouponUser, Promotion
 
 
@@ -28,7 +28,7 @@ class CouponSerializer(serializers.ModelSerializer):
 
     def validate_cover(self, value):
         if value:
-            validate_uploaded_file(value, "image")
+            value = FileUploadHelper(value, webp=True).validate()
             return value
 
 
@@ -47,5 +47,5 @@ class PromotionSerializer(serializers.ModelSerializer):
 
     def validate_cover(self, value):
         if value:
-            validate_uploaded_file(value, "image")
+            value = FileUploadHelper(value, webp=True).validate()
             return value

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from tools.fileupload_helper import validate_uploaded_file
+from tools.fileupload_helper import FileUploadHelper
 
 from .models import Contact, About, Partner, Investor, Policy, FAQ, CopyRight
 
@@ -23,7 +23,7 @@ class PartnerSerializer(serializers.ModelSerializer):
 
     def validate_logo(self, value):
         if value:
-            validate_uploaded_file(value, "image")
+            value = FileUploadHelper(value, webp=True).validate()
             return value
 
 
@@ -34,7 +34,7 @@ class InvestorSerializer(serializers.ModelSerializer):
 
     def validate_logo(self, value):
         if value:
-            validate_uploaded_file(value, "image")
+            value = FileUploadHelper(value, webp=True).validate()
             return value
 
 

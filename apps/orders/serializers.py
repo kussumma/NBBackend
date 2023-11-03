@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from tools.fileupload_helper import validate_uploaded_file
+from tools.fileupload_helper import FileUploadHelper
 
 from .models import (
     Order,
@@ -40,7 +40,7 @@ class ReturnImageSerializer(serializers.ModelSerializer):
 
     def validate_image(self, value):
         if value:
-            validate_uploaded_file(value, "image")
+            value = FileUploadHelper(value, webp=True).validate()
             return value
 
 
@@ -60,5 +60,5 @@ class RefundOrderSerializer(serializers.ModelSerializer):
 
     def validate_refund_receipt(self, value):
         if value:
-            validate_uploaded_file(value, "image")
+            value = FileUploadHelper(value, webp=True).validate()
             return value

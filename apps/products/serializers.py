@@ -1,5 +1,6 @@
+from unicodedata import category
 from rest_framework import serializers
-from tools.fileupload_helper import validate_uploaded_file
+from tools.fileupload_helper import FileUploadHelper
 
 from .models import (
     Category,
@@ -23,14 +24,12 @@ class SubsubcategorySerializer(serializers.ModelSerializer):
 
     def validate_cover(self, value):
         if value:
-            validate_uploaded_file(value, "image")
+            value = FileUploadHelper(value, webp=True).validate()
             return value
 
 
 class SubcategorySerializer(serializers.ModelSerializer):
-    subsubcategory = SubsubcategorySerializer(
-        many=True, source="subsubcategories", read_only=True
-    )
+    subsubcategory = serializers.SerializerMethodField()
 
     class Meta:
         model = Subcategory
@@ -39,8 +38,13 @@ class SubcategorySerializer(serializers.ModelSerializer):
 
     def validate_cover(self, value):
         if value:
-            validate_uploaded_file(value, "image")
+            value = FileUploadHelper(value, webp=True).validate()
             return value
+
+    def get_subsubcategory(self, obj):
+        subsubcategory = Subsubcategory.objects.filter(subcategory=obj).order_by("name")
+        subsubcategory_serializer = SubsubcategorySerializer(subsubcategory, many=True)
+        return subsubcategory_serializer.data
 
 
 class SearchSubcategorySerializer(serializers.ModelSerializer):
@@ -50,9 +54,7 @@ class SearchSubcategorySerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
-    subcategory = SubcategorySerializer(
-        many=True, source="subcategories", read_only=True
-    )
+    subcategory = serializers.SerializerMethodField()
 
     class Meta:
         model = Category
@@ -60,8 +62,13 @@ class CategorySerializer(serializers.ModelSerializer):
 
     def validate_cover(self, value):
         if value:
-            validate_uploaded_file(value, "image")
+            value = FileUploadHelper(value, webp=True).validate()
             return value
+
+    def get_subcategory(self, obj):
+        subcategory = Subcategory.objects.filter(category=obj).order_by("name")
+        subcategory_serializer = SubcategorySerializer(subcategory, many=True)
+        return subcategory_serializer.data
 
 
 class SearchCategorySerializer(serializers.ModelSerializer):
@@ -78,12 +85,12 @@ class BrandSerializer(serializers.ModelSerializer):
 
     def validate_cover(self, value):
         if value:
-            validate_uploaded_file(value, "image")
+            value = FileUploadHelper(value, webp=True).validate()
             return value
 
     def validate_logo(self, value):
         if value:
-            validate_uploaded_file(value, "image")
+            value = FileUploadHelper(value, webp=True).validate()
             return value
 
 
@@ -96,7 +103,7 @@ class StockSerializer(serializers.ModelSerializer):
 
     def validate_image(self, value):
         if value:
-            validate_uploaded_file(value, "image")
+            value = FileUploadHelper(value, webp=True).validate()
             return value
 
 
@@ -115,12 +122,12 @@ class RatingSerializer(serializers.ModelSerializer):
 
     def validate_image(self, value):
         if value:
-            validate_uploaded_file(value, "image")
+            value = FileUploadHelper(value, webp=True).validate()
             return value
 
     def validate_video(self, value):
         if value:
-            validate_uploaded_file(value, "video")
+            value = FileUploadHelper(value, "video").validate()
             return value
 
 
@@ -154,7 +161,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def validate_cover(self, value):
         if value:
-            validate_uploaded_file(value, "image")
+            value = FileUploadHelper(value, webp=True).validate()
             return value
 
 
@@ -165,5 +172,5 @@ class ExtraProductImageSerializer(serializers.ModelSerializer):
 
     def validate_image(self, value):
         if value:
-            validate_uploaded_file(value, "image")
+            value = FileUploadHelper(value, webp=True).validate()
             return value
