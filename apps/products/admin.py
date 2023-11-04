@@ -13,18 +13,32 @@ from .models import (
     ExtraProductImage,
 )
 
+from .admin_views import (
+    CategoryFormAdmin,
+    SubcategoryFormAdmin,
+    SubsubcategoryFormAdmin,
+    BrandFormAdmin,
+    ProductFormAdmin,
+    StockFormAdmin,
+    ExtraProductImageFormAdmin,
+    RatingFormAdmin,
+)
+
 
 class StockInline(admin.StackedInline):
+    form = StockFormAdmin
     model = Stock
     extra = 0
 
 
 class ExtraProductImageInline(admin.StackedInline):
+    form = ExtraProductImageFormAdmin
     model = ExtraProductImage
     extra = 0
 
 
 class ProductAdmin(admin.ModelAdmin):
+    form = ProductFormAdmin
     list_display = (
         "name",
         "category",
@@ -43,6 +57,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 class StockAdmin(admin.ModelAdmin):
+    form = StockFormAdmin
     list_display = (
         "product",
         "size",
@@ -59,18 +74,22 @@ class StockAdmin(admin.ModelAdmin):
 
 
 class CategoryAdmin(admin.ModelAdmin):
+    form = CategoryFormAdmin
     search_fields = ("name",)
 
 
 class SubcategoryAdmin(admin.ModelAdmin):
+    form = SubcategoryFormAdmin
     search_fields = ("name",)
 
 
 class SubsubcategoryAdmin(admin.ModelAdmin):
+    form = SubsubcategoryFormAdmin
     search_fields = ("name",)
 
 
 class BrandAdmin(admin.ModelAdmin):
+    form = BrandFormAdmin
     search_fields = ("name",)
 
 
@@ -99,12 +118,27 @@ class WishlistAdmin(admin.ModelAdmin):
         return response
 
 
+class RatingAdmin(admin.ModelAdmin):
+    form = RatingFormAdmin
+    list_display = (
+        "user",
+        "product",
+        "star",
+        "created_at",
+        "updated_at",
+    )
+    list_filter = ("user", "star")
+    search_fields = ("user", "product__name", "star")
+    ordering = ("-created_at",)
+    autocomplete_fields = ("user", "product")
+
+
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Subcategory, SubcategoryAdmin)
 admin.site.register(Subsubcategory, SubsubcategoryAdmin)
 admin.site.register(Brand, BrandAdmin)
-admin.site.register(Rating)
+admin.site.register(Rating, RatingAdmin)
 admin.site.register(Wishlist, WishlistAdmin)
 admin.site.register(Stock, StockAdmin)
 admin.site.register(ExtraProductImage)

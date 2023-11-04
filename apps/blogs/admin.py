@@ -10,8 +10,22 @@ from .models import (
     BlogUrl,
 )
 
+from .admin_views import (
+    BlogCategoryFormAdmin,
+    BlogFormAdmin,
+    BlogImageFormAdmin,
+)
+
+
+class BlogCategoryAdmin(admin.ModelAdmin):
+    form = BlogCategoryFormAdmin
+    list_display = ("name",)
+    search_fields = ["name"]
+    ordering = ("name",)
+
 
 class BlogImageInline(admin.TabularInline):
+    form = BlogImageFormAdmin
     model = BlogImage
     extra = 0
 
@@ -27,6 +41,7 @@ class BlogUrlInline(admin.TabularInline):
 
 
 class BlogAdmin(admin.ModelAdmin):
+    form = BlogFormAdmin
     list_display = (
         "title",
         "category",
@@ -42,7 +57,7 @@ class BlogAdmin(admin.ModelAdmin):
     autocomplete_fields = ("author",)
 
 
-admin.site.register(BlogCategory)
+admin.site.register(BlogCategory, BlogCategoryAdmin)
 admin.site.register(BlogTag)
 admin.site.register(Blog, BlogAdmin)
 admin.site.register(BlogImage)
