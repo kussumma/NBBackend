@@ -14,7 +14,7 @@ class FileUploadHelper:
     Parameters:
         uploaded_file: Uploaded file object
         type: File type, either "image" or "video"
-        ratio: Image aspect ratio, e.g. "16:9"
+        ratio: Image aspect ratio (width:height), e.g. "16:9"
         webp: Convert image to WebP format
     """
 
@@ -39,11 +39,11 @@ class FileUploadHelper:
             raise ValidationError("Invalid file type")
 
     def validate_image(self):
-        # Check file extension
-        file_extension = self.get_file_extension()
+        # Check content type
+        content_type = self.get_content_type()
 
         # Check file size
-        if file_extension in [".jpg", ".jpeg", ".png"]:
+        if content_type in ["image/jpeg", "image/png"]:
             if self.get_file_size() > self.max_file_size:
                 raise ValidationError(
                     "File size exceeds the maximum allowed size of 5 MB"
@@ -57,8 +57,8 @@ class FileUploadHelper:
                 if ratio != width / height:
                     raise ValidationError(f"Image aspect ratio must be {self.ratio}")
 
-                if width < 500 or height < 500:
-                    raise ValidationError("Image resolution must be at least 500x500")
+                if width < 400 or height < 400:
+                    raise ValidationError("Image resolution must be at least 400x400")
 
                 if width > 2000 or height > 2000:
                     raise ValidationError("Image resolution must be at most 2000x2000")
@@ -71,10 +71,10 @@ class FileUploadHelper:
         return self.uploaded_file
 
     def validate_video(self):
-        # Check file extension
-        file_extension = self.get_file_extension()
+        # Check content type
+        content_type = self.get_content_type()
 
-        if file_extension in [".mp4", ".mov"]:
+        if content_type in ["video/mp4", "video/quicktime"]:
             if self.get_file_size() > self.max_video_size:
                 raise ValidationError(
                     "File size exceeds the maximum allowed size of 30 MB"
@@ -105,8 +105,8 @@ class FileUploadHelper:
 
         return self.uploaded_file
 
-    def get_file_extension(self):
-        return os.path.splitext(self.uploaded_file.name)[1].lower()
+    def get_content_type(self):
+        return self.uploaded_file.content_type
 
     def get_file_size(self):
         return self.uploaded_file.size
@@ -121,9 +121,12 @@ class FileUploadHelper:
             return self.uploaded_file.file
 
     def get_ratio(self):
+        """
+        1 inch = 96 pixels
+        """
         ratio = self.ratio.split(":")
-        width_ratio = int(ratio[0])
-        height_ratio = int(ratio[1])
+        width_ratio = int(ratio[0]) * 96
+        height_ratio = int(ratio[1]) * 96
         new_ratio = width_ratio / height_ratio
         return new_ratio
 
