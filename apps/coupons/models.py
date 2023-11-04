@@ -1,6 +1,5 @@
 import secrets
 import uuid
-from django import db
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -9,6 +8,7 @@ from cryptography.fernet import InvalidToken
 from django.conf import settings
 import hashlib
 import base64
+from django.utils.text import slugify
 from tools.filestorage_helper import GridFSStorage
 
 User = get_user_model()
@@ -119,6 +119,7 @@ class Promotion(models.Model):
         primary_key=True, default=uuid.uuid4, editable=False, db_index=True
     )
     name = models.CharField(max_length=250, unique=True)
+    coupon_code = models.CharField(max_length=250, unique=True, db_index=True)
     cover = models.ImageField(
         storage=GridFSStorage(collection="promotion_covers"),
         default="default.jpg",
@@ -136,8 +137,7 @@ class Promotion(models.Model):
         return self.slug
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = self.generate_slug()
+        self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
     def is_valid(self):
