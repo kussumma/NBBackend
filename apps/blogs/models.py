@@ -19,6 +19,13 @@ class BlogCategory(models.Model):
         storage=GridFSStorage(collection="blog_categories"),
         default="default.jpg",
         db_index=True,
+        help_text="1220 x 210 px",
+    )
+    cover_mobile = models.ImageField(
+        storage=GridFSStorage(collection="blog_categories_mobile"),
+        default="default.jpg",
+        db_index=True,
+        help_text="400 x 210 px",
     )
     slug = models.SlugField(max_length=50, unique=True, db_index=True)
 
@@ -57,6 +64,31 @@ class Blog(models.Model):
         storage=GridFSStorage(collection="blog_covers"),
         default="default.jpg",
         db_index=True,
+        help_text="1220 x 210 px",
+    )
+    cover_mobile = models.ImageField(
+        storage=GridFSStorage(collection="blog_covers_mobile"),
+        default="default.jpg",
+        db_index=True,
+        help_text="400 x 210 px",
+    )
+    cover_homepage = models.ImageField(
+        storage=GridFSStorage(collection="blog_covers_home"),
+        default="default.jpg",
+        db_index=True,
+        help_text="600 x 280 px",
+    )
+    cover_homepage_mobile = models.ImageField(
+        storage=GridFSStorage(collection="blog_covers_home_mobile"),
+        default="default.jpg",
+        db_index=True,
+        help_text="400 x 280 px",
+    )
+    cover_homepage_headline = models.ImageField(
+        storage=GridFSStorage(collection="blog_covers_home_headline"),
+        default="default.jpg",
+        db_index=True,
+        help_text="600 x 600 px",
     )
     slug = models.SlugField(
         max_length=250, unique=True, null=True, blank=True, db_index=True
@@ -67,6 +99,8 @@ class Blog(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     author = models.ForeignKey(User, on_delete=models.PROTECT)
     is_published = models.BooleanField(default=True, db_index=True)
+    is_featured = models.BooleanField(default=False, db_index=False)
+    is_headline = models.BooleanField(default=False, db_index=False)
 
     def __str__(self):
         return self.title
@@ -85,6 +119,7 @@ class BlogImage(models.Model):
         storage=GridFSStorage(collection="blog_images"),
         default="default.jpg",
         db_index=True,
+        help_text="600 x 600 px",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

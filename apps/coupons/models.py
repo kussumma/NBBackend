@@ -43,6 +43,7 @@ class Coupon(models.Model):
         storage=GridFSStorage(collection="coupon_covers"),
         default="default.jpg",
         db_index=True,
+        help_text="400 x 250 px",
     )
     discount_type = models.ForeignKey(DiscountType, on_delete=models.CASCADE)
     discount_value = models.PositiveBigIntegerField(default=0)
@@ -124,6 +125,13 @@ class Promotion(models.Model):
         storage=GridFSStorage(collection="promotion_covers"),
         default="default.jpg",
         db_index=True,
+        help_text="1220 x 450 px",
+    )
+    cover_mobile = models.ImageField(
+        storage=GridFSStorage(collection="promotion_covers_mobile"),
+        default="default.jpg",
+        db_index=True,
+        help_text="400 x 450 px",
     )
     description = models.TextField()
     slug = models.SlugField(max_length=250, unique=True)

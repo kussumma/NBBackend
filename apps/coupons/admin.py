@@ -33,6 +33,13 @@ class PromotionFormAdmin(ModelForm):
             self.cleaned_data["cover"] = FileUploadHelper(
                 new_cover, webp=True
             ).validate()
+        if self.cleaned_data.get("cover_mobile") == self.instance.cover_mobile:
+            pass
+        else:
+            new_cover_mobile = self.cleaned_data.get("cover_mobile")
+            self.cleaned_data["cover_mobile"] = FileUploadHelper(
+                new_cover_mobile, webp=True
+            ).validate()
 
 
 class CouponUserInline(admin.TabularInline):
