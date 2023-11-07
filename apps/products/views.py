@@ -1,3 +1,4 @@
+from unicodedata import category
 from rest_framework import viewsets, views, permissions, status
 from django.contrib.auth import get_user_model
 from rest_framework import filters
@@ -313,10 +314,18 @@ class TopBrandsAPIView(views.APIView):
                 brand_name=F("product__brand__name"),
                 brand_logo=F("product__brand__logo"),
                 brand_cover=F("product__brand__cover"),
+                brand_cover_mobile=F("product__brand__cover_mobile"),
+                brand_cover_homepage=F("product__brand__cover_homepage"),
                 brand_origin=F("product__brand__origin"),
             )
             .values(
-                "brand_id", "brand_name", "brand_cover", "brand_logo", "brand_origin"
+                "brand_id",
+                "brand_name",
+                "brand_cover",
+                "brand_logo",
+                "brand_cover_mobile",
+                "brand_cover_homepage",
+                "brand_origin",
             )
             .annotate(total_sales=Sum("quantity"))
             .order_by("-total_sales")[:5]
@@ -330,6 +339,8 @@ class TopBrandsAPIView(views.APIView):
                 "total_sales",
                 "brand_cover",
                 "brand_logo",
+                "brand_cover_mobile",
+                "brand_cover_homepage",
                 "brand_origin",
             )
         )
@@ -348,8 +359,16 @@ class TopCategoryAPIView(views.APIView):
                 category_id=F("product__category"),
                 category_name=F("product__category__name"),
                 category_cover=F("product__category__cover"),
+                category_cover_mobile=F("product__category__cover_mobile"),
+                category_cover_homepage=F("product__category__cover_homepage"),
             )
-            .values("category_id", "category_name", "category_cover")
+            .values(
+                "category_id",
+                "category_name",
+                "category_cover",
+                "category_cover_mobile",
+                "category_cover_homepage",
+            )
             .annotate(total_sales=Sum("quantity"))
             .order_by("-total_sales")[:5]
         )
@@ -361,6 +380,8 @@ class TopCategoryAPIView(views.APIView):
                 "category_name",
                 "total_sales",
                 "category_cover",
+                "category_cover_mobile",
+                "category_cover_homepage",
             )
         )
 
