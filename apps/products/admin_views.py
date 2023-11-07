@@ -11,7 +11,6 @@ from .models import (
     Product,
     Brand,
     ExtraProductImage,
-    Stock,
     Rating,
 )
 
@@ -39,6 +38,20 @@ class CategoryFormAdmin(ModelForm):
             self.cleaned_data["cover"] = FileUploadHelper(
                 new_cover, webp=True
             ).validate()
+        if self.cleaned_data.get("cover_mobile") == self.instance.cover_mobile:
+            pass
+        else:
+            new_cover_mobile = self.cleaned_data.get("cover_mobile")
+            self.cleaned_data["cover_mobile"] = FileUploadHelper(
+                new_cover_mobile, webp=True
+            ).validate()
+        if self.cleaned_data.get("cover_homepage") == self.instance.cover_homepage:
+            pass
+        else:
+            new_cover_homepage = self.cleaned_data.get("cover_homepage")
+            self.cleaned_data["cover_homepage"] = FileUploadHelper(
+                new_cover_homepage, webp=True
+            ).validate()
 
 
 class SubcategoryFormAdmin(ModelForm):
@@ -54,6 +67,20 @@ class SubcategoryFormAdmin(ModelForm):
             self.cleaned_data["cover"] = FileUploadHelper(
                 new_cover, webp=True
             ).validate()
+        if self.cleaned_data.get("cover_mobile") == self.instance.cover_mobile:
+            pass
+        else:
+            new_cover_mobile = self.cleaned_data.get("cover_mobile")
+            self.cleaned_data["cover_mobile"] = FileUploadHelper(
+                new_cover_mobile, webp=True
+            ).validate()
+        if self.cleaned_data.get("cover_homepage") == self.instance.cover_homepage:
+            pass
+        else:
+            new_cover_homepage = self.cleaned_data.get("cover_homepage")
+            self.cleaned_data["cover_homepage"] = FileUploadHelper(
+                new_cover_homepage, webp=True
+            ).validate()
 
 
 class SubsubcategoryFormAdmin(ModelForm):
@@ -68,6 +95,20 @@ class SubsubcategoryFormAdmin(ModelForm):
             new_cover = self.cleaned_data.get("cover")
             self.cleaned_data["cover"] = FileUploadHelper(
                 new_cover, webp=True
+            ).validate()
+        if self.cleaned_data.get("cover_mobile") == self.instance.cover_mobile:
+            pass
+        else:
+            new_cover_mobile = self.cleaned_data.get("cover_mobile")
+            self.cleaned_data["cover_mobile"] = FileUploadHelper(
+                new_cover_mobile, webp=True
+            ).validate()
+        if self.cleaned_data.get("cover_homepage") == self.instance.cover_homepage:
+            pass
+        else:
+            new_cover_homepage = self.cleaned_data.get("cover_homepage")
+            self.cleaned_data["cover_homepage"] = FileUploadHelper(
+                new_cover_homepage, webp=True
             ).validate()
 
 
@@ -90,6 +131,20 @@ class BrandFormAdmin(ModelForm):
             self.cleaned_data["cover"] = FileUploadHelper(
                 new_cover, webp=True
             ).validate()
+        if self.cleaned_data.get("cover_mobile") == self.instance.cover_mobile:
+            pass
+        else:
+            new_cover_mobile = self.cleaned_data.get("cover_mobile")
+            self.cleaned_data["cover_mobile"] = FileUploadHelper(
+                new_cover_mobile, webp=True
+            ).validate()
+        if self.cleaned_data.get("cover_homepage") == self.instance.cover_homepage:
+            pass
+        else:
+            new_cover_homepage = self.cleaned_data.get("cover_homepage")
+            self.cleaned_data["cover_homepage"] = FileUploadHelper(
+                new_cover_homepage, webp=True
+            ).validate()
 
 
 class ProductFormAdmin(ModelForm):
@@ -110,21 +165,6 @@ class ProductFormAdmin(ModelForm):
 class ExtraProductImageFormAdmin(ModelForm):
     class Meta:
         model = ExtraProductImage
-        fields = "__all__"
-
-    def clean(self):
-        if self.cleaned_data.get("image") == self.instance.image:
-            pass
-        else:
-            new_image = self.cleaned_data.get("image")
-            self.cleaned_data["image"] = FileUploadHelper(
-                new_image, webp=True
-            ).validate()
-
-
-class StockFormAdmin(ModelForm):
-    class Meta:
-        model = Stock
         fields = "__all__"
 
     def clean(self):

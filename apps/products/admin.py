@@ -19,14 +19,12 @@ from .admin_views import (
     SubsubcategoryFormAdmin,
     BrandFormAdmin,
     ProductFormAdmin,
-    StockFormAdmin,
     ExtraProductImageFormAdmin,
     RatingFormAdmin,
 )
 
 
 class StockInline(admin.StackedInline):
-    form = StockFormAdmin
     model = Stock
     extra = 0
 
@@ -57,7 +55,6 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 class StockAdmin(admin.ModelAdmin):
-    form = StockFormAdmin
     list_display = (
         "product",
         "size",
