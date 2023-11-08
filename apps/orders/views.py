@@ -251,7 +251,7 @@ class OrderViewset(viewsets.ModelViewSet):
                 stock_discount=cart_item.stock.discount,
                 stock_sku=cart_item.stock.sku,
                 stock_price=cart_item.stock.price,
-                stock_image=cart_item.stock.image,
+                stock_image=cart_item.product.cover,
                 stock_size=cart_item.stock.size,
                 stock_color=cart_item.stock.color,
                 stock_color_code=cart_item.stock.color_code,

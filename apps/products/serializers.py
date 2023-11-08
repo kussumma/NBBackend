@@ -1,4 +1,3 @@
-from unicodedata import category
 from rest_framework import serializers
 from tools.fileupload_helper import FileUploadHelper
 
@@ -100,11 +99,6 @@ class StockSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stock
         fields = "__all__"
-
-    def validate_image(self, value):
-        if value:
-            value = FileUploadHelper(value, webp=True).validate()
-            return value
 
 
 class RatingSerializer(serializers.ModelSerializer):
