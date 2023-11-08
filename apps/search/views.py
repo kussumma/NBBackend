@@ -1,4 +1,3 @@
-from operator import is_
 from django.db import models
 from rest_framework import views, permissions
 from rest_framework.response import Response
@@ -7,15 +6,12 @@ import time
 
 from .models import Search
 from .serializers import SearchSerializer
-from apps.products.models import Product, Category, Subcategory, Subsubcategory, Brand
+from apps.products.models import Product, Brand
 from apps.store.models import FAQ
 from apps.blogs.models import Blog
 from apps.coupons.models import Coupon
 from apps.products.serializers import (
     ProductSerializer,
-    SearchCategorySerializer,
-    SearchSubcategorySerializer,
-    SubsubcategorySerializer,
     BrandSerializer,
 )
 from apps.store.serializers import FAQSerializer
