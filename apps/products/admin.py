@@ -19,12 +19,14 @@ from .admin_views import (
     SubsubcategoryFormAdmin,
     BrandFormAdmin,
     ProductFormAdmin,
+    StockFormAdmin,
     ExtraProductImageFormAdmin,
     RatingFormAdmin,
 )
 
 
 class StockInline(admin.StackedInline):
+    form = StockFormAdmin
     model = Stock
     extra = 0
 
@@ -55,17 +57,18 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 class StockAdmin(admin.ModelAdmin):
+    form = StockFormAdmin
     list_display = (
         "product",
         "size",
         "color",
-        "other",
+        "variant",
         "quantity",
         "created_at",
         "updated_at",
     )
-    list_filter = ("product", "size", "color", "other")
-    search_fields = ("product", "size", "color", "other")
+    list_filter = ("product", "size", "color", "variant")
+    search_fields = ("product", "size", "color", "variant")
     ordering = ("-created_at",)
     autocomplete_fields = ("product",)
 

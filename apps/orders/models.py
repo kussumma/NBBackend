@@ -124,7 +124,7 @@ class OrderItem(models.Model):
     stock_size = models.CharField(max_length=100, null=True, blank=True)
     stock_color = models.CharField(max_length=100, null=True, blank=True)
     stock_color_code = models.CharField(max_length=100, null=True, blank=True)
-    stock_other = models.CharField(max_length=100, null=True, blank=True)
+    stock_variant = models.CharField(max_length=100, null=True, blank=True)
     stock_weight = models.IntegerField(default=0)
     stock_length = models.IntegerField(default=0)
     stock_width = models.IntegerField(default=0)

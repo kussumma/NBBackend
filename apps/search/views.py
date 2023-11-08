@@ -60,7 +60,7 @@ class SearchView(views.APIView):
                         | models.Q(product_stock__price__icontains=term)
                         | models.Q(product_stock__size__icontains=term)
                         | models.Q(product_stock__color__icontains=term)
-                        | models.Q(product_stock__other__icontains=term)
+                        | models.Q(product_stock__variant__icontains=term)
                     ),
                     is_active=True,
                 ).order_by("name")[:10]

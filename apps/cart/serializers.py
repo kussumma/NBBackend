@@ -23,7 +23,7 @@ class CartItemSerializer(serializers.ModelSerializer):
             "discount": stock.discount,
             "size": stock.size,
             "color": stock.color,
-            "other": stock.other,
+            "variant": stock.variant,
         }
         return product_data
 

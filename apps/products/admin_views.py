@@ -9,6 +9,7 @@ from .models import (
     Subcategory,
     Subsubcategory,
     Product,
+    Stock,
     Brand,
     ExtraProductImage,
     Rating,
@@ -159,6 +160,21 @@ class ProductFormAdmin(ModelForm):
             new_cover = self.cleaned_data.get("cover")
             self.cleaned_data["cover"] = FileUploadHelper(
                 new_cover, webp=True
+            ).validate()
+
+
+class StockFormAdmin(ModelForm):
+    class Meta:
+        model = Stock
+        fields = "__all__"
+
+    def clean(self):
+        if self.cleaned_data.get("variant_image") == self.instance.variant_image:
+            pass
+        else:
+            new_variant_image = self.cleaned_data.get("variant_image")
+            self.cleaned_data["variant_image"] = FileUploadHelper(
+                new_variant_image, webp=True
             ).validate()
 
 

@@ -261,7 +261,13 @@ class Stock(models.Model):
     size = models.CharField(max_length=100, null=True, blank=True, db_index=True)
     color = models.CharField(max_length=100, null=True, blank=True, db_index=True)
     color_code = ColorField(null=True, blank=True)
-    other = models.CharField(max_length=100, null=True, blank=True)
+    variant = models.CharField(max_length=100, null=True, blank=True, db_index=True)
+    variant_image = models.ImageField(
+        storage=GridFSStorage(collection="variant_images"),
+        default="default.jpg",
+        db_index=True,
+        help_text="300 x 300 px",
+    )
     quantity = models.IntegerField(default=0, db_index=True)
     weight = models.IntegerField(default=0)
     length = models.IntegerField(default=0)
