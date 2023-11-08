@@ -18,7 +18,7 @@ class CartItemSerializer(serializers.ModelSerializer):
             "name": product.name,
             "sku": stock.sku,
             "slug": product.slug,
-            "image": stock.image.url,
+            "image": product.cover.url,
             "price": stock.price,
             "discount": stock.discount,
             "size": stock.size,
