@@ -120,7 +120,7 @@ class OrderItem(models.Model):
     stock_discount = models.IntegerField(default=0)
     stock_sku = models.CharField(max_length=100, null=True, blank=True)
     stock_price = models.IntegerField(default=0)
-    stock_image = models.CharField(max_length=250, null=True, blank=True)
+    product_cover = models.CharField(max_length=250, null=True, blank=True)
     stock_size = models.CharField(max_length=100, null=True, blank=True)
     stock_color = models.CharField(max_length=100, null=True, blank=True)
     stock_color_code = models.CharField(max_length=100, null=True, blank=True)
