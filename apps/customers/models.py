@@ -118,7 +118,7 @@ class FeatureRequest(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.user.email} - {self.product.slug}"
+        return f"{self.user.email} - {self.title}"
 
     def save(self, *args, **kwargs):
         self.detail = AdvancedProfanityFilter().censor(self.detail)
