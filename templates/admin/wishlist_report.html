@@ -1,28 +1,34 @@
-{% extends "admin/base.html" %}
-
-{% block content %}
+{% extends "admin/base.html" %} {% block content %}
 <div class="module">
-    <table style="width: 100%;">
-        <thead>
-            <tr>
-                <th style="padding: 8px 10px">Product</th>
-                <th style="padding: 8px 10px">Brand</th>
-                <th style="padding: 8px 10px">Category</th>
-                <th style="padding: 8px 10px">Wishlist</th>
-                <th style="padding: 8px 10px">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in summary %}
-            <tr>
-                <td>{{ item.product__name }}</td>
-                <td>{{ item.product__brand__name }}</td>
-                <td>{{ item.product__category__name }}</td>
-                <td>{{ item.total }}</td>
-                <td><a href="/delete-wishlist-by-product/{{ item.product__id }}">Delete</a></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+  <table style="width: 100%">
+    <thead>
+      <tr>
+        <th style="padding: 8px 10px">Product</th>
+        <th style="padding: 8px 10px">Brand</th>
+        <th style="padding: 8px 10px">Category</th>
+        <th style="padding: 8px 10px">Wishlist</th>
+        <th style="padding: 8px 10px">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if summary|length == 0 %}
+      <tr>
+        <td colspan="5" style="text-align: center">No wishlist found</td>
+      </tr>
+      {% endif %} {% for item in summary %}
+      <tr>
+        <td>{{ item.product__name }}</td>
+        <td>{{ item.product__brand__name }}</td>
+        <td>{{ item.product__category__name }}</td>
+        <td>{{ item.total }}</td>
+        <td>
+          <a href="/delete-wishlist-by-product/{{ item.product__id }}"
+            >Delete</a
+          >
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 {% endblock %}
