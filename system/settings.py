@@ -73,6 +73,9 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
+    "tools.custom_middlewares.BearerTokenMiddleware",
+    "tools.custom_middlewares.AccessTokenToBodyMiddleware",
+    "tools.custom_middlewares.RefreshTokenToBodyMiddleware",
 ]
 
 ROOT_URLCONF = "system.urls"
@@ -213,10 +216,14 @@ ACCOUNT_ADAPTER = "apps.accounts.adapters.CustomAccountAdapter"
 # DJANGO REST AUTH
 REST_AUTH = {
     "USE_JWT": True,
-    "JWT_AUTH_HTTPONLY": False,
-    "JWT_AUTH_SECURE": True,
+    "JWT_AUTH_HTTPONLY": True,
+    "JWT_AUTH_SECURE": not DEBUG,
     "JWT_AUTH_COOKIE": "nanobeepa-token",
     "JWT_AUTH_REFRESH_COOKIE": "nanobeepa-refresh-token",
+    "JWT_AUTH_REFRESH_COOKIE_PATH": "/",
+    "JWT_AUTH_COOKIE_PATH": "/",
+    "JWT_AUTH_COOKIE_USE_CSRF": True,
+    "JWT_AUTH_RETURN_EXPIRATION": True,
     "REGISTER_SERIALIZER": "apps.accounts.serializers.CustomRegisterSerializer",
     "USER_DETAILS_SERIALIZER": "apps.accounts.serializers.UserSerializer",
     "PASSWORD_RESET_SERIALIZER": "apps.accounts.serializers.CustomPasswordResetSerializer",
@@ -224,7 +231,7 @@ REST_AUTH = {
 
 # SIMPLE JWT
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
     "UPDATE_LAST_LOGIN": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
