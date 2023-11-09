@@ -19,7 +19,6 @@ class RecaptchaHelper:
                 },
             )
             recaptcha_response = recaptcha_response.json()
-            self.recaptcha_response = recaptcha_response
 
             return Response(recaptcha_response, status=status.HTTP_200_OK)
 
