@@ -55,7 +55,7 @@ class Complaint(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.user.email} - {self.product.slug}"
+        return f"{self.user.email} - {self.id}"
 
     def save(self, *args, **kwargs):
         self.content = AdvancedProfanityFilter().censor(self.content)
@@ -76,7 +76,7 @@ class ComplaintImage(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.complaint.user.email} - {self.complaint.product.slug}"
+        return f"{self.id}"
 
 
 class ProductRequest(models.Model):
@@ -142,7 +142,7 @@ class BugReport(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.user.email} - {self.product.slug}"
+        return f"{self.user.email} - {self.title}"
 
     def save(self, *args, **kwargs):
         self.detail = AdvancedProfanityFilter().censor(self.detail)
@@ -165,4 +165,4 @@ class BugReportImage(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.bug_report.title} - {self.bug_report.created_at}"
+        return f"{self.id}"
