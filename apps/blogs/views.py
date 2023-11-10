@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions, filters
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
@@ -56,9 +57,20 @@ class BlogViewSet(viewsets.ModelViewSet):
     queryset = Blog.objects.all()
     serializer_class = BlogSerializer
     permission_classes = [IsAdminOrReadOnly]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ["title", "description"]
-    ordering_fields = ["title", "description"]
+    filter_backends = [
+        filters.SearchFilter,
+        filters.OrderingFilter,
+        DjangoFilterBackend,
+    ]
+    filterset_fields = {
+        "category": ["exact"],
+        "tags": ["exact"],
+        "is_published": ["exact"],
+        "is_featured": ["exact"],
+        "is_headline": ["exact"],
+    }
+    search_fields = ["title", "content"]
+    ordering_fields = ["title", "content"]
     ordering = ["-created_at"]
     lookup_field = "slug"
 
