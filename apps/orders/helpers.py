@@ -97,7 +97,7 @@ def send_order_confirmation_email(order_id):
     try:
         # Render the HTML template with the order data
         data = {
-            "order_ref_code": order.ref_code,
+            "order_ref_code": order.id,
             "shipping_ref_code": order.order_shipping.shipping_ref_code,
             "order_date": order.created_at.strftime("%d %B %Y"),
             "customer_name": f"{order.user.first_name} {order.user.last_name}",
@@ -152,7 +152,7 @@ def send_order_shipping_email(order_id):
     try:
         # Render the HTML template with the order data
         data = {
-            "order_ref_code": order.ref_code,
+            "order_ref_code": order.id,
             "shipping_ref_code": order.order_shipping.shipping_ref_code,
             "customer_name": f"{order.user.first_name} {order.user.last_name}",
             "shipping_estimation": shipping_estimation,

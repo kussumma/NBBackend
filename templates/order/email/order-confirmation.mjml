@@ -70,10 +70,6 @@
             <td colspan="3" style="padding:10px 0px">Shipping</td>
             <td style="text-align:right">{{order.shipping_amount}}</td>
           </tr>
-          <tr style="text-align:left;">
-            <td colspan="3" style="padding:10px 0px">PPN</td>
-            <td style="text-align:right">{{order.tax_amount}}</td>
-          </tr>
           <tr>
             <td colspan="4" style="padding:5px 0px;"></td>
           </tr>
