@@ -1,4 +1,3 @@
-from unicodedata import category
 from rest_framework import viewsets, views, permissions, status
 from django.contrib.auth import get_user_model
 from rest_framework import filters
