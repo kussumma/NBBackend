@@ -26,6 +26,10 @@ class OrderViewset(viewsets.ModelViewSet):
     ordering_fields = ["user__email", "ref_code", "created_at", "updated_at"]
     ordering = ["-created_at"]
 
+    def get_queryset(self):
+        user = self.request.user
+        return Order.objects.filter(user=user)
+
     def create(self, request, *args, **kwargs):
         # get cart items
         user = self.request.user
