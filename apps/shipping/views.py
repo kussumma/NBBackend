@@ -26,7 +26,6 @@ from .serializers import (
 from apps.cart.models import Cart, CartItem
 from apps.orders.models import OrderShipping
 
-from tools.recaptcha_helper import RecaptchaHelper
 from .helpers import lionparcel_original_tariff
 from .helpers import lionparcel_tariff_mapping
 from .helpers import lionparcel_track_status
@@ -70,29 +69,6 @@ class ShippingViewSet(viewsets.ModelViewSet):
         return ShippingSerializer
 
     def perform_create(self, serializer):
-        recaptcha = self.request.data.get("recaptcha", "")
-
-        if not recaptcha:
-            return Response(
-                {"error": "recaptcha validation failed"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        recaptcha_helper = RecaptchaHelper(recaptcha)
-        recaptcha_response = recaptcha_helper.validate()
-
-        if recaptcha_response.data["success"] == False:
-            return Response(
-                {"error": "recaptcha validation failed"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if recaptcha_response.data["score"] < 0.8:
-            return Response(
-                {"error": "recaptcha validation failed"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
         # check if the shipping reach the maximum limit
         user = self.request.user
         shipping_count = Shipping.objects.filter(user=user).count()

@@ -3,9 +3,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
-from rest_framework import status
-
-from tools.recaptcha_helper import RecaptchaHelper
 
 from .models import (
     BlogCategory,
@@ -115,28 +112,6 @@ class BlogCommentViewSet(viewsets.ModelViewSet):
     ordering = ["-created_at"]
 
     def perform_create(self, serializer):
-        recaptcha = self.request.data.get("recaptcha", "")
-
-        if not recaptcha:
-            return Response(
-                {"error": "recaptcha is required"}, status=status.HTTP_400_BAD_REQUEST
-            )
-
-        recaptcha_helper = RecaptchaHelper(recaptcha)
-        recaptcha_response = recaptcha_helper.validate()
-
-        if recaptcha_response.data["success"] == False:
-            return Response(
-                {"error": "recaptcha validation failed"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if recaptcha_response.data["score"] < 0.8:
-            return Response(
-                {"error": "recaptcha validation failed"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
         serializer.save(user=self.request.user)
 
     def get_queryset(self):

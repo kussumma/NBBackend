@@ -123,7 +123,7 @@ class SearchView(views.APIView):
 
         # calculate time taken
         time_taken = end_time - start_time
-        time_taken = f"{round(time_taken, 2)} seconds"
+        time_taken = f"{round(time_taken, 3)} seconds"
 
         return Response(
             {

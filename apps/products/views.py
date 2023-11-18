@@ -32,7 +32,6 @@ from .serializers import (
 )
 
 from tools.custom_permissions import IsAdminOrReadOnly, IsAuthenticatedOrReadOnly
-from tools.recaptcha_helper import RecaptchaHelper
 
 User = get_user_model()
 
@@ -203,29 +202,6 @@ class RatingViewSet(viewsets.ModelViewSet):
     ordering = ["-created_at"]
 
     def create(self, request, *args, **kwargs):
-        # recaptcha
-        recaptcha = request.data.get("recaptcha", "")
-
-        if not recaptcha:
-            return Response(
-                {"error": "recaptcha is required"}, status=status.HTTP_400_BAD_REQUEST
-            )
-
-        recaptcha_helper = RecaptchaHelper(recaptcha)
-        recaptcha_response = recaptcha_helper.validate()
-
-        if recaptcha_response.data["success"] == False:
-            return Response(
-                {"error": "recaptcha validation failed"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if recaptcha_response.data["score"] < 0.8:
-            return Response(
-                {"error": "recaptcha validation failed"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
         # get product
         product_id = request.data.get("product")
         try:
