@@ -99,6 +99,10 @@ class Coupon(models.Model):
         except Exception:
             return False
 
+    def delete(self, *args, **kwargs):
+        self.cover.delete()
+        super(Coupon, self).delete(*args, **kwargs)
+
 
 class CouponUser(models.Model):
     id = models.UUIDField(
@@ -154,3 +158,8 @@ class Promotion(models.Model):
             return self.is_active and self.valid_from <= now and self.valid_to >= now
         except Exception:
             return False
+
+    def delete(self, *args, **kwargs):
+        self.cover.delete()
+        self.cover_mobile.delete()
+        super(Promotion, self).delete(*args, **kwargs)

@@ -69,6 +69,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
+    def delete(self, *args, **kwargs):
+        self.avatar.delete()
+        super().delete(*args, **kwargs)
+
 
 GENDER_CHOICES = [("male", "Male"), ("female", "Female")]
 

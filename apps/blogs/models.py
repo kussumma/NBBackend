@@ -36,6 +36,11 @@ class BlogCategory(models.Model):
         self.slug = slugify(self.name)
         super(BlogCategory, self).save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        self.cover.delete()
+        self.cover_mobile.delete()
+        super(BlogCategory, self).delete(*args, **kwargs)
+
 
 class BlogTag(models.Model):
     id = models.UUIDField(
@@ -109,6 +114,14 @@ class Blog(models.Model):
         self.slug = slugify(self.title)
         super(Blog, self).save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        self.cover.delete()
+        self.cover_mobile.delete()
+        self.cover_homepage.delete()
+        self.cover_homepage_mobile.delete()
+        self.cover_homepage_headline.delete()
+        super(Blog, self).delete(*args, **kwargs)
+
 
 class BlogImage(models.Model):
     id = models.UUIDField(
@@ -123,6 +136,10 @@ class BlogImage(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def delete(self, *args, **kwargs):
+        self.image.delete()
+        super(BlogImage, self).delete(*args, **kwargs)
 
 
 class BlogVideo(models.Model):

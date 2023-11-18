@@ -42,6 +42,12 @@ class Category(models.Model):
     def __str__(self):
         return self.slug
 
+    def delete(self, *args, **kwargs):
+        self.cover.delete()
+        self.cover_mobile.delete()
+        self.cover_homepage.delete()
+        super(Category, self).delete(*args, **kwargs)
+
 
 class Subcategory(models.Model):
     id = models.UUIDField(
@@ -79,6 +85,12 @@ class Subcategory(models.Model):
     def __str__(self):
         return self.slug
 
+    def delete(self, *args, **kwargs):
+        self.cover.delete()
+        self.cover_mobile.delete()
+        self.cover_homepage.delete()
+        super(Subcategory, self).delete(*args, **kwargs)
+
 
 class Subsubcategory(models.Model):
     id = models.UUIDField(
@@ -115,6 +127,12 @@ class Subsubcategory(models.Model):
 
     def __str__(self):
         return self.slug
+
+    def delete(self, *args, **kwargs):
+        self.cover.delete()
+        self.cover_mobile.delete()
+        self.cover_homepage.delete()
+        super(Subsubcategory, self).delete(*args, **kwargs)
 
 
 class Brand(models.Model):
@@ -156,6 +174,13 @@ class Brand(models.Model):
 
     def __str__(self):
         return self.slug
+
+    def delete(self, *args, **kwargs):
+        self.logo.delete()
+        self.cover.delete()
+        self.cover_mobile.delete()
+        self.cover_homepage.delete()
+        super(Brand, self).delete(*args, **kwargs)
 
 
 class Product(models.Model):
@@ -199,6 +224,10 @@ class Product(models.Model):
     def __str__(self):
         return self.slug
 
+    def delete(self, *args, **kwargs):
+        self.cover.delete()
+        super(Product, self).delete(*args, **kwargs)
+
 
 class Rating(models.Model):
     id = models.UUIDField(
@@ -229,6 +258,11 @@ class Rating(models.Model):
         profanity_filter = AdvancedProfanityFilter()
         self.review = profanity_filter.censor(self.review)
         super(Rating, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        self.image.delete()
+        self.video.delete()
+        super(Rating, self).delete(*args, **kwargs)
 
 
 class Wishlist(models.Model):
@@ -279,6 +313,10 @@ class Stock(models.Model):
     def __str__(self):
         return f"{self.product.slug} - {self.price}"
 
+    def delete(self, *args, **kwargs):
+        self.variant_image.delete()
+        super(Stock, self).delete(*args, **kwargs)
+
 
 class ExtraProductImage(models.Model):
     id = models.UUIDField(
@@ -296,3 +334,7 @@ class ExtraProductImage(models.Model):
 
     def __str__(self):
         return f"{self.product.slug} - {self.image}"
+
+    def delete(self, *args, **kwargs):
+        self.image.delete()
+        super(ExtraProductImage, self).delete(*args, **kwargs)

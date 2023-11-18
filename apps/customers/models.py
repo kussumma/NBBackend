@@ -78,6 +78,10 @@ class ComplaintImage(models.Model):
     def __str__(self):
         return f"{self.id}"
 
+    def delete(self, *args, **kwargs):
+        self.image.delete()
+        super(ComplaintImage, self).delete(*args, **kwargs)
+
 
 class ProductRequest(models.Model):
     id = models.UUIDField(
@@ -102,6 +106,10 @@ class ProductRequest(models.Model):
     def save(self, *args, **kwargs):
         self.detail = AdvancedProfanityFilter().censor(self.detail)
         super(ProductRequest, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        self.image.delete()
+        super(ProductRequest, self).delete(*args, **kwargs)
 
 
 class FeatureRequest(models.Model):
@@ -166,3 +174,7 @@ class BugReportImage(models.Model):
 
     def __str__(self):
         return f"{self.id}"
+
+    def delete(self, *args, **kwargs):
+        self.image.delete()
+        super(BugReportImage, self).delete(*args, **kwargs)

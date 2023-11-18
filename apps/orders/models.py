@@ -178,6 +178,10 @@ class ReturnImage(models.Model):
     def __str__(self):
         return f"{self.return_order.user.email} - {self.return_order.order.ref_code} - {self.created_at}"
 
+    def delete(self, *args, **kwargs):
+        self.image.delete()
+        super(ReturnImage, self).delete(*args, **kwargs)
+
 
 class RefundOrder(models.Model):
     id = models.UUIDField(
@@ -197,3 +201,7 @@ class RefundOrder(models.Model):
 
     def __str__(self):
         return f"{self.refund_order.user.email} - {self.refund_order.order.ref_code} - {self.created_at}"
+
+    def delete(self, *args, **kwargs):
+        self.refund_receipt.delete()
+        super(RefundOrder, self).delete(*args, **kwargs)

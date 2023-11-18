@@ -62,6 +62,10 @@ class Partner(models.Model):
     def __str__(self):
         return self.name
 
+    def delete(self, *args, **kwargs):
+        self.logo.delete()
+        super(Partner, self).delete(*args, **kwargs)
+
 
 class Investor(models.Model):
     id = models.UUIDField(
@@ -84,6 +88,10 @@ class Investor(models.Model):
 
     def __str__(self):
         return self.name
+
+    def delete(self, *args, **kwargs):
+        self.logo.delete()
+        super(Investor, self).delete(*args, **kwargs)
 
 
 class Policy(models.Model):
