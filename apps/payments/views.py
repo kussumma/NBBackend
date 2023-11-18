@@ -4,7 +4,6 @@ from django.conf import settings
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from decouple import config
 
 from apps.orders.models import Order
 
@@ -20,10 +19,13 @@ class PaymentAPIViews(APIView):
             order = Order.objects.get(id=order_id)
 
             # get order id
-            order_id = str(order.pk)
+            order_id = order.ref_code
 
             # get order total amount
             total_amount = order.total_amount
+
+            # get order shipping cost
+            shipping_amount = order.shipping_amount
 
             # get user first & last name
             user_first_name = order.user.first_name
@@ -56,6 +58,20 @@ class PaymentAPIViews(APIView):
                 "email": user_email,
                 "phone": user_phone,
             },
+            "item_details": [
+                {
+                    "id": 1,
+                    "price": total_amount - shipping_amount,
+                    "quantity": 1,
+                    "name": f"Order {order_id}",
+                },
+                {
+                    "id": 2,
+                    "price": shipping_amount,
+                    "quantity": 1,
+                    "name": "Misc Fee",
+                },
+            ],
         }
 
         # create transaction token

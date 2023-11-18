@@ -55,6 +55,7 @@ def lionparcel_booking(order_id):
     # create booking data
     booking_data = {
         "stt_goods_estimate_price": order.total_amount,
+        "stt_no_ref_external": order.ref_code,
         "stt_origin": contact.origin,
         "stt_destination": shipping.destination_route,
         "stt_sender_name": contact.name,
@@ -97,7 +98,7 @@ def send_order_confirmation_email(order_id):
     try:
         # Render the HTML template with the order data
         data = {
-            "order_ref_code": order.id,
+            "order_ref_code": order.ref_code,
             "shipping_ref_code": order.order_shipping.shipping_ref_code,
             "order_date": order.created_at.strftime("%d %B %Y"),
             "customer_name": f"{order.user.first_name} {order.user.last_name}",
@@ -152,7 +153,7 @@ def send_order_shipping_email(order_id):
     try:
         # Render the HTML template with the order data
         data = {
-            "order_ref_code": order.id,
+            "order_ref_code": order.ref_code,
             "shipping_ref_code": order.order_shipping.shipping_ref_code,
             "customer_name": f"{order.user.first_name} {order.user.last_name}",
             "shipping_estimation": shipping_estimation,
