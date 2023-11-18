@@ -1,12 +1,19 @@
 import pytest
 from tools.lionparcel_helper import LionParcelHelper
 from django.conf import settings
+import random
+import string
 
 
 @pytest.fixture
 def lion_parcel_helper():
     api_key = settings.LIONPARCEL_API_KEY
     return LionParcelHelper(api_key)
+
+
+@pytest.fixture
+def random_string():
+    return "".join(random.choice(string.ascii_letters) for i in range(10)).upper()
 
 
 def test_get_tariff(lion_parcel_helper):
@@ -23,10 +30,11 @@ def test_get_tariff(lion_parcel_helper):
     assert "forward_area" in result
 
 
-def test_make_booking(lion_parcel_helper):
+def test_make_booking(lion_parcel_helper, random_string):
     # Arrange
     booking_data = {
         "stt_goods_estimate_price": 300000,
+        "stt_no_ref_external": random_string,
         "stt_origin": "KUTA SELATAN, BADUNG",
         "stt_destination": "DAWAN, KLUNGKUNG",
         "stt_sender_name": "TEST",
@@ -54,7 +62,7 @@ def test_make_booking(lion_parcel_helper):
     assert "stt_no" in result["data"]["stt"][0]
 
 
-def test_track_booking(lion_parcel_helper):
+def test_track_booking(lion_parcel_helper, random_string):
     # Arrange
     booking_id = "99LP1700230905237"
 
