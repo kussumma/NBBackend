@@ -13,8 +13,8 @@ class AdvancedProfanityFilter:
             "g": ("9"),
             "i": ("*", "1"),
             "o": ("*", "0", "@"),
-            "u": ("*", "v"),
-            "v": ("*", "u"),
+            "u": ("*"),
+            "v": ("*"),
             "l": ("1"),
             "e": ("*", "3"),
             "s": ("$", "5"),
@@ -48,7 +48,7 @@ class AdvancedProfanityFilter:
             return True
         else:
             similarity = fuzz.partial_ratio(word, profane_word)
-            return similarity > 90
+            return similarity >= 92
 
     def is_whitelisted(self, word):
         for whitelisted_word in self.whitelist:
@@ -58,7 +58,7 @@ class AdvancedProfanityFilter:
 
     def is_profanity(self, word):
         for profane_word in self.blacklist:
-            if len(word) >= 3:
+            if len(word) > 3:
                 new_word = self.replace_profanity(word)
                 if self.is_similar(new_word, profane_word):
                     return True
