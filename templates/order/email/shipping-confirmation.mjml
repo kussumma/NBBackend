@@ -49,7 +49,7 @@
     </mj-section>
     <mj-section>
       <mj-column>
-        <mj-button inner-padding="16px 40px" href="https://lionparcel.com/track/stt" target="_blank" border="1px solid #ffffff" align="center">
+        <mj-button inner-padding="16px 40px" href="https://lionparcel.com/track/stt?q={{order.shipping_ref_code}}" target="_blank" border="1px solid #ffffff" align="center">
           Track your order
         </mj-button>
       </mj-column>
