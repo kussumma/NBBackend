@@ -140,7 +140,7 @@ class LionParcelHelper:
         # create the booking data
         booking_data = {
             "stt_no": "",
-            "stt_no_ref_external": "",
+            "stt_no_ref_external": booking_data["stt_no_ref_external"],
             "stt_tax_number": "",
             "stt_goods_estimate_price": booking_data["stt_goods_estimate_price"],
             "stt_goods_status": "",
