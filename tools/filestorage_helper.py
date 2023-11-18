@@ -32,7 +32,7 @@ class GridFSStorage(Storage):
         return filename
 
     def delete(self, name):
-        self.fs.delete(self.fs.find_one({"filename": name})["_id"])
+        self.fs.delete(self.fs.find_one({"filename": name})._id)
 
     def exists(self, name):
         return self.fs.exists({"filename": name})
