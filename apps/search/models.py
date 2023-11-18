@@ -12,7 +12,7 @@ class Search(models.Model):
     )
     query = models.CharField(max_length=250, db_index=True)
     user = models.ForeignKey(
-        User, related_name="searches", on_delete=models.PROTECT, null=True, blank=True
+        User, related_name="searches", on_delete=models.CASCADE, null=True, blank=True
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
