@@ -76,6 +76,7 @@ MIDDLEWARE = [
     "tools.custom_middlewares.BearerTokenMiddleware",
     "tools.custom_middlewares.AccessTokenToBodyMiddleware",
     "tools.custom_middlewares.RefreshTokenToBodyMiddleware",
+    "tools.custom_middlewares.ReCaptchaMiddleware",
 ]
 
 ROOT_URLCONF = "system.urls"
@@ -160,9 +161,6 @@ MONGODB_GRIDFS = {
 # MongoDB GridFS
 MONGODB_CLIENT = MongoClient(MONGODB_GRIDFS["URL"])
 MONGODB_DATABASE = MONGODB_CLIENT[MONGODB_GRIDFS["DB"]]
-
-# GridFSStorage
-DEFAULT_FILE_STORAGE = "tools.filestorage_helper.GridFSStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
