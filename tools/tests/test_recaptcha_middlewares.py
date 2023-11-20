@@ -42,7 +42,7 @@ def test_call_method_recaptcha_token_missing(middleware):
 
 def test_call_method_recaptcha_validation_failed(middleware, monkeypatch):
     def mock_validate(self):
-        return {"data": {"success": False}}
+        return {"success": False, "error-codes": ["invalid-input-response"]}
 
     monkeypatch.setattr(
         "tools.custom_middlewares.RecaptchaHelper.validate", mock_validate
@@ -59,7 +59,7 @@ def test_call_method_recaptcha_validation_failed(middleware, monkeypatch):
 
 def test_call_method_recaptcha_score_less_than_0_8(middleware, monkeypatch):
     def mock_validate(self):
-        return {"data": {"success": True, "score": 0.7}}
+        return {"success": True, "score": 0.7}
 
     monkeypatch.setattr(
         "tools.custom_middlewares.RecaptchaHelper.validate", mock_validate
@@ -76,7 +76,7 @@ def test_call_method_recaptcha_score_less_than_0_8(middleware, monkeypatch):
 
 def test_call_method_recaptcha_validation_passed(middleware, monkeypatch):
     def mock_validate(self):
-        return {"data": {"success": True, "score": 0.9}}
+        return {"success": True, "score": 0.9}
 
     monkeypatch.setattr(
         "tools.custom_middlewares.RecaptchaHelper.validate", mock_validate
