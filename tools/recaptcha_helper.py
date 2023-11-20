@@ -1,7 +1,5 @@
 import requests
 from django.conf import settings
-from rest_framework import status
-from rest_framework.response import Response
 
 
 class RecaptchaHelper:
@@ -20,7 +18,7 @@ class RecaptchaHelper:
             )
             recaptcha_response = recaptcha_response.json()
 
-            return Response(recaptcha_response, status=status.HTTP_200_OK)
+            return recaptcha_response
 
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return e

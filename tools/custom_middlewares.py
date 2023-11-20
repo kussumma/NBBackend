@@ -79,7 +79,7 @@ class ReCaptchaMiddleware(MiddlewareMixin):
             recaptcha = None
 
             # get recaptcha token from body
-            if request.method in self.request_method and request.body:
+            if request.body:
                 body = json.loads(request.body)
                 recaptcha = body.get("recaptcha")
 
@@ -91,15 +91,13 @@ class ReCaptchaMiddleware(MiddlewareMixin):
             recaptcha_helper = RecaptchaHelper(recaptcha)
             recaptcha_response = recaptcha_helper.validate()
 
-            if recaptcha_response["data"]["success"] == False:
+            if not recaptcha_response.get("success", False):
                 return JsonResponse(
-                    {"error": "recaptcha validation failed"}, status=400
+                    {"error": "reCAPTCHA validation failed"}, status=400
                 )
 
-            if recaptcha_response["data"]["score"] < 0.8:
-                return JsonResponse(
-                    {"error": "recaptcha validation failed"}, status=400
-                )
+            if recaptcha_response.get("score", 0) < 0.8:
+                return JsonResponse({"error": "reCAPTCHA score is too low"}, status=400)
 
         response = self.get_response(request)
         return response
