@@ -10,6 +10,7 @@ from .models import (
     FeatureRequest,
     BugReport,
     BugReportImage,
+    Subscription,
 )
 
 User = get_user_model()
@@ -75,3 +76,9 @@ class BugReportImageSerializer(serializers.ModelSerializer):
         if value:
             value = FileUploadHelper(value, webp=True).validate()
             return value
+
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = "__all__"

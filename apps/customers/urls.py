@@ -7,6 +7,7 @@ from .views import (
     ProductRequestViewset,
     FeatureRequestViewset,
     BugReportViewset,
+    SubscriptionViewset,
 )
 
 router = DefaultRouter()
@@ -16,6 +17,7 @@ router.register("complaint", ComplaintViewset, basename="complaint")
 router.register("product-request", ProductRequestViewset, basename="product-request")
 router.register("feature-request", FeatureRequestViewset, basename="feature-request")
 router.register("bug-report", BugReportViewset, basename="bug-report")
+router.register("subscription", SubscriptionViewset, basename="subscription")
 
 urlpatterns = [
     path("v1/", include(router.urls)),

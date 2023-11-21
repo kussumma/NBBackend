@@ -8,6 +8,7 @@ from .models import (
     FeatureRequest,
     BugReport,
     BugReportImage,
+    Subscription,
 )
 
 admin.site.register(Favorite)
@@ -17,3 +18,4 @@ admin.site.register(ProductRequest)
 admin.site.register(FeatureRequest)
 admin.site.register(BugReport)
 admin.site.register(BugReportImage)
+admin.site.register(Subscription)
