@@ -1,6 +1,6 @@
 asgiref==3.7.2
 black==23.11.0
-certifi==2023.7.22
+certifi==2023.11.17
 cffi==1.16.0
 charset-normalizer==3.3.2
 click==8.1.7
@@ -55,6 +55,7 @@ sentry-sdk==1.35.0
 sqlparse==0.4.4
 tablib==3.5.0
 thefuzz==0.20.0
+tzdata==2023.3
 urllib3==2.1.0
 uuid==1.30
 xlrd==2.0.1
