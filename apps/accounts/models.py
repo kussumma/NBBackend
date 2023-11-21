@@ -87,7 +87,6 @@ class UserDetail(models.Model):
     phone_number = models.CharField(max_length=20, null=True, blank=True, db_index=True)
     gender = models.CharField(choices=GENDER_CHOICES, max_length=20, default="female")
     date_of_birth = models.DateField(null=True, blank=True, db_index=True)
-    newsletter = models.BooleanField(default=False, db_index=True)
     city = models.CharField(max_length=255, null=True, blank=True)
     country = models.CharField(max_length=255, null=True, blank=True)
     language = models.CharField(max_length=255, default="GB", db_index=True)
