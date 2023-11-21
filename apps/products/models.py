@@ -190,6 +190,10 @@ class Product(models.Model):
     name = models.CharField(max_length=250, unique=True, db_index=True)
     description = models.TextField()
     description_id = models.TextField(null=True, blank=True)
+    usage = models.TextField(null=True, blank=True)
+    usage_id = models.TextField(null=True, blank=True)
+    ingredients = models.TextField(null=True, blank=True)
+    ingredients_id = models.TextField(null=True, blank=True)
     brand = models.ForeignKey(
         Brand, related_name="product_brands", on_delete=models.PROTECT
     )
