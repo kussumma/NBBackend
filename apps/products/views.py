@@ -1,4 +1,4 @@
-from rest_framework import viewsets, views, permissions, status
+from rest_framework import viewsets, views, permissions
 from django.contrib.auth import get_user_model
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
@@ -29,6 +29,8 @@ from .serializers import (
     WishlistSerializer,
     StockSerializer,
     ExtraProductImageSerializer,
+    TopCategorySerializer,
+    TopBrandSerializer,
 )
 
 from tools.custom_permissions import IsAdminOrReadOnly, IsAuthenticatedOrReadOnly
@@ -306,21 +308,9 @@ class TopBrandsAPIView(views.APIView):
             .order_by("-total_sales")[:5]
         )
 
-        # Convert QuerySet to list of dictionaries
-        top_brands_list = list(
-            top_brands.values(
-                "brand_id",
-                "brand_name",
-                "total_sales",
-                "brand_cover",
-                "brand_logo",
-                "brand_cover_mobile",
-                "brand_cover_homepage",
-                "brand_origin",
-            )
-        )
+        serializer = TopBrandSerializer(top_brands, many=True)
 
-        return Response(top_brands_list)
+        return Response(serializer.data)
 
 
 class TopCategoryAPIView(views.APIView):
@@ -348,16 +338,6 @@ class TopCategoryAPIView(views.APIView):
             .order_by("-total_sales")[:5]
         )
 
-        # Convert QuerySet to list of dictionaries
-        top_category_list = list(
-            top_category.values(
-                "category_id",
-                "category_name",
-                "total_sales",
-                "category_cover",
-                "category_cover_mobile",
-                "category_cover_homepage",
-            )
-        )
+        serializer = TopCategorySerializer(top_category, many=True)
 
-        return Response(top_category_list)
+        return Response(serializer.data)

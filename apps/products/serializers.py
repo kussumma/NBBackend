@@ -168,3 +168,50 @@ class ExtraProductImageSerializer(serializers.ModelSerializer):
         if value:
             value = FileUploadHelper(value, webp=True).validate()
             return value
+
+
+class TopCategorySerializer(serializers.Serializer):
+    category_id = serializers.UUIDField()
+    category_name = serializers.CharField()
+    category_cover = serializers.SerializerMethodField()
+    category_cover_mobile = serializers.SerializerMethodField()
+    category_cover_homepage = serializers.SerializerMethodField()
+    total_sales = serializers.IntegerField()
+
+    def get_category_cover(self, obj):
+        category = Category.objects.get(id=obj["category_id"])
+        return category.cover.url
+
+    def get_category_cover_mobile(self, obj):
+        category = Category.objects.get(id=obj["category_id"])
+        return category.cover_mobile.url
+
+    def get_category_cover_homepage(self, obj):
+        category = Category.objects.get(id=obj["category_id"])
+        return category.cover_homepage.url
+
+
+class TopBrandSerializer(serializers.Serializer):
+    brand_id = serializers.UUIDField()
+    brand_name = serializers.CharField()
+    brand_logo = serializers.SerializerMethodField()
+    brand_cover = serializers.SerializerMethodField()
+    brand_cover_mobile = serializers.SerializerMethodField()
+    brand_cover_homepage = serializers.SerializerMethodField()
+    total_sales = serializers.IntegerField()
+
+    def get_brand_logo(self, obj):
+        brand = Brand.objects.get(id=obj["brand_id"])
+        return brand.logo.url
+
+    def get_brand_cover(self, obj):
+        brand = Brand.objects.get(id=obj["brand_id"])
+        return brand.cover.url
+
+    def get_brand_cover_mobile(self, obj):
+        brand = Brand.objects.get(id=obj["brand_id"])
+        return brand.cover_mobile.url
+
+    def get_brand_cover_homepage(self, obj):
+        brand = Brand.objects.get(id=obj["brand_id"])
+        return brand.cover_homepage.url
