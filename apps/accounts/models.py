@@ -45,7 +45,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=255, db_index=True)
     avatar = models.ImageField(
         storage=GridFSStorage(collection="avatars"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         db_index=True,
     )
     level = models.CharField(choices=LEVEL_CHOICES, max_length=20, default="bronze")

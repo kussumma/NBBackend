@@ -41,7 +41,8 @@ class Coupon(models.Model):
     name = models.CharField(max_length=250, unique=True)
     cover = models.ImageField(
         storage=GridFSStorage(collection="coupon_covers"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         db_index=True,
         help_text="400 x 250 px",
     )
@@ -127,13 +128,15 @@ class Promotion(models.Model):
     coupon_code = models.CharField(max_length=250, unique=True, db_index=True)
     cover = models.ImageField(
         storage=GridFSStorage(collection="promotion_covers"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         db_index=True,
         help_text="1220 x 450 px",
     )
     cover_mobile = models.ImageField(
         storage=GridFSStorage(collection="promotion_covers_mobile"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         db_index=True,
         help_text="400 x 450 px",
     )

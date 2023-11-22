@@ -18,17 +18,20 @@ class Category(models.Model):
     description_id = models.TextField(null=True, blank=True)
     cover = models.ImageField(
         storage=GridFSStorage(collection="categories"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         help_text="1220 x 210 px",
     )
     cover_mobile = models.ImageField(
         storage=GridFSStorage(collection="categories_mobile"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         help_text="400 x 210 px",
     )
     cover_homepage = models.ImageField(
         storage=GridFSStorage(collection="categories_home"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         help_text="220 x 320 px",
     )
     slug = models.SlugField(
@@ -58,17 +61,20 @@ class Subcategory(models.Model):
     description_id = models.TextField(null=True, blank=True)
     cover = models.ImageField(
         storage=GridFSStorage(collection="subcategories"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         help_text="1220 x 210 px",
     )
     cover_mobile = models.ImageField(
         storage=GridFSStorage(collection="subcategories_mobile"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         help_text="400 x 210 px",
     )
     cover_homepage = models.ImageField(
         storage=GridFSStorage(collection="subcategories_home"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         help_text="220 x 320 px",
     )
     slug = models.SlugField(
@@ -101,17 +107,20 @@ class Subsubcategory(models.Model):
     description_id = models.TextField(null=True, blank=True)
     cover = models.ImageField(
         storage=GridFSStorage(collection="subsubcategories"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         help_text="1220 x 210 px",
     )
     cover_mobile = models.ImageField(
         storage=GridFSStorage(collection="subsubcategories_mobile"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         help_text="400 x 210 px",
     )
     cover_homepage = models.ImageField(
         storage=GridFSStorage(collection="subsubcategories_home"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         help_text="220 x 320 px",
     )
     slug = models.SlugField(
@@ -145,23 +154,27 @@ class Brand(models.Model):
     origin = models.CharField(max_length=250, null=True, blank=True)
     logo = models.ImageField(
         storage=GridFSStorage(collection="brand_logos"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         db_index=True,
         help_text="200 x 200 px",
     )
     cover = models.ImageField(
         storage=GridFSStorage(collection="brands"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         help_text="1220 x 210 px",
     )
     cover_mobile = models.ImageField(
         storage=GridFSStorage(collection="brands_mobile"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         help_text="400 x 210 px",
     )
     cover_homepage = models.ImageField(
         storage=GridFSStorage(collection="brands_home"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         help_text="220 x 320 px",
     )
     slug = models.SlugField(
@@ -210,7 +223,8 @@ class Product(models.Model):
     )
     cover = models.ImageField(
         storage=GridFSStorage(collection="products"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         help_text="300 x 300 px",
     )
     link = models.URLField(null=True, blank=True)
@@ -247,7 +261,8 @@ class Rating(models.Model):
     review = models.TextField()
     image = models.ImageField(
         storage=GridFSStorage(collection="rating_images"),
-        default="default.jpg",
+        null=True,
+        blank=True,
     )
     video = models.FileField(
         storage=GridFSStorage(collection="rating_videos"), null=True, blank=True
@@ -302,7 +317,8 @@ class Stock(models.Model):
     variant = models.CharField(max_length=100, null=True, blank=True, db_index=True)
     variant_image = models.ImageField(
         storage=GridFSStorage(collection="variant_images"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         db_index=True,
         help_text="300 x 300 px",
     )
@@ -331,7 +347,8 @@ class ExtraProductImage(models.Model):
     )
     image = models.ImageField(
         storage=GridFSStorage(collection="extra_product_images"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         db_index=True,
         help_text="300 x 300 px",
     )

@@ -171,7 +171,7 @@ class ReturnImage(models.Model):
         ReturnOrder, on_delete=models.CASCADE, related_name="return_images"
     )
     image = models.ImageField(
-        storage=GridFSStorage(collection="return_images"), default="default.jpg"
+        storage=GridFSStorage(collection="return_images"), null=True, blank=True
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -192,7 +192,7 @@ class RefundOrder(models.Model):
     )
     refund_amount = models.PositiveIntegerField(default=0)
     refund_receipt = models.FileField(
-        storage=GridFSStorage(collection="refund_receipts"), default="default.jpg"
+        storage=GridFSStorage(collection="refund_receipts"), null=True, blank=True
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

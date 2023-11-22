@@ -17,13 +17,15 @@ class BlogCategory(models.Model):
     description_id = models.TextField(null=True, blank=True)
     cover = models.ImageField(
         storage=GridFSStorage(collection="blog_categories"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         db_index=True,
         help_text="1220 x 210 px",
     )
     cover_mobile = models.ImageField(
         storage=GridFSStorage(collection="blog_categories_mobile"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         db_index=True,
         help_text="400 x 210 px",
     )
@@ -67,31 +69,36 @@ class Blog(models.Model):
     content_id = models.TextField(null=True, blank=True)
     cover = models.ImageField(
         storage=GridFSStorage(collection="blog_covers"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         db_index=True,
         help_text="1220 x 210 px",
     )
     cover_mobile = models.ImageField(
         storage=GridFSStorage(collection="blog_covers_mobile"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         db_index=True,
         help_text="400 x 210 px",
     )
     cover_homepage = models.ImageField(
         storage=GridFSStorage(collection="blog_covers_home"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         db_index=True,
         help_text="600 x 280 px",
     )
     cover_homepage_mobile = models.ImageField(
         storage=GridFSStorage(collection="blog_covers_home_mobile"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         db_index=True,
         help_text="400 x 280 px",
     )
     cover_homepage_headline = models.ImageField(
         storage=GridFSStorage(collection="blog_covers_home_headline"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         db_index=True,
         help_text="600 x 600 px",
     )
@@ -130,7 +137,8 @@ class BlogImage(models.Model):
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
     image = models.ImageField(
         storage=GridFSStorage(collection="blog_images"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         db_index=True,
         help_text="600 x 600 px",
     )

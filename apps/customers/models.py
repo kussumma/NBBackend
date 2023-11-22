@@ -71,7 +71,7 @@ class ComplaintImage(models.Model):
         Complaint, on_delete=models.CASCADE, related_name="complaint_images"
     )
     image = models.ImageField(
-        storage=GridFSStorage(collection="complaint_images"), default="default.jpg"
+        storage=GridFSStorage(collection="complaint_images"), null=True, blank=True
     )
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -92,7 +92,8 @@ class ProductRequest(models.Model):
     )
     image = models.ImageField(
         storage=GridFSStorage(collection="product_request_images"),
-        default="default.jpg",
+        null=True,
+        blank=True,
     )
     title = models.CharField(max_length=255)
     detail = models.TextField()
@@ -168,7 +169,7 @@ class BugReportImage(models.Model):
         BugReport, on_delete=models.CASCADE, related_name="bug_report_images"
     )
     image = models.ImageField(
-        storage=GridFSStorage(collection="bug_report_images"), default="default.jpg"
+        storage=GridFSStorage(collection="bug_report_images"), null=True, blank=True
     )
     created_at = models.DateTimeField(auto_now_add=True)
 

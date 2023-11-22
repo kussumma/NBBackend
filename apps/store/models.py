@@ -48,7 +48,7 @@ class Partner(models.Model):
     )
     name = models.CharField(max_length=255)
     logo = models.ImageField(
-        storage=GridFSStorage(collection="partner_logos"), default="default.jpg"
+        storage=GridFSStorage(collection="partner_logos"), null=True, blank=True
     )
     description = models.TextField(null=True, blank=True)
     description_id = models.TextField(
@@ -74,7 +74,8 @@ class Investor(models.Model):
     name = models.CharField(max_length=255)
     logo = models.ImageField(
         storage=GridFSStorage(collection="investor_logos"),
-        default="default.jpg",
+        null=True,
+        blank=True,
         db_index=True,
     )
     description = models.TextField(null=True, blank=True)
