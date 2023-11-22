@@ -13,13 +13,13 @@ class PaymentAPIViews(APIView):
 
     def post(self, request):
         # get order id from request
-        order_id = request.data.get("order_id")
+        ref_code = request.data.get("ref_code")
         try:
             # get order from database
-            order = Order.objects.get(id=order_id)
+            order = Order.objects.get(ref_code=ref_code)
 
             # get order id
-            order_id = order.ref_code
+            ref_code = order.ref_code
 
             # get order total amount
             total_amount = order.total_amount
@@ -48,7 +48,7 @@ class PaymentAPIViews(APIView):
         # create transaction details
         param = {
             "transaction_details": {
-                "order_id": order_id,
+                "order_id": ref_code,
                 "gross_amount": total_amount,
             },
             "credit_card": {"secure": True},
@@ -63,7 +63,7 @@ class PaymentAPIViews(APIView):
                     "id": 1,
                     "price": total_amount - shipping_amount,
                     "quantity": 1,
-                    "name": f"Order {order_id}",
+                    "name": f"Order {ref_code}",
                 },
                 {
                     "id": 2,
@@ -92,14 +92,14 @@ class PaymentStatusAPIViews(APIView):
 
     def post(self, request):
         # get order id from request
-        order_id = request.data.get("order_id")
+        ref_code = request.data.get("ref_code")
 
         try:
             # get order from database
-            order = Order.objects.get(id=order_id)
+            order = Order.objects.get(ref_code=ref_code)
 
             # get order id
-            order_id = str(order.pk)
+            ref_code = order.ref_code
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -109,7 +109,7 @@ class PaymentStatusAPIViews(APIView):
 
         # get transaction status
         try:
-            transaction_status = snap.transactions.status(order_id)
+            transaction_status = snap.transactions.status(ref_code)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -188,7 +188,7 @@ class PaymentNotificationAPIView(APIView):
 
         # get order from database
         try:
-            order = Order.objects.get(id=order_id)
+            order = Order.objects.get(ref_code=order_id)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
