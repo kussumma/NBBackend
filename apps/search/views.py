@@ -3,6 +3,8 @@ from rest_framework import views, permissions
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 import time
+from django.utils import timezone
+import datetime
 
 from .models import Search
 from .serializers import SearchSerializer
@@ -115,8 +117,9 @@ class SearchView(views.APIView):
         profanity_filter = AdvancedProfanityFilter()
         search_query = profanity_filter.censor(search_query)
 
-        user = request.user if request.user.is_authenticated else None
-        Search.objects.create(query=search_query, user=user)
+        if len(search_query) > 3:
+            user = request.user if request.user.is_authenticated else None
+            Search.objects.create(query=search_query, user=user)
 
         # end timer
         end_time = time.time()
@@ -141,9 +144,18 @@ class TrendingSearchView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
-        # get trending searches
+        # Get the current date and time
+        now = timezone.now()
+
+        # Calculate the date and time one week ago
+        one_week_ago = now - datetime.timedelta(weeks=1)
+
+        # Modify the query to filter the searches that were made after the date and time calculated above
         trending_searches = (
-            Search.objects.values("query")
+            Search.objects.filter(
+                created_at__gte=one_week_ago
+            )  # assuming `created_at` is the field that stores when the search was made
+            .values("query")
             .annotate(search_count=models.Count("query"))
             .order_by("-search_count")[:5]
         )
