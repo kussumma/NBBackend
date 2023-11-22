@@ -1,4 +1,3 @@
-from numpy import rec
 from rest_framework import viewsets, permissions, filters, views, status
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError

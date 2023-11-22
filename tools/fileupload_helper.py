@@ -1,4 +1,3 @@
-import os
 import cv2
 import PIL
 from io import BytesIO
