@@ -1,10 +1,11 @@
 from django.db import models
-from rest_framework import views, permissions
+from rest_framework import views, permissions, status
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 import time
 from django.utils import timezone
 import datetime
+from django.db.models import Q
 
 from .models import Search
 from .serializers import SearchSerializer
@@ -40,71 +41,49 @@ class SearchView(views.APIView):
         # split search query into individual search terms
         search_terms = search_query.split()
 
-        # Initialize empty lists to collect results
-        product_results = set()
-        brand_results = set()
-        faq_results = set()
-        blog_results = set()
-        coupon_results = set()
+        # Initialize Q objects
+        product_query = Q()
+        brand_query = Q()
+        faq_query = Q()
+        blog_query = Q()
+        coupon_query = Q()
 
-        # perform search
+        # Build Q objects
         for term in search_terms:
-            product_results.update(
-                Product.objects.filter(
-                    (
-                        models.Q(name__icontains=term)
-                        | models.Q(description__icontains=term)
-                        | models.Q(category__name__icontains=term)
-                        | models.Q(subcategory__name__icontains=term)
-                        | models.Q(subsubcategory__name__icontains=term)
-                        | models.Q(product_stock__sku__icontains=term)
-                        | models.Q(product_stock__discount__icontains=term)
-                        | models.Q(product_stock__price__icontains=term)
-                        | models.Q(product_stock__size__icontains=term)
-                        | models.Q(product_stock__color__icontains=term)
-                        | models.Q(product_stock__variant__icontains=term)
-                    ),
-                    is_active=True,
-                ).order_by("name")[:10]
+            product_query |= (
+                Q(name__icontains=term)
+                | Q(description__icontains=term)
+                | Q(category__name__icontains=term)
+                | Q(subcategory__name__icontains=term)
+                | Q(subsubcategory__name__icontains=term)
+                | Q(product_stock__sku__icontains=term)
+                | Q(product_stock__discount__icontains=term)
+                | Q(product_stock__price__icontains=term)
+                | Q(product_stock__size__icontains=term)
+                | Q(product_stock__color__icontains=term)
+                | Q(product_stock__variant__icontains=term)
             )
-            brand_results.update(
-                Brand.objects.filter(
-                    models.Q(name__icontains=term) | models.Q(origin__icontains=term)
-                ).order_by("name")[:5]
-            )
-            faq_results.update(
-                FAQ.objects.filter(
-                    models.Q(question__icontains=term)
-                    | models.Q(answer__icontains=term)
-                ).order_by("question")[:5]
-            )
-            blog_results.update(
-                Blog.objects.filter(
-                    (
-                        models.Q(title__icontains=term)
-                        | models.Q(content__icontains=term)
-                    ),
-                    is_published=True,
-                ).order_by("title")[:5]
-            )
-            coupon_results.update(
-                Coupon.objects.filter(
-                    (
-                        models.Q(prefix_code__icontains=term)
-                        | models.Q(name__icontains=term)
-                        | models.Q(discount_value__icontains=term)
-                    ),
-                    is_active=True,
-                    is_private=False,
-                ).order_by("name")[:5]
+            brand_query |= Q(name__icontains=term) | Q(origin__icontains=term)
+            faq_query |= Q(question__icontains=term) | Q(answer__icontains=term)
+            blog_query |= Q(title__icontains=term) | Q(content__icontains=term)
+            coupon_query |= (
+                Q(prefix_code__icontains=term)
+                | Q(name__icontains=term)
+                | Q(discount_value__icontains=term)
             )
 
-        # Limit the results to the top 5 for each category
-        product_results = sorted(product_results, key=lambda x: x.name)[:10]
-        brand_results = sorted(brand_results, key=lambda x: x.name)[:5]
-        faq_results = sorted(faq_results, key=lambda x: x.question)[:5]
-        blog_results = sorted(blog_results, key=lambda x: x.title)[:5]
-        coupon_results = sorted(coupon_results, key=lambda x: x.name)[:5]
+        # Perform search
+        product_results = Product.objects.filter(
+            product_query, is_active=True
+        ).order_by("name")[:10]
+        brand_results = Brand.objects.filter(brand_query).order_by("name")[:5]
+        faq_results = FAQ.objects.filter(faq_query).order_by("question")[:5]
+        blog_results = Blog.objects.filter(blog_query, is_published=True).order_by(
+            "title"
+        )[:5]
+        coupon_results = Coupon.objects.filter(
+            coupon_query, is_active=True, is_private=False
+        ).order_by("name")[:5]
 
         # Serialize the search results
         product_serializer = ProductSerializer(product_results, many=True)
@@ -112,14 +91,6 @@ class SearchView(views.APIView):
         faq_serializer = FAQSerializer(faq_results, many=True)
         blog_serializer = BlogSerializer(blog_results, many=True)
         coupon_serializer = CouponSerializer(coupon_results, many=True)
-
-        # Create a new search record
-        profanity_filter = AdvancedProfanityFilter()
-        search_query = profanity_filter.censor(search_query)
-
-        if len(search_query) > 3:
-            user = request.user if request.user.is_authenticated else None
-            Search.objects.create(query=search_query, user=user)
 
         # end timer
         end_time = time.time()
@@ -138,6 +109,33 @@ class SearchView(views.APIView):
                 "time_taken": time_taken,
             }
         )
+
+
+class StoreSearchView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        search_query = request.query_params.get("q", "")
+        contains_profane = []
+
+        if search_query and len(search_query) > 3:
+            # Create a new search record
+            try:
+                profanity_filter = AdvancedProfanityFilter()
+
+                # store search if its profane
+                for term in search_query.split():
+                    if profanity_filter.is_profanity(term):
+                        contains_profane.append(term)
+
+                if len(contains_profane) < 1:
+                    user = request.user if request.user.is_authenticated else None
+                    Search.objects.create(query=search_query, user=user)
+
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"search_query": search_query}, status=status.HTTP_200_OK)
 
 
 class TrendingSearchView(views.APIView):
