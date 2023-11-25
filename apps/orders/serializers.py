@@ -12,6 +12,8 @@ from .models import (
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    product_slug = serializers.CharField(source="product.slug", read_only=True)
+
     class Meta:
         model = OrderItem
         fields = "__all__"
