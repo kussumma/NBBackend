@@ -13,10 +13,19 @@ from .models import (
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product_slug = serializers.CharField(source="product.slug", read_only=True)
+    is_rated = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderItem
         fields = "__all__"
+
+    def get_is_rated(self, obj):
+        request = self.context.get("request")
+        user = request.user
+        if user.is_authenticated:
+            if obj.product.product_ratings.filter(user=user).exists():
+                return True
+        return False
 
 
 class OrderShippingSerializer(serializers.ModelSerializer):
