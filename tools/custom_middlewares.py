@@ -2,7 +2,6 @@ from django.utils.deprecation import MiddlewareMixin
 from django.conf import settings
 from django.http import JsonResponse
 from django.urls import reverse
-from django.core.exceptions import ValidationError
 import json
 from tools.recaptcha_helper import RecaptchaHelper
 
@@ -71,11 +70,13 @@ class ReCaptchaMiddleware(MiddlewareMixin):
             reverse("subscription-list"),
         ]
         self.request_method = ["POST"]
+        self.recaptcha_enabled = settings.RECAPTCHA_ENABLED
 
     def __call__(self, request):
         if (
             request.method in self.request_method
             and request.path in self.protected_path
+            and self.recaptcha_enabled
         ):
             # get recaptcha token from body
             recaptcha = json.loads(request.body).get("recaptcha", None)
