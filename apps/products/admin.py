@@ -11,6 +11,7 @@ from .models import (
     Wishlist,
     Stock,
     ExtraProductImage,
+    ExtraProductVideo,
 )
 
 from .admin_views import (
@@ -21,6 +22,7 @@ from .admin_views import (
     ProductFormAdmin,
     StockFormAdmin,
     ExtraProductImageFormAdmin,
+    ExtraProductVideoFormAdmin,
     RatingFormAdmin,
 )
 
@@ -37,6 +39,12 @@ class ExtraProductImageInline(admin.StackedInline):
     extra = 0
 
 
+class ExtraProductVideoInline(admin.StackedInline):
+    form = ExtraProductVideoFormAdmin
+    model = ExtraProductVideo
+    extra = 0
+
+
 class ProductAdmin(admin.ModelAdmin):
     form = ProductFormAdmin
     list_display = (
@@ -50,7 +58,7 @@ class ProductAdmin(admin.ModelAdmin):
         "is_active",
     )
     list_filter = ("category", "subcategory", "subsubcategory", "brand", "is_active")
-    inlines = [StockInline, ExtraProductImageInline]
+    inlines = [StockInline, ExtraProductImageInline, ExtraProductVideoInline]
     search_fields = ("name", "description")
     ordering = ("-created_at",)
     autocomplete_fields = ("category", "subcategory", "subsubcategory", "brand")
@@ -144,3 +152,4 @@ admin.site.register(Rating, RatingAdmin)
 admin.site.register(Wishlist, WishlistAdmin)
 admin.site.register(Stock, StockAdmin)
 admin.site.register(ExtraProductImage)
+admin.site.register(ExtraProductVideo)

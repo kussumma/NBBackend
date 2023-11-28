@@ -359,3 +359,22 @@ class ExtraProductImage(models.Model):
     def delete(self, *args, **kwargs):
         self.image.delete()
         super(ExtraProductImage, self).delete(*args, **kwargs)
+
+
+class ExtraProductVideo(models.Model):
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False, db_index=True
+    )
+    product = models.ForeignKey(
+        Product, related_name="product_extra_videos", on_delete=models.CASCADE
+    )
+    video = models.FileField(
+        storage=GridFSStorage(collection="extra_product_videos"), null=True, blank=True
+    )
+
+    def __str__(self):
+        return f"{self.product.slug} - {self.video}"
+
+    def delete(self, *args, **kwargs):
+        self.video.delete()
+        super(ExtraProductVideo, self).delete(*args, **kwargs)

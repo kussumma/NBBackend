@@ -12,6 +12,7 @@ from .models import (
     Stock,
     Brand,
     ExtraProductImage,
+    ExtraProductVideo,
     Rating,
 )
 
@@ -190,6 +191,21 @@ class ExtraProductImageFormAdmin(ModelForm):
             new_image = self.cleaned_data.get("image")
             self.cleaned_data["image"] = FileUploadHelper(
                 new_image, webp=True
+            ).validate()
+
+
+class ExtraProductVideoFormAdmin(ModelForm):
+    class Meta:
+        model = ExtraProductVideo
+        fields = "__all__"
+
+    def clean(self):
+        if self.cleaned_data.get("video") == self.instance.video:
+            pass
+        else:
+            new_video = self.cleaned_data.get("video")
+            self.cleaned_data["video"] = FileUploadHelper(
+                new_video, type="video"
             ).validate()
 
 

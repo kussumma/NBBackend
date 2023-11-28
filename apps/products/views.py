@@ -18,6 +18,7 @@ from .models import (
     Wishlist,
     Stock,
     ExtraProductImage,
+    ExtraProductVideo,
 )
 from .serializers import (
     CategorySerializer,
@@ -29,6 +30,7 @@ from .serializers import (
     WishlistSerializer,
     StockSerializer,
     ExtraProductImageSerializer,
+    ExtraProductVideoSerializer,
     TopCategorySerializer,
     TopBrandSerializer,
 )
@@ -85,6 +87,10 @@ class ProductViewSet(viewsets.ModelViewSet):
         images = ExtraProductImage.objects.filter(product=instance)
         images_serializer = ExtraProductImageSerializer(images, many=True)
 
+        # get product videos
+        videos = ExtraProductVideo.objects.filter(product=instance)
+        videos_serializer = ExtraProductVideoSerializer(videos, many=True)
+
         # get product stock
         stock = Stock.objects.filter(product=instance)
         stock_serializer = StockSerializer(stock, many=True)
@@ -129,6 +135,7 @@ class ProductViewSet(viewsets.ModelViewSet):
             {
                 "product": serializer.data,
                 "images": images_serializer.data,
+                "videos": videos_serializer.data,
                 "stock": stock_serializer.data,
                 "total_rating": average_rating,
                 "latest_rating": ratings_serializer.data,

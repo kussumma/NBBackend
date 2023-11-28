@@ -11,6 +11,7 @@ from .models import (
     Wishlist,
     Stock,
     ExtraProductImage,
+    ExtraProductVideo,
 )
 from apps.accounts.serializers import BasicUserSerializer
 
@@ -167,6 +168,17 @@ class ExtraProductImageSerializer(serializers.ModelSerializer):
     def validate_image(self, value):
         if value:
             value = FileUploadHelper(value, webp=True).validate()
+            return value
+
+
+class ExtraProductVideoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExtraProductVideo
+        fields = "__all__"
+
+    def validate_video(self, value):
+        if value:
+            value = FileUploadHelper(value, "video").validate()
             return value
 
 
