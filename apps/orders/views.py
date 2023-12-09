@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.db import transaction
 import math
+from django_filters.rest_framework import DjangoFilterBackend
 
 from apps.cart.models import Cart, CartItem
 from apps.coupons.models import Coupon, CouponUser
@@ -20,9 +21,21 @@ class OrderViewset(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
     queryset = Order.objects.all()
     permission_classes = [IsAuthenticated]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [
+        filters.SearchFilter,
+        filters.OrderingFilter,
+        DjangoFilterBackend,
+    ]
     search_fields = ["user__email", "ref_code"]
     ordering_fields = ["user__email", "ref_code", "created_at", "updated_at"]
+    filterset_fields = {
+        "user__email": ["exact"],
+        "ref_code": ["exact"],
+        "status": ["exact"],
+        "payment_status": ["exact"],
+        "created_at": ["exact", "gte", "lte"],
+        "updated_at": ["exact", "gte", "lte"],
+    }
     ordering = ["-created_at"]
 
     def get_queryset(self):
