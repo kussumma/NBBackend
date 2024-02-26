@@ -48,6 +48,8 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.TextField(choices=STATUS_CHOICES, default="pending")
+    payment_method = models.TextField(null=True, blank=True)
+    payment_time = models.DateTimeField(null=True, blank=True)
     payment_token = models.TextField(null=True, blank=True)
     payment_status = models.TextField(choices=PAYMENT_STATUS_CHOICES, default="pending")
     payment_ref_code = models.UUIDField(null=True, blank=True)
