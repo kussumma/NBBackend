@@ -1,7 +1,6 @@
 Dear {{ user.first_name }},
 
-You're receiving this email because you recently use this email address to register an account at NanoBeepa (https://nanobeepa.com). 
-If it's you, please click the link below to activate your account:
+Please click the button below to activate your account at https://nanobeepa.com
 
 {{ activate_url }}
 
@@ -10,9 +9,8 @@ If you didn't register an account at NanoBeepa, please ignore this email.
 Thank you for choosing NanoBeepa.
 
 
-Copyright © {% now 'Y' %} NanoBeepa. All rights reserved.
-PT. Inayat Bunga Perdana
+NanoBeepa
 
+Address: Mutiara Kampial, Jl. Kedaung No.14 Blok C, Benoa, South Kuta, Badung Regency, Bali 80361
 Email support: cs@nanobeepa.com
 WhatsApp support: +6281238995951
-Website: https://nanobeepa.com

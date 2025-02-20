@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.db import transaction
 import math
+from django_filters.rest_framework import DjangoFilterBackend
 
 from apps.cart.models import Cart, CartItem
 from apps.coupons.models import Coupon, CouponUser
@@ -20,9 +21,21 @@ class OrderViewset(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
     queryset = Order.objects.all()
     permission_classes = [IsAuthenticated]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [
+        filters.SearchFilter,
+        filters.OrderingFilter,
+        DjangoFilterBackend,
+    ]
     search_fields = ["user__email", "ref_code"]
     ordering_fields = ["user__email", "ref_code", "created_at", "updated_at"]
+    filterset_fields = {
+        "user__email": ["exact"],
+        "ref_code": ["exact"],
+        "status": ["exact"],
+        "payment_status": ["exact"],
+        "created_at": ["exact", "gte", "lte"],
+        "updated_at": ["exact", "gte", "lte"],
+    }
     ordering = ["-created_at"]
 
     def get_queryset(self):
@@ -251,18 +264,18 @@ class OrderViewset(viewsets.ModelViewSet):
                 product=cart_item.product,
                 product_name=cart_item.product.name,
                 stock=cart_item.stock,
-                stock_discount=cart_item.stock.discount,
+                stock_discount=cart_item.stock.discount or 0,
                 stock_sku=cart_item.stock.sku,
                 stock_price=cart_item.stock.price,
-                product_cover=cart_item.product.cover,
-                stock_size=cart_item.stock.size,
-                stock_color=cart_item.stock.color,
-                stock_color_code=cart_item.stock.color_code,
-                stock_variant=cart_item.stock.variant,
-                stock_weight=cart_item.stock.weight,
-                stock_length=cart_item.stock.length,
-                stock_width=cart_item.stock.width,
-                stock_height=cart_item.stock.height,
+                product_cover=cart_item.product.cover or None,
+                stock_size=cart_item.stock.size or None,
+                stock_color=cart_item.stock.color or None,
+                stock_color_code=cart_item.stock.color_code or None,
+                stock_variant=cart_item.stock.variant or None,
+                stock_weight=cart_item.stock.weight or 0,
+                stock_length=cart_item.stock.length or 0,
+                stock_width=cart_item.stock.width or 0,
+                stock_height=cart_item.stock.height or 0,
             )
 
         # recalculating stock

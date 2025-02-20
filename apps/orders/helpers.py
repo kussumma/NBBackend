@@ -94,6 +94,9 @@ def send_order_confirmation_email(order_id):
             {"error": "Order not found"}, status=status.HTTP_400_BAD_REQUEST
         )
 
+    # get shipping address
+    shipping = OrderShipping.objects.get(order=order)
+
     # send email to user
     try:
         # Render the HTML template with the order data
@@ -105,9 +108,12 @@ def send_order_confirmation_email(order_id):
             "order_items": order.order_items.all(),
             "order_total": order.total_amount,
             "shipping_amount": order.shipping_amount,
+            "shipping_address": f"{shipping.receiver_name} - {shipping.receiver_address} - {shipping.receiver_phone} - {shipping.destination_route}",
             "subtotal_amount": order.subtotal_amount,
             "tax_amount": order.tax_amount,
-            "payment": order.payment_status,
+            "payment_status": order.payment_status,
+            "payment_method": order.payment_method,
+            "payment_time": order.payment_time.strftime("%d %B %Y"),
             "year": datetime.datetime.now().year,
         }
 

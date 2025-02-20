@@ -162,7 +162,9 @@ class PaymentNotificationAPIView(APIView):
         order_id = transaction["order_id"]
         transaction_id = transaction["transaction_id"]
         transaction_status = transaction["transaction_status"]
+        transaction_time = transaction["transaction_time"]
         fraud_status = transaction["fraud_status"]
+        payment_type = transaction["payment_type"]
 
         # check the transaction status
         status = "pending"
@@ -194,6 +196,8 @@ class PaymentNotificationAPIView(APIView):
 
         # update order status
         try:
+            order.payment_method = payment_type
+            order.payment_time = transaction_time
             order.payment_status = status
             order.payment_ref_code = transaction_id
             order.save()

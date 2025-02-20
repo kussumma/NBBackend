@@ -6,6 +6,7 @@ import time
 from django.utils import timezone
 import datetime
 from django.db.models import Q
+from django.db.models import Subquery
 
 from .models import Search
 from .serializers import SearchSerializer
@@ -73,17 +74,40 @@ class SearchView(views.APIView):
             )
 
         # Perform search
-        product_results = Product.objects.filter(
-            product_query, is_active=True
-        ).order_by("name")[:10]
-        brand_results = Brand.objects.filter(brand_query).order_by("name")[:5]
-        faq_results = FAQ.objects.filter(faq_query).order_by("question")[:5]
-        blog_results = Blog.objects.filter(blog_query, is_published=True).order_by(
-            "title"
+        product_ids = (
+            Product.objects.filter(product_query, is_active=True)
+            .values("id")
+            .distinct()
+        )
+        product_results = Product.objects.filter(id__in=Subquery(product_ids)).order_by(
+            "name"
+        )[:10]
+
+        brand_ids = Brand.objects.filter(brand_query).values("id").distinct()
+        brand_results = Brand.objects.filter(id__in=Subquery(brand_ids)).order_by(
+            "name"
         )[:5]
-        coupon_results = Coupon.objects.filter(
-            coupon_query, is_active=True, is_private=False
-        ).order_by("name")[:5]
+
+        faq_ids = FAQ.objects.filter(faq_query).values("id").distinct()
+        faq_results = FAQ.objects.filter(id__in=Subquery(faq_ids)).order_by("question")[
+            :5
+        ]
+
+        blog_ids = (
+            Blog.objects.filter(blog_query, is_published=True).values("id").distinct()
+        )
+        blog_results = Blog.objects.filter(id__in=Subquery(blog_ids)).order_by("title")[
+            :5
+        ]
+
+        coupon_ids = (
+            Coupon.objects.filter(coupon_query, is_active=True, is_private=False)
+            .values("id")
+            .distinct()
+        )
+        coupon_results = Coupon.objects.filter(id__in=Subquery(coupon_ids)).order_by(
+            "name"
+        )[:5]
 
         # Serialize the search results
         product_serializer = ProductSerializer(product_results, many=True)

@@ -18,12 +18,12 @@ class CartItemSerializer(serializers.ModelSerializer):
             "name": product.name,
             "sku": stock.sku,
             "slug": product.slug,
-            "image": product.cover.url,
+            "image": product.cover.url or None,
             "price": stock.price,
             "discount": stock.discount,
-            "size": stock.size,
-            "color": stock.color,
-            "variant": stock.variant,
+            "size": stock.size or None,
+            "color": stock.color or None,
+            "variant": stock.variant or None,
         }
         return product_data
 
